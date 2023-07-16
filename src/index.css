@@ -1,0 +1,27 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  height: 100%;
+}
+
+.fills-full-height {
+  height: 100%;
+}
+
+.header-avatar img:hover {
+  cursor: pointer;
+}
+
+.ant-layout-header {
+  background-color: #222323;
+}
+
+.header.ant-menu-horizontal {
+  border-bottom: 0;
+  background-color: #222323;
+}
+
+#root .ant-layout {
+  background-color: #222323;
+}
