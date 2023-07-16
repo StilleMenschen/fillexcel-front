@@ -4,6 +4,7 @@ import ErrorPage from "../components/error-page/error-page.tsx";
 import Instructions from "../components/instructions/instructions.tsx";
 import { fetchUser } from "../store/account.ts";
 import { setNavBar } from "../store/navigation.ts";
+import FillRule from "../components/fill-rule/fill-rule.tsx";
 
 const router = createBrowserRouter([
     {
@@ -23,15 +24,15 @@ const router = createBrowserRouter([
                 },
                 element: <Instructions />
             },
-           /* {
+            {
                 path: "/fillRule",
                 loader: () => {
                     setNavBar("fillRule");
                     return null;
                 },
                 element: <FillRule />
-            },
-            {
+            }
+            /* {
                 path: "/dataSet",
                 loader: () => {
                     setNavBar("dataSet");

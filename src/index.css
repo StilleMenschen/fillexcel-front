@@ -3,6 +3,8 @@ html, body {
   padding: 0;
   border: 0;
   height: 100%;
+  color: #efefee;
+  background-color: #232222;
 }
 
 .fills-full-height {
@@ -14,14 +16,18 @@ html, body {
 }
 
 .ant-layout-header {
-  background-color: #222323;
+  background-color: #232222;
+}
+
+.ant-layout-content {
+  padding-inline: 50px;
 }
 
 .header.ant-menu-horizontal {
   border-bottom: 0;
-  background-color: #222323;
+  background-color: #232222;
 }
 
 #root .ant-layout {
-  background-color: #222323;
+  background-color: #232222;
 }

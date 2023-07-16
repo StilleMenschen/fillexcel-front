@@ -15,8 +15,8 @@ export interface Requirement {
 
 export interface QueryRequirement {
     username: string;
-    remark: FormDataEntryValue | null;
-    original_filename: FormDataEntryValue | null;
+    remark?: FormDataEntryValue | null;
+    original_filename?: FormDataEntryValue | null;
 }
 
 export interface FileResult {

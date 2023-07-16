@@ -22,13 +22,20 @@ const menuList: MenuProps["items"] = [
     }
 ];
 
+const paths = new Map([
+    ["Home", "/"],
+    ["fillRule", "/fillRule"],
+    ["dataSet", "/dataSet"],
+    ["fileRecord", "/fileRecord"]
+]);
+
 function NavBar() {
     const navigate = useNavigate();
     const nav = useNavBar();
 
     const onClick: MenuProps["onClick"] = (e) => {
         setNavBar(e.key);
-        navigate(e.key);
+        navigate(paths.get(e.key) || "/");
     };
 
     return <Menu className="header" onClick={onClick} selectedKeys={[nav]} mode="horizontal" items={menuList} />;

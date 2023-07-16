@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import router from "./routers/index.tsx";
 import { RouterProvider } from "react-router-dom";
 import { ConfigProvider, theme } from "antd";
+import zhCN from "antd/locale/zh_CN";
+import "dayjs/locale/zh-cn";
 import "./index.css";
 
 const webTheme = {
@@ -16,7 +18,7 @@ const webTheme = {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <ConfigProvider theme={webTheme}>
+        <ConfigProvider theme={webTheme} locale={zhCN}>
             <RouterProvider router={router} />
         </ConfigProvider>
     </React.StrictMode>
