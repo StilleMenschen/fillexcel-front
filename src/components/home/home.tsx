@@ -2,7 +2,7 @@ import { Layout, message } from "antd";
 import Headers from "../headers/headers.tsx";
 import { Outlet } from "react-router-dom";
 import LoginDialog from "../login/login-dialog.tsx";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { message as messageUnit } from "../../store/feedback.ts";
 
 /**
@@ -11,22 +11,23 @@ import { message as messageUnit } from "../../store/feedback.ts";
 function Home() {
     const [messageApi, contextHolder] = message.useMessage();
 
-    useEffect(() => {
+    useMemo(() => {
         messageUnit.success = (msg) => {
-            messageApi.success(msg);
+            void messageApi.success(msg);
         };
         messageUnit.info = (msg) => {
-            messageApi.info(msg);
+            void messageApi.info(msg);
         };
         messageUnit.warning = (msg) => {
-            messageApi.warning(msg);
+            void messageApi.warning(msg);
         };
         messageUnit.error = (msg) => {
-            messageApi.error(msg);
+            void messageApi.error(msg);
         };
         messageUnit.loading = (msg) => {
-            messageApi.loading(msg);
+            void messageApi.loading(msg);
         };
+        return true;
     }, [messageApi]);
 
     return (

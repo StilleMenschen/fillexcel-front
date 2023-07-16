@@ -71,7 +71,6 @@ httpService.interceptors.response.use(
             if (response.status) {
                 if ([401, 403].indexOf(response.status) !== -1) {
                     setLogout();
-                    debugger;
                     if (response.config.url?.indexOf("/auth/token") === -1) {
                         message.warning("登录失效，请重新登录");
                     }
