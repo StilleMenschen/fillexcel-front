@@ -31,7 +31,13 @@ export default defineConfig({
             output: {
                 manualChunks(id) {
                     // 合并外部依赖到同一个文件
-                    if (id.indexOf("node_modules") !== -1) {
+                    if (/node_modules[\\/]@?ant/.test(id)) {
+                        return "vendor-ui";
+                    }
+                    if (/node_modules[\\/]rc-/.test(id)) {
+                        return "vendor-ui-rc";
+                    }
+                    if (/node_modules/.test(id)) {
                         return "vendor";
                     }
                     // 按组件的目录名称分包

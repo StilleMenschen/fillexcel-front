@@ -1,15 +1,4 @@
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import { useRef, useState } from "react";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
-import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid";
+/*
 import { uploadFile } from "./fill-rule-service.ts";
 import { message } from "../../store/feedback.ts";
 import { useUser } from "../../store/account.ts";
@@ -126,3 +115,4 @@ function FillRuleEdit(props: EditProps) {
 }
 
 export default FillRuleEdit;
+*/
