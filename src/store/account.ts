@@ -2,7 +2,7 @@ import { User } from "./define.ts";
 import { useSyncExternalStore } from "react";
 import { getUserInfo } from "../components/login/login-service.ts";
 import { setLogout } from "./sign-info.ts";
-import { message } from "antd";
+import { message } from "./feedback.ts";
 
 let user: User = {
     id: -1,

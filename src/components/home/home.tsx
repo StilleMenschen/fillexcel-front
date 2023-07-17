@@ -37,6 +37,7 @@ function Home() {
                 <Layout.Header>
                     <Headers />
                 </Layout.Header>
+                <div className="little-space"></div>
                 <Layout.Content>
                     <Outlet />
                 </Layout.Content>

@@ -5,6 +5,7 @@ import Instructions from "../components/instructions/instructions.tsx";
 import { fetchUser } from "../store/account.ts";
 import { setNavBar } from "../store/navigation.ts";
 import FillRule from "../components/fill-rule/fill-rule.tsx";
+import DataSet from "../components/data-set/data-set.tsx";
 
 const router = createBrowserRouter([
     {
@@ -31,16 +32,16 @@ const router = createBrowserRouter([
                     return null;
                 },
                 element: <FillRule />
-            }
-            /* {
+            },
+            {
                 path: "/dataSet",
                 loader: () => {
                     setNavBar("dataSet");
                     return null;
                 },
                 element: <DataSet />
-            },
-            {
+            }
+            /* {
                 path: "/fileRecord",
                 loader: () => {
                     setNavBar("fileRecord");

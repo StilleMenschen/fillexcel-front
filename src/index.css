@@ -31,3 +31,9 @@ html, body {
 #root .ant-layout {
   background-color: #232222;
 }
+
+.little-space {
+  height: 0.48rem;
+  line-height: 0.48rem;
+  width: 0;
+}

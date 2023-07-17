@@ -13,10 +13,10 @@ export interface Requirement {
     updated_at: string | null;
 }
 
-export interface QueryRequirement {
+export interface RequirementQueryParams {
     username: string;
-    remark?: FormDataEntryValue | null;
-    original_filename?: FormDataEntryValue | null;
+    remark?: string | null;
+    original_filename?: string | null;
 }
 
 export interface FileResult {
@@ -25,11 +25,11 @@ export interface FileResult {
 }
 
 export function getRequirementList(
-    q: QueryRequirement,
+    queryParams: RequirementQueryParams,
     page: number,
     size: number
 ): Promise<ResultResponse<Array<Requirement>>> {
-    return httpService.get("/fills/requirement", { params: { ...q, page, size } });
+    return httpService.get("/fills/requirement", { params: { ...queryParams, page, size } });
 }
 
 export function addRequirement(req: Requirement): Promise<ResultResponse<Requirement>> {
