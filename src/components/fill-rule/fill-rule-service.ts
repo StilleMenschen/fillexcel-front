@@ -12,6 +12,15 @@ export interface Requirement {
     created_at: string | null;
     updated_at: string | null;
 }
+export interface AddRequirement {
+    id?: number | null;
+    username: string;
+    remark: string | null;
+    file_id: string;
+    original_filename: string;
+    start_line: number;
+    line_number: number;
+}
 
 export interface RequirementQueryParams {
     username: string;
@@ -32,7 +41,7 @@ export function getRequirementList(
     return httpService.get("/fills/requirement", { params: { ...queryParams, page, size } });
 }
 
-export function addRequirement(req: Requirement): Promise<ResultResponse<Requirement>> {
+export function addRequirement(req: AddRequirement): Promise<ResultResponse<Requirement>> {
     return httpService.post("/fills/requirement", req);
 }
 
@@ -44,7 +53,8 @@ export function updateRequirement(id: number, req: Requirement): Promise<ResultR
     return httpService.put(`/fills/requirement/${id}`, req);
 }
 
-export function deleteRequirement(id: number): Promise<unknown> {
+export function deleteRequirement(id: number | null): Promise<unknown> {
+    if (!id) return Promise.resolve();
     return httpService.delete(`/fills/requirement/${id}`);
 }
 

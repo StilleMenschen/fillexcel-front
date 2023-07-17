@@ -69,11 +69,15 @@ httpService.interceptors.response.use(
             // console.log(error.response.headers);
             const response = error.response;
             if (response.status) {
-                if ([401, 403].indexOf(response.status) !== -1) {
+                if (400 == response.status) {
+                    message.warning("传入数据有误，请重新填写");
+                } else if ([401, 403].indexOf(response.status) !== -1) {
                     setLogout();
                     if (response.config.url?.indexOf("/auth/token") === -1) {
                         message.warning("登录失效，请重新登录");
                     }
+                } else if (response.data && response.data.message) {
+                    message.error(response.data.message);
                 } else {
                     message.error("后端服务访问异常");
                 }
