@@ -60,7 +60,7 @@ function FillRule() {
             .catch(() => null);
     }, [username, pageNumber, pageSize]);
 
-    const queryRequirement = (query: QueryRequirement) => {
+    const onQuery = (query: QueryRequirement) => {
         getRequirementList({ username, ...query }, pageNumber, pageSize)
             .then(({ data }) => {
                 setRequirementList(data.data);
@@ -81,7 +81,7 @@ function FillRule() {
 
     return (
         <>
-            <Form layout="inline" form={queryForm} onFinish={queryRequirement}>
+            <Form layout="inline" form={queryForm} onFinish={onQuery}>
                 <Form.Item label="备注" name="remark">
                     <Input placeholder="请输入备注" allowClear />
                 </Form.Item>
