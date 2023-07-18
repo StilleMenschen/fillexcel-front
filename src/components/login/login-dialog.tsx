@@ -1,4 +1,4 @@
-import { Button, Modal, Form, Input } from "antd";
+import { Modal, Form, Input, Button } from "antd";
 import { fetchToken } from "./login-service.ts";
 import { setLogin, useSignInfo } from "../../store/sign-info.ts";
 import { fetchUser } from "../../store/account.ts";
@@ -14,17 +14,17 @@ function LoginDialog() {
     const signInfo = useSignInfo();
 
     const onFinish = (user: LoginUser) => {
-         // 处理登录逻辑，例如发送登录请求等
-         fetchToken(user.username, user.password)
-         .then(({ data }) => {
-             message.success("登录成功");
-             setLogin(data.access);
-             // 获取用户信息
-             fetchUser(user.username);
-         })
-         .catch(() => {
-            message.error("账号或密码不正确");
-         });
+        // 处理登录逻辑，例如发送登录请求等
+        fetchToken(user.username, user.password)
+            .then(({ data }) => {
+                message.success("登录成功");
+                setLogin(data.access);
+                // 获取用户信息
+                fetchUser(user.username);
+            })
+            .catch(() => {
+                message.error("账号或密码不正确");
+            });
     };
 
     return (

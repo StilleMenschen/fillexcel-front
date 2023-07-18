@@ -1,7 +1,6 @@
 import { useUser } from "../../store/account.ts";
 import { setLogout } from "../../store/sign-info.ts";
-import type { MenuProps } from "antd";
-import { Avatar, Dropdown, Typography } from "antd";
+import { MenuProps, Avatar, Dropdown, Typography } from "antd";
 
 const items: MenuProps["items"] = [
     {

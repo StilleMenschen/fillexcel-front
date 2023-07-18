@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { MenuProps } from "antd";
-import { Menu } from "antd";
+import { MenuProps, Menu } from "antd";
 import { setNavBar, useNavBar } from "../../store/navigation.ts";
 
 const menuList: MenuProps["items"] = [

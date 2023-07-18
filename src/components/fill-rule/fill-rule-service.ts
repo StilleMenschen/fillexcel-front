@@ -2,7 +2,7 @@ import { httpService, ResultResponse } from "../../http";
 import { AxiosResponse } from "axios";
 
 export interface Requirement {
-    id: number | null;
+    id: number;
     username: string;
     remark: string | null;
     file_id: string;
@@ -12,7 +12,8 @@ export interface Requirement {
     created_at: string | null;
     updated_at: string | null;
 }
-export interface AddRequirement {
+
+export interface AddOrUpdateRequirement {
     id?: number | null;
     username: string;
     remark: string | null;
@@ -41,7 +42,7 @@ export function getRequirementList(
     return httpService.get("/fills/requirement", { params: { ...queryParams, page, size } });
 }
 
-export function addRequirement(req: AddRequirement): Promise<ResultResponse<Requirement>> {
+export function addRequirement(req: AddOrUpdateRequirement): Promise<ResultResponse<Requirement>> {
     return httpService.post("/fills/requirement", req);
 }
 
@@ -53,8 +54,7 @@ export function updateRequirement(id: number, req: Requirement): Promise<ResultR
     return httpService.put(`/fills/requirement/${id}`, req);
 }
 
-export function deleteRequirement(id: number | null): Promise<unknown> {
-    if (!id) return Promise.resolve();
+export function deleteRequirement(id: number) {
     return httpService.delete(`/fills/requirement/${id}`);
 }
 

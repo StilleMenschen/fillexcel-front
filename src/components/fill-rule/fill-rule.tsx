@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Input, PaginationProps, Popconfirm, Table } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Popconfirm, Table, Typography, Space } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
 import { deleteRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
 import FillRuleEdit from "./fill-rule-edit.tsx";
 import { message } from "../../store/feedback.ts";
+import { PaginationProps } from "antd/es/pagination";
 
 interface QueryRequirement {
     remark: string | null;
@@ -43,7 +44,19 @@ function FillRule() {
             .catch(() => null);
     };
 
-    const onChange: PaginationProps["onChange"] = (number, size) => {
+    const onDeleteRequirement = (id: number) => {
+        deleteRequirement(id)
+            .then(() => {
+                message.warning(`数据已删除`);
+                onQuery({
+                    remark: queryForm.getFieldValue("remark") as string,
+                    original_filename: queryForm.getFieldValue("original_filename") as string
+                });
+            })
+            .catch(() => null);
+    };
+
+    const onPageChange: PaginationProps["onChange"] = (number, size) => {
         // 如果分页数有变
         if (pageSize !== size) {
             setPageSize(size);
@@ -82,7 +95,7 @@ function FillRule() {
                     showSizeChanger: true,
                     total: totalElement,
                     showTotal: showTotal,
-                    onChange: onChange
+                    onChange: onPageChange
                 }}>
                 <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" />
                 <Table.Column<Requirement> title="文件名" dataIndex="original_filename" key="original_filename" />
@@ -94,35 +107,25 @@ function FillRule() {
                     key="operation"
                     fixed="right"
                     render={(_, row) => (
-                        <Popconfirm
-                            title="删除填充规则"
-                            description={
-                                <p>
-                                    确定要删除此规则？
-                                    <br />
-                                    所有关联的列规则也会同步被删除！
-                                </p>
-                            }
-                            placement="left"
-                            cancelButtonProps={{
-                                danger: true
-                            }}
-                            okType="default"
-                            onCancel={() => {
-                                deleteRequirement(row.id)
-                                    .then(() => {
-                                        message.warning(`成功删除数据`);
-                                        onQuery({
-                                            remark: queryForm.getFieldValue("remark") as string,
-                                            original_filename: queryForm.getFieldValue("original_filename") as string
-                                        });
-                                    })
-                                    .catch(() => null);
-                            }}
-                            okText="取消"
-                            cancelText="删除">
-                            <DeleteOutlined style={{ fontSize: "1rem", color: "red" }} />
-                        </Popconfirm>
+                        <Space size="small">
+                            <EditOutlined
+                                onClick={() => message.info(`编辑${row.original_filename}`)}
+                                style={{ fontSize: "1rem", color: "cyan", cursor: "pointer" }}
+                            />
+                            <Popconfirm
+                                title="确定要删除此规则？"
+                                description={<Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>}
+                                placement="left"
+                                cancelButtonProps={{
+                                    danger: true
+                                }}
+                                okType="default"
+                                onCancel={() => onDeleteRequirement(row.id)}
+                                okText="取消"
+                                cancelText="删除">
+                                <DeleteOutlined style={{ fontSize: "1rem", color: "red" }} />
+                            </Popconfirm>
+                        </Space>
                     )}
                 />
             </Table>

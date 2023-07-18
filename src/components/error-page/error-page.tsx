@@ -1,5 +1,5 @@
 import { useRouteError } from "react-router-dom";
-import { Card, Space } from "antd";
+import { Space, Card } from "antd";
 
 interface Error {
     statusText: string | null;

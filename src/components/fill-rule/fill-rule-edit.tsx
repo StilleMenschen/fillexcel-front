@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Form, Input, InputNumber, Modal, Upload } from "antd";
-import { AddRequirement, addRequirement, uploadFile } from "./fill-rule-service.ts";
+import { AddOrUpdateRequirement, addRequirement, uploadFile } from "./fill-rule-service.ts";
 import { message } from "../../store/feedback.ts";
 import { useUser } from "../../store/account.ts";
 import { RcFile, UploadFile } from "antd/es/upload/interface";
@@ -28,7 +28,7 @@ function FillRuleEdit(props: EditProps) {
         props.handleQuery();
     };
 
-    const onSubmit = (data: AddRequirement) => {
+    const onSubmit = (data: AddOrUpdateRequirement) => {
         if (!fileId || !filename) {
             message.error("请先选择Excel文件（.xlsx格式）");
             return;
@@ -50,18 +50,16 @@ function FillRuleEdit(props: EditProps) {
     };
 
     const onFileUpload = (file: RcFile) => {
-        setFilename(file.name);
         if (file) {
-            setFileList([file]);
             setUploading(true);
             uploadFile(username, file)
                 .then(({ data }) => {
                     fileId.current = data.fileId;
                     message.success(`上传文件成功: ${data.fileId}`);
+                    setFilename(file.name);
+                    setFileList([file]);
                 })
-                .catch(() => {
-                    message.error("上传文件失败");
-                })
+                .catch(() => null)
                 .finally(() => setUploading(false));
         } else {
             message.error("请先选择Excel文件！");
