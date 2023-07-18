@@ -33,7 +33,7 @@ function Home() {
     return (
         <>
             {contextHolder}
-            <Layout className="fills-full-height">
+            <Layout className="a-hundred-percent-height">
                 <Layout.Header>
                     <Headers />
                 </Layout.Header>
