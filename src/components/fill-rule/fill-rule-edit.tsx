@@ -22,18 +22,12 @@ function FillRuleEdit(props: EditProps) {
     const fileId = useRef<string>("");
 
     const handleClose = () => {
-        props.setOpenEdit(false);
         props.onFillRuleQuery();
+        props.setOpenEdit(false);
     };
 
     const setEditFormData = useCallback(() => {
-        if (!props.openEdit) return;
-        if (!props.editData) {
-            editForm.resetFields();
-            setFileList([]);
-            setFilename("");
-            fileId.current = "";
-        } else {
+        if (props.editData) {
             const { id, file_id, original_filename, remark, start_line, line_number } = props.editData;
             fileId.current = file_id;
             setFilename(original_filename);
@@ -45,7 +39,10 @@ function FillRuleEdit(props: EditProps) {
         }
     }, [editForm, props]);
 
-    useMemo(() => setEditFormData(), [setEditFormData]);
+    useMemo(() => {
+        setEditFormData();
+        return false;
+    }, [setEditFormData]);
 
     const handleSubmit = (data: AddOrUpdateRequirement) => {
         if (!fileId.current || !filename) {
@@ -95,13 +92,7 @@ function FillRuleEdit(props: EditProps) {
     };
 
     return (
-        <Modal
-            open={props.openEdit}
-            onCancel={handleClose}
-            title={"新增填充规则"}
-            maskClosable={false}
-            destroyOnClose={true}
-            footer={null}>
+        <Modal open={props.openEdit} onCancel={handleClose} title={"新增填充规则"} maskClosable={false} footer={null}>
             <Form
                 form={editForm}
                 onFinish={handleSubmit}

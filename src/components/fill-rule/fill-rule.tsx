@@ -40,6 +40,7 @@ function FillRule() {
 
     useMemo(() => {
         handleFillRuleQuery({ remark: null, original_filename: null });
+        return false;
     }, [handleFillRuleQuery]);
 
     const handleEdit = (id: number) => {
@@ -109,8 +110,7 @@ function FillRule() {
                     showTotal: showTotal,
                     onChange: handlePageChange
                 }}>
-                <Table.Column<Requirement> title="ID" dataIndex="id" key="id" />
-                <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" />
+                <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" width={256} ellipsis={true} />
                 <Table.Column<Requirement> title="文件名" dataIndex="original_filename" key="original_filename" />
                 <Table.Column<Requirement> title="起始行" dataIndex="start_line" key="start_line" />
                 <Table.Column<Requirement> title="填充行数" dataIndex="line_number" key="line_number" />
@@ -119,11 +119,12 @@ function FillRule() {
                     title="操作"
                     key="operation"
                     fixed="right"
+                    width={72}
                     render={(_, row) => (
                         <Space size="small">
                             <EditOutlined
                                 onClick={() => handleEdit(row.id)}
-                                style={{ fontSize: "1rem", color: "cyan", cursor: "pointer" }}
+                                style={{ fontSize: "1.12rem", color: "cyan", cursor: "pointer" }}
                             />
                             <Popconfirm
                                 title="确定要删除此规则？"
@@ -136,18 +137,25 @@ function FillRule() {
                                 onCancel={() => handleDeleteRequirement(row.id)}
                                 okText="取消"
                                 cancelText="删除">
-                                <DeleteOutlined style={{ fontSize: "1rem", color: "red" }} />
+                                <DeleteOutlined style={{ fontSize: "1.12rem", color: "red" }} />
                             </Popconfirm>
                         </Space>
                     )}
                 />
             </Table>
-            <FillRuleEdit
-                editData={editData.current}
-                openEdit={openEdit}
-                setOpenEdit={setOpenEdit}
-                onFillRuleQuery={handleFillRuleQuery}
-            />
+            {openEdit && (
+                <FillRuleEdit
+                    editData={editData.current}
+                    openEdit={openEdit}
+                    setOpenEdit={setOpenEdit}
+                    onFillRuleQuery={() => {
+                        handleFillRuleQuery({
+                            remark: queryForm.getFieldValue("remark") as string,
+                            original_filename: queryForm.getFieldValue("original_filename") as string
+                        });
+                    }}
+                />
+            )}
         </>
     );
 }
