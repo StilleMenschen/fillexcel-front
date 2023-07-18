@@ -10,7 +10,7 @@ export interface EditProps {
     id?: number | null;
     openEdit: boolean;
     setOpenEdit: CallableFunction;
-    handleQuery: CallableFunction;
+    onFillRuleQuery: CallableFunction;
 }
 
 function FillRuleEdit(props: EditProps) {
@@ -25,10 +25,10 @@ function FillRuleEdit(props: EditProps) {
         editForm.resetFields();
         setFileList([]);
         props.setOpenEdit(false);
-        props.handleQuery();
+        props.onFillRuleQuery();
     };
 
-    const onSubmit = (data: AddOrUpdateRequirement) => {
+    const handleSubmit = (data: AddOrUpdateRequirement) => {
         if (!fileId || !filename) {
             message.error("请先选择Excel文件（.xlsx格式）");
             return;
@@ -49,7 +49,7 @@ function FillRuleEdit(props: EditProps) {
             .catch(() => null);
     };
 
-    const onFileUpload = (file: RcFile) => {
+    const handleFileUpload = (file: RcFile) => {
         if (file) {
             setUploading(true);
             uploadFile(username, file)
@@ -70,7 +70,7 @@ function FillRuleEdit(props: EditProps) {
         <Modal open={props.openEdit} onCancel={handleClose} title={"新增填充规则"} maskClosable={false} footer={null}>
             <Form
                 form={editForm}
-                onFinish={onSubmit}
+                onFinish={handleSubmit}
                 initialValues={{
                     start_line: 1,
                     line_number: 2
@@ -112,7 +112,7 @@ function FillRuleEdit(props: EditProps) {
                     rules={[{ required: true, message: "请先选择Excel文件（.xlsx格式）" }]}>
                     <Upload
                         beforeUpload={(file) => {
-                            onFileUpload(file);
+                            handleFileUpload(file);
                             return false;
                         }}
                         onRemove={() => {

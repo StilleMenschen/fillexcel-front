@@ -13,7 +13,7 @@ function LoginDialog() {
     const [loginForm] = Form.useForm();
     const signInfo = useSignInfo();
 
-    const onFinish = (user: LoginUser) => {
+    const handleLogin = (user: LoginUser) => {
         // 处理登录逻辑，例如发送登录请求等
         fetchToken(user.username, user.password)
             .then(({ data }) => {
@@ -32,7 +32,7 @@ function LoginDialog() {
             <Form
                 form={loginForm}
                 name="login-form"
-                onFinish={onFinish}
+                onFinish={handleLogin}
                 initialValues={{ username: "jack", password: "4321dcba" }}
                 labelCol={{ span: 4 }}
                 autoComplete="off">

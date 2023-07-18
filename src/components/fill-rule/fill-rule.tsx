@@ -35,7 +35,7 @@ function FillRule() {
             .catch(() => null);
     }, [username, pageNumber, pageSize]);
 
-    const onQuery = (query: QueryRequirement) => {
+    const handleFillRuleQuery = (query: QueryRequirement) => {
         getRequirementList({ username, ...query }, pageNumber, pageSize)
             .then(({ data }) => {
                 setRequirementList(data.data);
@@ -44,11 +44,11 @@ function FillRule() {
             .catch(() => null);
     };
 
-    const onDeleteRequirement = (id: number) => {
+    const handleDeleteRequirement = (id: number) => {
         deleteRequirement(id)
             .then(() => {
                 message.warning(`数据已删除`);
-                onQuery({
+                handleFillRuleQuery({
                     remark: queryForm.getFieldValue("remark") as string,
                     original_filename: queryForm.getFieldValue("original_filename") as string
                 });
@@ -56,7 +56,7 @@ function FillRule() {
             .catch(() => null);
     };
 
-    const onPageChange: PaginationProps["onChange"] = (number, size) => {
+    const handlePageChange: PaginationProps["onChange"] = (number, size) => {
         // 如果分页数有变
         if (pageSize !== size) {
             setPageSize(size);
@@ -68,7 +68,7 @@ function FillRule() {
 
     return (
         <>
-            <Form layout="inline" form={queryForm} onFinish={onQuery}>
+            <Form layout="inline" form={queryForm} onFinish={handleFillRuleQuery}>
                 <Form.Item label="备注" name="remark">
                     <Input placeholder="请输入备注" allowClear />
                 </Form.Item>
@@ -95,7 +95,7 @@ function FillRule() {
                     showSizeChanger: true,
                     total: totalElement,
                     showTotal: showTotal,
-                    onChange: onPageChange
+                    onChange: handlePageChange
                 }}>
                 <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" />
                 <Table.Column<Requirement> title="文件名" dataIndex="original_filename" key="original_filename" />
@@ -120,7 +120,7 @@ function FillRule() {
                                     danger: true
                                 }}
                                 okType="default"
-                                onCancel={() => onDeleteRequirement(row.id)}
+                                onCancel={() => handleDeleteRequirement(row.id)}
                                 okText="取消"
                                 cancelText="删除">
                                 <DeleteOutlined style={{ fontSize: "1rem", color: "red" }} />
@@ -129,7 +129,7 @@ function FillRule() {
                     )}
                 />
             </Table>
-            <FillRuleEdit openEdit={openEdit} setOpenEdit={setOpenEdit} handleQuery={onQuery} />
+            <FillRuleEdit openEdit={openEdit} setOpenEdit={setOpenEdit} onFillRuleQuery={handleFillRuleQuery} />
         </>
     );
 }

@@ -32,12 +32,12 @@ function NavBar() {
     const navigate = useNavigate();
     const nav = useNavBar();
 
-    const onClick: MenuProps["onClick"] = (e) => {
+    const handleClick: MenuProps["onClick"] = (e) => {
         setNavBar(e.key);
         navigate(paths.get(e.key) || "/");
     };
 
-    return <Menu className="header" onClick={onClick} selectedKeys={[nav]} mode="horizontal" items={menuList} />;
+    return <Menu className="header" onClick={handleClick} selectedKeys={[nav]} mode="horizontal" items={menuList} />;
 }
 
 export default NavBar;
