@@ -14,7 +14,6 @@ export interface Requirement {
 }
 
 export interface AddOrUpdateRequirement {
-    id?: number | null;
     username: string;
     remark: string | null;
     file_id: string;
@@ -46,11 +45,11 @@ export function addRequirement(req: AddOrUpdateRequirement): Promise<ResultRespo
     return httpService.post("/fills/requirement", req);
 }
 
-export function getRequirement(id: number): Promise<ResultResponse<Array<Requirement>>> {
+export function getRequirement(id: number): Promise<AxiosResponse<Requirement>> {
     return httpService.get(`/fills/requirement/${id}`);
 }
 
-export function updateRequirement(id: number, req: Requirement): Promise<ResultResponse<Requirement>> {
+export function updateRequirement(id: number, req: AddOrUpdateRequirement): Promise<ResultResponse<Requirement>> {
     return httpService.put(`/fills/requirement/${id}`, req);
 }
 

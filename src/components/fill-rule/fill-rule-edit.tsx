@@ -1,13 +1,13 @@
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Form, Input, InputNumber, Modal, Upload } from "antd";
-import { AddOrUpdateRequirement, addRequirement, uploadFile } from "./fill-rule-service.ts";
+import { AddOrUpdateRequirement, addRequirement, Requirement, updateRequirement, uploadFile } from "./fill-rule-service.ts";
 import { message } from "../../store/feedback.ts";
 import { useUser } from "../../store/account.ts";
 import { RcFile, UploadFile } from "antd/es/upload/interface";
 
 export interface EditProps {
-    id?: number | null;
+    editData: Requirement | null;
     openEdit: boolean;
     setOpenEdit: CallableFunction;
     onFillRuleQuery: CallableFunction;
@@ -22,31 +22,59 @@ function FillRuleEdit(props: EditProps) {
     const fileId = useRef<string>("");
 
     const handleClose = () => {
-        editForm.resetFields();
-        setFileList([]);
         props.setOpenEdit(false);
         props.onFillRuleQuery();
     };
 
+    const setEditFormData = useCallback(() => {
+        if (!props.openEdit) return;
+        if (!props.editData) {
+            editForm.resetFields();
+            setFileList([]);
+            setFilename("");
+            fileId.current = "";
+        } else {
+            const { id, file_id, original_filename, remark, start_line, line_number } = props.editData;
+            fileId.current = file_id;
+            setFilename(original_filename);
+            setFileList([{ uid: file_id, name: original_filename }]);
+            editForm.setFieldValue("id", id);
+            editForm.setFieldValue("remark", remark);
+            editForm.setFieldValue("start_line", start_line);
+            editForm.setFieldValue("line_number", line_number);
+        }
+    }, [editForm, props]);
+
+    useMemo(() => setEditFormData(), [setEditFormData]);
+
     const handleSubmit = (data: AddOrUpdateRequirement) => {
-        if (!fileId || !filename) {
+        if (!fileId.current || !filename) {
             message.error("请先选择Excel文件（.xlsx格式）");
             return;
         }
-        addRequirement({
-            id: props.id,
+        const formData: AddOrUpdateRequirement = {
             username: username,
             remark: data.remark,
             file_id: fileId.current,
             original_filename: filename,
             start_line: data.start_line,
             line_number: data.line_number
-        })
-            .then(() => {
-                message.success("保存成功");
-                handleClose();
-            })
-            .catch(() => null);
+        };
+        if (!props.editData) {
+            addRequirement(formData)
+                .then(() => {
+                    message.success("保存成功");
+                    handleClose();
+                })
+                .catch(() => null);
+        } else {
+            updateRequirement(props.editData.id, formData)
+                .then(() => {
+                    message.success("保存成功");
+                    handleClose();
+                })
+                .catch(() => null);
+        }
     };
 
     const handleFileUpload = (file: RcFile) => {
@@ -67,7 +95,13 @@ function FillRuleEdit(props: EditProps) {
     };
 
     return (
-        <Modal open={props.openEdit} onCancel={handleClose} title={"新增填充规则"} maskClosable={false} footer={null}>
+        <Modal
+            open={props.openEdit}
+            onCancel={handleClose}
+            title={"新增填充规则"}
+            maskClosable={false}
+            destroyOnClose={true}
+            footer={null}>
             <Form
                 form={editForm}
                 onFinish={handleSubmit}
@@ -78,9 +112,9 @@ function FillRuleEdit(props: EditProps) {
                 name="editForm"
                 layout="vertical"
                 autoComplete="off">
-                {props.id && (
-                    <Form.Item name="id" label="ID">
-                        <Input value={props.id} disabled />
+                {props.editData && (
+                    <Form.Item name="id" label="ID" initialValue={props.editData.id}>
+                        <Input disabled />
                     </Form.Item>
                 )}
                 <Form.Item name="remark" label="备注" rules={[{ required: true }]}>
@@ -106,10 +140,7 @@ function FillRuleEdit(props: EditProps) {
                     ]}>
                     <InputNumber style={{ width: "100%" }} />
                 </Form.Item>
-                <Form.Item
-                    name="files"
-                    label="Excel源文件"
-                    rules={[{ required: true, message: "请先选择Excel文件（.xlsx格式）" }]}>
+                <Form.Item name="files" label="Excel源文件">
                     <Upload
                         beforeUpload={(file) => {
                             handleFileUpload(file);

@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
-import { Button, Form, Input, Popconfirm, Table, Typography, Space } from "antd";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
-import { deleteRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
+import { deleteRequirement, getRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
 import FillRuleEdit from "./fill-rule-edit.tsx";
 import { message } from "../../store/feedback.ts";
-import { PaginationProps } from "antd/es/pagination";
 
 interface QueryRequirement {
     remark: string | null;
@@ -25,21 +24,29 @@ function FillRule() {
     const [pageSize, setPageSize] = useState(8);
     const [totalElement, setTotalElement] = useState(0);
     const [requirementList, setRequirementList] = useState([] as Array<Requirement>);
+    const editData = useRef<Requirement | null>(null);
 
-    useEffect(() => {
-        getRequirementList({ username }, pageNumber, pageSize)
-            .then(({ data }) => {
-                setRequirementList(data.data);
-                setTotalElement(data.page.total);
-            })
-            .catch(() => null);
-    }, [username, pageNumber, pageSize]);
+    const handleFillRuleQuery = useCallback(
+        (query: QueryRequirement) => {
+            getRequirementList({ username, ...query }, pageNumber, pageSize)
+                .then(({ data }) => {
+                    setRequirementList(data.data);
+                    setTotalElement(data.page.total);
+                })
+                .catch(() => null);
+        },
+        [username, pageNumber, pageSize]
+    );
 
-    const handleFillRuleQuery = (query: QueryRequirement) => {
-        getRequirementList({ username, ...query }, pageNumber, pageSize)
+    useMemo(() => {
+        handleFillRuleQuery({ remark: null, original_filename: null });
+    }, [handleFillRuleQuery]);
+
+    const handleEdit = (id: number) => {
+        getRequirement(id)
             .then(({ data }) => {
-                setRequirementList(data.data);
-                setTotalElement(data.page.total);
+                editData.current = data;
+                setOpenEdit(true);
             })
             .catch(() => null);
     };
@@ -79,7 +86,12 @@ function FillRule() {
                     <Button htmlType="submit">查询</Button>
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" onClick={() => setOpenEdit(true)}>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            editData.current = null;
+                            setOpenEdit(true);
+                        }}>
                         新增
                     </Button>
                 </Form.Item>
@@ -97,6 +109,7 @@ function FillRule() {
                     showTotal: showTotal,
                     onChange: handlePageChange
                 }}>
+                <Table.Column<Requirement> title="ID" dataIndex="id" key="id" />
                 <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" />
                 <Table.Column<Requirement> title="文件名" dataIndex="original_filename" key="original_filename" />
                 <Table.Column<Requirement> title="起始行" dataIndex="start_line" key="start_line" />
@@ -109,7 +122,7 @@ function FillRule() {
                     render={(_, row) => (
                         <Space size="small">
                             <EditOutlined
-                                onClick={() => message.info(`编辑${row.original_filename}`)}
+                                onClick={() => handleEdit(row.id)}
                                 style={{ fontSize: "1rem", color: "cyan", cursor: "pointer" }}
                             />
                             <Popconfirm
@@ -129,7 +142,12 @@ function FillRule() {
                     )}
                 />
             </Table>
-            <FillRuleEdit openEdit={openEdit} setOpenEdit={setOpenEdit} onFillRuleQuery={handleFillRuleQuery} />
+            <FillRuleEdit
+                editData={editData.current}
+                openEdit={openEdit}
+                setOpenEdit={setOpenEdit}
+                onFillRuleQuery={handleFillRuleQuery}
+            />
         </>
     );
 }
