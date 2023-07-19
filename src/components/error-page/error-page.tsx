@@ -1,5 +1,5 @@
 import { useRouteError } from "react-router-dom";
-import { Space, Card } from "antd";
+import { Button, Empty } from "antd";
 
 interface Error {
     statusText: string | null;
@@ -10,19 +10,12 @@ export default function ErrorPage() {
     const error = useRouteError() as Error;
 
     return (
-        <Space direction="vertical" size="middle" style={{ display: "flex" }}>
-            <Card title="Card" size="small">
-                <p>哎呀!</p>
-                <p>出现意外错误。</p>
-            </Card>
-            <Card title="Card" size="small">
-                <i>{error.statusText || error.message}</i>
-            </Card>
-            <Card title="Card" size="small">
-                <a href="#" onClick={() => window.history.back()}>
-                    返回上一页
-                </a>
-            </Card>
-        </Space>
+        <Empty
+            style={{ paddingTop: "2rem" }}
+            description={<span>哎呀！出现意外错误... {error.statusText || error.message}</span>}>
+            <Button type="link" onClick={() => window.history.back()}>
+                返回上一页
+            </Button>
+        </Empty>
     );
 }

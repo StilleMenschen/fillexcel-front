@@ -6,6 +6,7 @@ import { fetchUser } from "../store/account.ts";
 import { setNavBar } from "../store/navigation.ts";
 import FillRule from "../components/fill-rule/fill-rule.tsx";
 import DataSet from "../components/data-set/data-set.tsx";
+import FillRuleList from "../components/fill-rule/fill-rule-list.tsx";
 
 const router = createBrowserRouter([
     {
@@ -31,7 +32,13 @@ const router = createBrowserRouter([
                     setNavBar("fillRule");
                     return null;
                 },
-                element: <FillRule />
+                element: <FillRule />,
+                children: [
+                    {
+                        path: "/fillRule/",
+                        element: <FillRuleList />
+                    }
+                ]
             },
             {
                 path: "/dataSet",
