@@ -57,7 +57,7 @@ export function deleteRequirement(id: number) {
     return httpService.delete(`/fills/requirement/${id}`);
 }
 
-export function uploadFile(username: string, file: File): Promise<AxiosResponse<FileResult>> {
+export function uploadRequirementFile(username: string, file: File): Promise<AxiosResponse<FileResult>> {
     const formData = new FormData();
     formData.append("username", username);
     formData.append("file", file);

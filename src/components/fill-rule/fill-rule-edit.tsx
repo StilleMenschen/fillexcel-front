@@ -1,10 +1,17 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Form, Input, InputNumber, Modal, Upload } from "antd";
-import { AddOrUpdateRequirement, addRequirement, Requirement, updateRequirement, uploadFile } from "./fill-rule-service.ts";
+import {
+    AddOrUpdateRequirement,
+    addRequirement,
+    Requirement,
+    updateRequirement,
+    uploadRequirementFile
+} from "./fill-rule-service.ts";
 import { message } from "../../store/feedback.ts";
 import { useUser } from "../../store/account.ts";
 import { RcFile, UploadFile } from "antd/es/upload/interface";
+import { useImmer } from "use-immer";
 
 export interface EditProps {
     editData: Requirement | null;
@@ -16,10 +23,9 @@ export interface EditProps {
 function FillRuleEdit(props: EditProps) {
     const { username } = useUser();
     const [editForm] = Form.useForm();
-    const [filename, setFilename] = useState<string>("");
+    const [fileItem, updateFileItem] = useImmer({ id: "", name: "" });
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [uploading, setUploading] = useState(false);
-    const fileId = useRef<string>("");
 
     const handleClose = () => {
         props.onFillRuleQuery();
@@ -29,15 +35,17 @@ function FillRuleEdit(props: EditProps) {
     const setEditFormData = useCallback(() => {
         if (props.editData) {
             const { id, file_id, original_filename, remark, start_line, line_number } = props.editData;
-            fileId.current = file_id;
-            setFilename(original_filename);
+            updateFileItem((draft) => {
+                draft.id = file_id;
+                draft.name = original_filename;
+            });
             setFileList([{ uid: file_id, name: original_filename }]);
             editForm.setFieldValue("id", id);
             editForm.setFieldValue("remark", remark);
             editForm.setFieldValue("start_line", start_line);
             editForm.setFieldValue("line_number", line_number);
         }
-    }, [editForm, props]);
+    }, [editForm, props, updateFileItem]);
 
     useMemo(() => {
         setEditFormData();
@@ -45,15 +53,15 @@ function FillRuleEdit(props: EditProps) {
     }, [setEditFormData]);
 
     const handleSubmit = (data: AddOrUpdateRequirement) => {
-        if (!fileId.current || !filename) {
+        if (!fileItem.id || !fileItem.name) {
             message.error("请先选择Excel文件（.xlsx格式）");
             return;
         }
         const formData: AddOrUpdateRequirement = {
             username: username,
             remark: data.remark,
-            file_id: fileId.current,
-            original_filename: filename,
+            file_id: fileItem.id,
+            original_filename: fileItem.name,
             start_line: data.start_line,
             line_number: data.line_number
         };
@@ -77,11 +85,13 @@ function FillRuleEdit(props: EditProps) {
     const handleFileUpload = (file: RcFile) => {
         if (file) {
             setUploading(true);
-            uploadFile(username, file)
+            uploadRequirementFile(username, file)
                 .then(({ data }) => {
-                    fileId.current = data.fileId;
                     message.success(`上传文件成功: ${data.fileId}`);
-                    setFilename(file.name);
+                    updateFileItem((draft) => {
+                        draft.id = data.fileId;
+                        draft.name = file.name;
+                    });
                     setFileList([file]);
                 })
                 .catch(() => null)
@@ -143,7 +153,7 @@ function FillRuleEdit(props: EditProps) {
                         fileList={fileList}
                         accept=".xlsx"
                         maxCount={1}>
-                        <Button icon={<UploadOutlined />}>{uploading ? "文件上传中" : "选择“.xlsx”格式的文件"} </Button>
+                        <Button icon={<UploadOutlined />}>{uploading ? "文件上传中..." : "选择“.xlsx”格式的文件"} </Button>
                     </Upload>
                 </Form.Item>
                 <Form.Item>

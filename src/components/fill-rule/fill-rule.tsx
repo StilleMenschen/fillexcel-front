@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography } from "antd";
+import { useImmer } from "use-immer";
+import { Breadcrumb, Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
 import { deleteRequirement, getRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
@@ -20,28 +21,36 @@ function FillRule() {
     // 新增/编辑
     const [openEdit, setOpenEdit] = useState(false);
     // 表格组件分页
-    const [pageNumber, setPageNumber] = useState(1);
-    const [pageSize, setPageSize] = useState(8);
-    const [totalElement, setTotalElement] = useState(0);
+    const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [requirementList, setRequirementList] = useState([] as Array<Requirement>);
     const editData = useRef<Requirement | null>(null);
 
     const handleFillRuleQuery = useCallback(
         (query: QueryRequirement) => {
-            getRequirementList({ username, ...query }, pageNumber, pageSize)
+            getRequirementList({ username, ...query }, pageObj.number, pageObj.size)
                 .then(({ data }) => {
                     setRequirementList(data.data);
-                    setTotalElement(data.page.total);
+                    updatePageObj((draft) => {
+                        draft.total = data.page.total;
+                    });
                 })
                 .catch(() => null);
         },
-        [username, pageNumber, pageSize]
+        [username, pageObj, updatePageObj]
+    );
+
+    const getQueryFormData = useCallback(
+        () => ({
+            remark: queryForm.getFieldValue("remark") as string,
+            original_filename: queryForm.getFieldValue("original_filename") as string
+        }),
+        [queryForm]
     );
 
     useMemo(() => {
-        handleFillRuleQuery({ remark: null, original_filename: null });
+        handleFillRuleQuery(getQueryFormData());
         return false;
-    }, [handleFillRuleQuery]);
+    }, [handleFillRuleQuery, getQueryFormData]);
 
     const handleEdit = (id: number) => {
         getRequirement(id)
@@ -56,26 +65,29 @@ function FillRule() {
         deleteRequirement(id)
             .then(() => {
                 message.warning(`数据已删除`);
-                handleFillRuleQuery({
-                    remark: queryForm.getFieldValue("remark") as string,
-                    original_filename: queryForm.getFieldValue("original_filename") as string
-                });
+                handleFillRuleQuery(getQueryFormData());
             })
             .catch(() => null);
     };
 
     const handlePageChange: PaginationProps["onChange"] = (number, size) => {
         // 如果分页数有变
-        if (pageSize !== size) {
-            setPageSize(size);
-            setPageNumber(1);
+        if (pageObj.size !== size) {
+            updatePageObj((draft) => {
+                draft.number = 1;
+                draft.size = size;
+            });
         } else {
-            setPageNumber(number);
+            updatePageObj((draft) => {
+                draft.number = number;
+            });
         }
     };
 
     return (
         <>
+            <Breadcrumb items={[{ title: "填充规则啦" }, { title: "列规则啦" }, { title: "编辑" }]} />
+            <div className="little-space"></div>
             <Form layout="inline" form={queryForm} onFinish={handleFillRuleQuery}>
                 <Form.Item label="备注" name="remark">
                     <Input placeholder="请输入备注" allowClear />
@@ -102,11 +114,11 @@ function FillRule() {
                 rowKey="id"
                 dataSource={requirementList}
                 pagination={{
-                    current: pageNumber,
-                    pageSize: pageSize,
+                    current: pageObj.number,
+                    pageSize: pageObj.size,
                     pageSizeOptions: [8, 16],
                     showSizeChanger: true,
-                    total: totalElement,
+                    total: pageObj.total,
                     showTotal: showTotal,
                     onChange: handlePageChange
                 }}>
@@ -149,10 +161,7 @@ function FillRule() {
                     openEdit={openEdit}
                     setOpenEdit={setOpenEdit}
                     onFillRuleQuery={() => {
-                        handleFillRuleQuery({
-                            remark: queryForm.getFieldValue("remark") as string,
-                            original_filename: queryForm.getFieldValue("original_filename") as string
-                        });
+                        handleFillRuleQuery(getQueryFormData());
                     }}
                 />
             )}
