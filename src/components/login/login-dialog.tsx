@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Button } from "antd";
 import { fetchToken } from "./login-service.ts";
 import { setLogin, useSignInfo } from "../../store/sign-info.ts";
-import { fetchUser } from "../../store/account.ts";
+import { fetchUserInfo } from "../../store/account.ts";
 import { message } from "../../store/feedback.ts";
 
 interface LoginUser {
@@ -20,7 +20,7 @@ function LoginDialog() {
                 message.success("登录成功");
                 setLogin(data.access);
                 // 获取用户信息
-                fetchUser(user.username);
+                fetchUserInfo(user.username);
             })
             .catch(() => {
                 message.error("账号或密码不正确");

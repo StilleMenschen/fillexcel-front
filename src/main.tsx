@@ -9,8 +9,8 @@ import "./index.css";
 const webTheme = {
     algorithm: theme.darkAlgorithm,
     token: {
-        colorPrimary: "#fa8c16",
-        colorInfo: "#13c2c2",
+        colorPrimary: "orange",
+        colorInfo: "greenyellow",
         wireframe: false
     }
 };

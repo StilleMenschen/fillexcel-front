@@ -32,7 +32,7 @@ const emitChange = () => {
     }
 };
 
-export const fetchUser = (name: string | null) => {
+export const fetchUserInfo = (name: string | null) => {
     username = name || username;
     if (username) {
         getUserInfo(username)

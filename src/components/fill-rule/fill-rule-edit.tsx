@@ -20,10 +20,15 @@ export interface EditProps {
     onFillRuleQuery: CallableFunction;
 }
 
+interface FileItem {
+    id: string;
+    name: string;
+}
+
 function FillRuleEdit(props: EditProps) {
     const { username } = useUser();
     const [editForm] = Form.useForm();
-    const [fileItem, updateFileItem] = useImmer({ id: "", name: "" });
+    const [fileItem, updateFileItem] = useImmer<FileItem>({ id: "", name: "" });
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [uploading, setUploading] = useState(false);
 
@@ -49,7 +54,7 @@ function FillRuleEdit(props: EditProps) {
 
     useMemo(() => {
         setEditFormData();
-        return false;
+        return true;
     }, [setEditFormData]);
 
     const handleSubmit = (data: AddOrUpdateRequirement) => {
@@ -102,7 +107,7 @@ function FillRuleEdit(props: EditProps) {
     };
 
     return (
-        <Modal open={props.openEdit} onCancel={handleClose} title={"新增填充规则"} maskClosable={false} footer={null}>
+        <Modal open={props.openEdit} onCancel={handleClose} title="新增填充规则" maskClosable={false} footer={null}>
             <Form
                 form={editForm}
                 onFinish={handleSubmit}

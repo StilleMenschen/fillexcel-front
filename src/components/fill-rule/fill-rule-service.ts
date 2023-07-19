@@ -41,7 +41,7 @@ export function getRequirementList(
     return httpService.get("/fills/requirement", { params: { ...queryParams, page, size } });
 }
 
-export function addRequirement(req: AddOrUpdateRequirement): Promise<ResultResponse<Requirement>> {
+export function addRequirement(req: AddOrUpdateRequirement): Promise<AxiosResponse<Requirement>> {
     return httpService.post("/fills/requirement", req);
 }
 
@@ -49,7 +49,7 @@ export function getRequirement(id: number): Promise<AxiosResponse<Requirement>> 
     return httpService.get(`/fills/requirement/${id}`);
 }
 
-export function updateRequirement(id: number, req: AddOrUpdateRequirement): Promise<ResultResponse<Requirement>> {
+export function updateRequirement(id: number, req: AddOrUpdateRequirement): Promise<AxiosResponse<Requirement>> {
     return httpService.put(`/fills/requirement/${id}`, req);
 }
 

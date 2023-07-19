@@ -1,12 +1,12 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import Home from "../components/home/home.tsx";
 import ErrorPage from "../components/error-page/error-page.tsx";
 import Instructions from "../components/instructions/instructions.tsx";
-import { fetchUser } from "../store/account.ts";
+import { fetchUserInfo } from "../store/account.ts";
 import { setNavBar } from "../store/navigation.ts";
-import FillRule from "../components/fill-rule/fill-rule.tsx";
 import DataSet from "../components/data-set/data-set.tsx";
 import FillRuleList from "../components/fill-rule/fill-rule-list.tsx";
+import ColumnRuleList from "../components/column-rule/column-rule-list.tsx";
 
 const router = createBrowserRouter([
     {
@@ -14,7 +14,8 @@ const router = createBrowserRouter([
         element: <Home />,
         errorElement: <ErrorPage />,
         loader: () => {
-            fetchUser(null);
+            // 尝试获取用户信息
+            fetchUserInfo(null);
             return null;
         },
         children: [
@@ -32,11 +33,15 @@ const router = createBrowserRouter([
                     setNavBar("fillRule");
                     return null;
                 },
-                element: <FillRule />,
+                element: <Outlet />,
                 children: [
                     {
                         path: "/fillRule/",
                         element: <FillRuleList />
+                    },
+                    {
+                        path: "/fillRule/:ruleId",
+                        element: <ColumnRuleList />
                     }
                 ]
             },

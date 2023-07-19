@@ -1,23 +1,19 @@
 import { httpService } from "../../http";
-import { AxiosResponse } from "axios";
 import { User } from "../../store/define.ts";
+import { AxiosResponse } from "axios";
 
 export interface TokenResponse {
     access: string;
     refresh: string;
 }
 
-export interface BackendResultResponse<T> extends AxiosResponse {
-    data: T;
-}
-
-export function fetchToken(username: string, password: string): Promise<BackendResultResponse<TokenResponse>> {
+export function fetchToken(username: string, password: string): Promise<AxiosResponse<TokenResponse>> {
     return httpService.post("/auth/token", {
         username,
         password
     });
 }
 
-export function getUserInfo(username: string): Promise<BackendResultResponse<User>> {
+export function getUserInfo(username: string): Promise<AxiosResponse<User>> {
     return httpService.get(`/user/${username}`);
 }

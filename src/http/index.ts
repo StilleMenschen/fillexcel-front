@@ -16,6 +16,10 @@ export interface BackendResult<T> {
     page: Pager;
 }
 
+export interface BackendResultResponse<T> extends AxiosResponse {
+    data: T;
+}
+
 export interface ResultResponse<T> extends AxiosResponse {
     data: BackendResult<T>;
 }

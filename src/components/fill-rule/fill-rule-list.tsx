@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { Breadcrumb, Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography } from "antd";
+import { DeleteOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
 import { deleteRequirement, getRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
 import FillRuleEdit from "./fill-rule-edit.tsx";
 import { message } from "../../store/feedback.ts";
+import { useNavigate } from "react-router-dom";
 
 interface QueryRequirement {
     remark: string | null;
@@ -22,8 +23,10 @@ function FillRuleList() {
     const [openEdit, setOpenEdit] = useState(false);
     // 表格组件分页
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
-    const [requirementList, setRequirementList] = useState([] as Array<Requirement>);
+    const [requirementList, setRequirementList] = useState<Array<Requirement>>([]);
     const editData = useRef<Requirement | null>(null);
+    // 导航到配置页
+    const navigate = useNavigate();
 
     const handleFillRuleQuery = useCallback(
         (query: QueryRequirement) => {
@@ -49,7 +52,7 @@ function FillRuleList() {
 
     useMemo(() => {
         handleFillRuleQuery(getQueryFormData());
-        return false;
+        return true;
     }, [handleFillRuleQuery, getQueryFormData]);
 
     const handleEdit = (id: number) => {
@@ -86,8 +89,6 @@ function FillRuleList() {
 
     return (
         <>
-            <Breadcrumb items={[{ title: "填充规则啦" }, { title: "列规则啦" }, { title: "编辑" }]} />
-            <div className="little-space"></div>
             <Form layout="inline" form={queryForm} onFinish={handleFillRuleQuery}>
                 <Form.Item label="备注" name="remark">
                     <Input placeholder="请输入备注" allowClear />
@@ -122,21 +123,27 @@ function FillRuleList() {
                     showTotal: showTotal,
                     onChange: handlePageChange
                 }}>
-                <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" width={256} ellipsis={true} />
-                <Table.Column<Requirement> title="文件名" dataIndex="original_filename" key="original_filename" />
-                <Table.Column<Requirement> title="起始行" dataIndex="start_line" key="start_line" />
-                <Table.Column<Requirement> title="填充行数" dataIndex="line_number" key="line_number" />
-                <Table.Column<Requirement> title="更新于" dataIndex="updated_at" key="updated_at" />
+                <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" ellipsis={true} />
+                <Table.Column<Requirement> title="文件名" dataIndex="original_filename" width={360} key="original_filename" />
+                <Table.Column<Requirement> title="起始行" dataIndex="start_line" width={80} key="start_line" />
+                <Table.Column<Requirement> title="填充行数" dataIndex="line_number" width={100} key="line_number" />
+                <Table.Column<Requirement> title="更新于" dataIndex="updated_at" width={172} key="updated_at" />
                 <Table.Column<Requirement>
                     title="操作"
                     key="operation"
                     fixed="right"
-                    width={72}
+                    width={104}
                     render={(_, row) => (
                         <Space size="small">
+                            <SettingOutlined
+                                title="配置"
+                                onClick={() => navigate(`/fillRule/${row.id}`)}
+                                style={{ fontSize: "1.12rem", color: "Orange", cursor: "pointer" }}
+                            />
                             <EditOutlined
+                                title="编辑"
                                 onClick={() => handleEdit(row.id)}
-                                style={{ fontSize: "1.12rem", color: "cyan", cursor: "pointer" }}
+                                style={{ fontSize: "1.12rem", color: "greenyellow", cursor: "pointer" }}
                             />
                             <Popconfirm
                                 title="确定要删除此规则？"
@@ -149,7 +156,7 @@ function FillRuleList() {
                                 onCancel={() => handleDeleteRequirement(row.id)}
                                 okText="取消"
                                 cancelText="删除">
-                                <DeleteOutlined style={{ fontSize: "1.12rem", color: "red" }} />
+                                <DeleteOutlined title="删除" style={{ fontSize: "1.12rem", color: "red" }} />
                             </Popconfirm>
                         </Space>
                     )}
