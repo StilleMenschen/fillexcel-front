@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography } from "antd";
+import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
 import { deleteRequirement, getRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
@@ -132,22 +132,27 @@ function FillRuleList() {
                     title="操作"
                     key="operation"
                     fixed="right"
-                    width={104}
+                    width={140}
                     render={(_, row) => (
                         <Space size="small">
-                            <SettingOutlined
-                                title="配置"
-                                onClick={() => navigate(`/fillRule/${row.id}`)}
-                                style={{ fontSize: "1.12rem", color: "Orange", cursor: "pointer" }}
-                            />
-                            <EditOutlined
-                                title="编辑"
-                                onClick={() => handleEdit(row.id)}
-                                style={{ fontSize: "1.12rem", color: "greenyellow", cursor: "pointer" }}
-                            />
+                            <Tooltip title="配置">
+                                <Button
+                                    type="primary"
+                                    shape="circle"
+                                    icon={<SettingOutlined style={{ fontSize: "1.12rem" }} />}
+                                    onClick={() => navigate(`/fillRule/${row.id}`)}
+                                />
+                            </Tooltip>
+                            <Tooltip title="编辑">
+                                <Button
+                                    shape="circle"
+                                    onClick={() => handleEdit(row.id)}
+                                    icon={<EditOutlined style={{ fontSize: "1.12rem" }} />}
+                                />
+                            </Tooltip>
                             <Popconfirm
                                 title="确定要删除此规则？"
-                                description={<Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>}
+                                description={<Typography.Text type="danger">所有关联的列规则也会被同步删除！</Typography.Text>}
                                 placement="left"
                                 cancelButtonProps={{
                                     danger: true
@@ -156,7 +161,9 @@ function FillRuleList() {
                                 onCancel={() => handleDeleteRequirement(row.id)}
                                 okText="取消"
                                 cancelText="删除">
-                                <DeleteOutlined title="删除" style={{ fontSize: "1.12rem", color: "red" }} />
+                                <Tooltip title="删除">
+                                    <Button shape="circle" icon={<DeleteOutlined style={{ fontSize: "1.12rem" }} />} />
+                                </Tooltip>
                             </Popconfirm>
                         </Space>
                     )}
