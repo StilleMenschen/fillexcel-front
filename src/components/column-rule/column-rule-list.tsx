@@ -8,7 +8,7 @@ import { DATA_TYPE } from "../../store/define.ts";
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
 
 function ColumnRuleList() {
-    const { ruleId } = useParams();
+    const { fillRuleId } = useParams();
     const [queryForm] = Form.useForm();
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [columnRuleList, setColumnRuleList] = useState<Array<ColumnRule>>([]);
@@ -17,7 +17,7 @@ function ColumnRuleList() {
 
     const handleColumnRuleQuery = useCallback(() => {
         const columnName = queryForm.getFieldValue("columnName") as string;
-        getColumnRuleListByRequirement(ruleId || "", pageObj.number, pageObj.size, columnName)
+        getColumnRuleListByRequirement(fillRuleId || "", pageObj.number, pageObj.size, columnName)
             .then(({ data }) => {
                 updatePageObj((draft) => {
                     draft.total = data.page.total;
@@ -25,7 +25,7 @@ function ColumnRuleList() {
                 setColumnRuleList(data.data);
             })
             .catch(() => null);
-    }, [ruleId, pageObj, queryForm, updatePageObj, setColumnRuleList]);
+    }, [fillRuleId, pageObj, queryForm, updatePageObj, setColumnRuleList]);
 
     useMemo(() => {
         handleColumnRuleQuery();
@@ -50,7 +50,7 @@ function ColumnRuleList() {
         <>
             <Breadcrumb items={[{ title: <Link to="/fillRule">填充规则</Link> }, { title: "列规则" }]} />
             <div className="little-space"></div>
-            <Form layout="inline" form={queryForm} onFinish={handleColumnRuleQuery}>
+            <Form layout="inline" name="queryRuleForm" form={queryForm} onFinish={handleColumnRuleQuery}>
                 <Form.Item label="列名" name="columnName">
                     <Input placeholder="请输入列名" allowClear />
                 </Form.Item>
@@ -61,7 +61,7 @@ function ColumnRuleList() {
                     <Button
                         type="primary"
                         onClick={() => {
-                            navigate(`/fillRule/${ruleId || ""}/add`);
+                            navigate(`/fillRule/${fillRuleId || ""}/add`);
                         }}>
                         新增
                     </Button>

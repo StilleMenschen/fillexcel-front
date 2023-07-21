@@ -41,11 +41,11 @@ const router = createBrowserRouter([
                         element: <FillRuleList />
                     },
                     {
-                        path: ":ruleId",
+                        path: ":fillRuleId",
                         element: <ColumnRuleList />
                     },
                     {
-                        path: ":ruleId/add",
+                        path: ":fillRuleId/add",
                         element: <ColumnRuleAdd />
                     }
                 ]

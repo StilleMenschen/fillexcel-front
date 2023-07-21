@@ -6,9 +6,9 @@ export interface GenerateRuleParameter {
     name: string;
     data_type: string;
     description: string;
-    required: string;
+    required: boolean;
     default_value: string;
-    need_outside_data: string;
+    need_outside_data: boolean;
     created_at: string;
     updated_at: string;
 }
