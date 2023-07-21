@@ -1,10 +1,10 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Breadcrumb, Button, Form, Input, PaginationProps, Table, Typography } from "antd";
 import { useImmer } from "use-immer";
 import { useCallback, useMemo, useState } from "react";
 import { ColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
 import { DATA_TYPE } from "../../store/define.ts";
-import { message } from "../../store/feedback.ts";
+import { useBreadcrumb } from "../../store/breadcrumb.ts";
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
 
@@ -13,6 +13,9 @@ function ColumnRuleList() {
     const [queryForm] = Form.useForm();
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [columnRuleList, setColumnRuleList] = useState<Array<ColumnRule>>([]);
+    // 导航到编辑/新增页
+    const navigate = useNavigate();
+    const breadcrumbMap = useBreadcrumb();
 
     const handleColumnRuleQuery = useCallback(() => {
         const columnName = queryForm.getFieldValue("columnName") as string;
@@ -47,7 +50,12 @@ function ColumnRuleList() {
 
     return (
         <>
-            <Breadcrumb items={[{ title: <Link to="/fillRule">填充规则</Link> }, { title: "列规则" }]} />
+            <Breadcrumb
+                items={breadcrumbMap.fillRule.map((b) => {
+                    if (b.link) return { title: <Link to={b.path}>{b.title}</Link> };
+                    else return { title: <span>{b.title}</span> };
+                })}
+            />
             <div className="little-space"></div>
             <Form layout="inline" form={queryForm} onFinish={handleColumnRuleQuery}>
                 <Form.Item label="列名" name="columnName">
@@ -60,7 +68,7 @@ function ColumnRuleList() {
                     <Button
                         type="primary"
                         onClick={() => {
-                            message.info("新增啦！");
+                            navigate(`/fillRule/${ruleId || ""}/add`);
                         }}>
                         新增
                     </Button>

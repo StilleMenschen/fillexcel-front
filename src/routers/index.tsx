@@ -7,6 +7,8 @@ import { setNavBar } from "../store/navigation.ts";
 import DataSet from "../components/data-set/data-set.tsx";
 import FillRuleList from "../components/fill-rule/fill-rule-list.tsx";
 import ColumnRuleList from "../components/column-rule/column-rule-list.tsx";
+import ColumnRuleAdd from "../components/column-rule/column-rule-add.tsx";
+import { setBreadcrumb } from "../store/breadcrumb.ts";
 
 const router = createBrowserRouter([
     {
@@ -20,7 +22,7 @@ const router = createBrowserRouter([
         },
         children: [
             {
-                path: "/",
+                index: true,
                 loader: () => {
                     setNavBar("Home");
                     return null;
@@ -36,12 +38,28 @@ const router = createBrowserRouter([
                 element: <Outlet />,
                 children: [
                     {
-                        path: "/fillRule/",
+                        index: true,
+                        loader: () => {
+                            setBreadcrumb("fillRule", 1, "/fillRule", "填充规则");
+                            return null;
+                        },
                         element: <FillRuleList />
                     },
                     {
-                        path: "/fillRule/:ruleId",
+                        path: ":ruleId",
+                        loader: ({ params }) => {
+                            setBreadcrumb("fillRule", 2, `/fillRule/${params.ruleId || 0}`, "列规则");
+                            return null;
+                        },
                         element: <ColumnRuleList />
+                    },
+                    {
+                        path: ":ruleId/add",
+                        loader: ({ params }) => {
+                            setBreadcrumb("fillRule", 3, `/fillRule/${params.ruleId || 0}/add`, "新增");
+                            return null;
+                        },
+                        element: <ColumnRuleAdd />
                     }
                 ]
             },
@@ -59,7 +77,6 @@ const router = createBrowserRouter([
                     setNavBar("fileRecord");
                     return null;
                 },
-                index: true,
                 element: <FileRecordTable />
             }*/
         ]
