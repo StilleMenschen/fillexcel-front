@@ -152,7 +152,7 @@ function FillRuleList() {
                             </Tooltip>
                             <Popconfirm
                                 title="确定要删除此规则？"
-                                description={<Typography.Text type="danger">所有关联的列规则也会被同步删除！</Typography.Text>}
+                                description={<Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>}
                                 placement="left"
                                 cancelButtonProps={{
                                     danger: true

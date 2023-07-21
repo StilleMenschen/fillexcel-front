@@ -1,17 +1,17 @@
-import { Link } from "react-router-dom";
 import { Breadcrumb } from "antd";
-import { useBreadcrumb } from "../../store/breadcrumb";
+import { Link, useParams } from "react-router-dom";
 
 function ColumnRuleAdd() {
-    const breadcrumbMap = useBreadcrumb();
+    const { ruleId } = useParams();
 
     return (
         <>
             <Breadcrumb
-                items={breadcrumbMap.fillRule.map((b) => {
-                    if (b.link) return { title: <Link to={b.path}>{b.title}</Link> };
-                    else return { title: <span>{b.title}</span> };
-                })}
+                items={[
+                    { title: <Link to="/fillRule">填充规则</Link> },
+                    { title: <Link to={`/fillRule/${ruleId}`}>列规则</Link> },
+                    { title: "新增" }
+                ]}
             />
             <div className="little-space"></div>
             <p>下面是新增的表单</p>

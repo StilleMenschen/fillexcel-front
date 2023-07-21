@@ -4,7 +4,6 @@ import { useImmer } from "use-immer";
 import { useCallback, useMemo, useState } from "react";
 import { ColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
 import { DATA_TYPE } from "../../store/define.ts";
-import { useBreadcrumb } from "../../store/breadcrumb.ts";
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
 
@@ -15,7 +14,6 @@ function ColumnRuleList() {
     const [columnRuleList, setColumnRuleList] = useState<Array<ColumnRule>>([]);
     // 导航到编辑/新增页
     const navigate = useNavigate();
-    const breadcrumbMap = useBreadcrumb();
 
     const handleColumnRuleQuery = useCallback(() => {
         const columnName = queryForm.getFieldValue("columnName") as string;
@@ -50,12 +48,7 @@ function ColumnRuleList() {
 
     return (
         <>
-            <Breadcrumb
-                items={breadcrumbMap.fillRule.map((b) => {
-                    if (b.link) return { title: <Link to={b.path}>{b.title}</Link> };
-                    else return { title: <span>{b.title}</span> };
-                })}
-            />
+            <Breadcrumb items={[{ title: <Link to="/fillRule">填充规则</Link> }, { title: "列规则" }]} />
             <div className="little-space"></div>
             <Form layout="inline" form={queryForm} onFinish={handleColumnRuleQuery}>
                 <Form.Item label="列名" name="columnName">
