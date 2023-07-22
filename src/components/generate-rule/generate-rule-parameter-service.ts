@@ -1,8 +1,8 @@
 import { httpService, ResultResponse } from "../../http";
 
 export interface GenerateRuleParameter {
-    id: string;
-    rule_id: string;
+    id: number;
+    rule_id: number;
     name: string;
     data_type: string;
     description: string;

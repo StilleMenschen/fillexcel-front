@@ -1,9 +1,11 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Breadcrumb, Button, Form, Input, PaginationProps, Table, Typography } from "antd";
+import { Breadcrumb, Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
 import { useImmer } from "use-immer";
 import { useCallback, useMemo, useState } from "react";
-import { ColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
+import { ColumnRule, deleteColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
 import { DATA_TYPE } from "../../store/define.ts";
+import { DeleteOutlined } from "@ant-design/icons";
+import { message } from "../../store/feedback.ts";
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
 
@@ -44,6 +46,15 @@ function ColumnRuleList() {
                 draft.number = number;
             });
         }
+    };
+
+    const handleColumnRule = (id: number) => {
+        deleteColumnRule(id)
+            .then(() => {
+                message.success("已删除");
+                handleColumnRuleQuery();
+            })
+            .catch(() => null);
     };
 
     return (
@@ -95,6 +106,31 @@ function ColumnRuleList() {
                     render={(_, row) => <Typography.Text> {row.associated_of ? "是" : "否"} </Typography.Text>}
                 />
                 <Table.Column<ColumnRule> title="更新于" dataIndex="updated_at" key="updated_at" />
+                <Table.Column<ColumnRule>
+                    title="操作"
+                    key="operation"
+                    fixed="right"
+                    width={140}
+                    render={(_, row) => (
+                        <Space size="small">
+                            <Popconfirm
+                                title="确定要删除此规则？"
+                                description={<Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>}
+                                placement="left"
+                                cancelButtonProps={{
+                                    danger: true
+                                }}
+                                okType="default"
+                                onCancel={() => handleColumnRule(row.id)}
+                                okText="取消"
+                                cancelText="删除">
+                                <Tooltip title="删除">
+                                    <Button shape="circle" icon={<DeleteOutlined style={{ fontSize: "1.12rem" }} />} />
+                                </Tooltip>
+                            </Popconfirm>
+                        </Space>
+                    )}
+                />
             </Table>
         </>
     );

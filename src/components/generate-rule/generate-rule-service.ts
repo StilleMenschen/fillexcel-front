@@ -6,8 +6,8 @@ export interface GenerateRule {
     function_name: string;
     fill_order: number;
     description: string;
-    created_at: string;
-    updated_at: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export function getGenerateRuleList(page: number, size: number): Promise<ResultResponse<Array<GenerateRule>>> {

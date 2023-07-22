@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "./generate-rule-parameter-service.ts";
 import { Button, Form, FormInstance, Input, InputNumber, Switch } from "antd";
 import { GenerateRule } from "./generate-rule-service.ts";
@@ -6,8 +6,9 @@ import { message } from "../../store/feedback.ts";
 import { Rule } from "rc-field-form/lib/interface";
 
 interface GenerateRuleParameterFormProp {
-    rule: GenerateRule;
+    rule: GenerateRule | null;
     parameterForm: FormInstance;
+    onParameterListChange: (parameterList: Array<GenerateRuleParameter>) => void;
 }
 // 额外的校验规则
 export const extraRuleMap = new Map<string, Array<Rule>>([
@@ -19,16 +20,16 @@ export const extraRuleMap = new Map<string, Array<Rule>>([
     ["random_number_iter.stop", [{ type: "number", min: 1, max: 65535, message: "请输入大于1-65535之间的数字" }]]
 ]);
 
-export const renderInput = (parameter: GenerateRuleParameter, rule: GenerateRule) => {
+export const renderInput = (parameter: GenerateRuleParameter, rule: GenerateRule | null) => {
     if (parameter.need_outside_data) {
         return (
             <Form.Item key={parameter.id} label={parameter.description} extra={parameter.hints} name={parameter.name}>
-                <Button onClick={() => message.info(parameter.rule_id)}>选择数据集</Button>
+                <Button onClick={() => message.info(String(parameter.rule_id))}>选择数据集</Button>
             </Form.Item>
         );
     }
     // 这里的key和上面的规则名称相关联
-    const ruleKey = `${rule.function_name}.${parameter.name}`;
+    const ruleKey = `${rule?.function_name}.${parameter.name}`;
     const extraRule = extraRuleMap.get(ruleKey) || [];
     switch (parameter.data_type) {
         case "string":
@@ -73,7 +74,7 @@ export const renderInput = (parameter: GenerateRuleParameter, rule: GenerateRule
                     extra={parameter.hints}
                     name={parameter.name}
                     valuePropName="checked">
-                    <Switch defaultChecked={false} />
+                    <Switch />
                 </Form.Item>
             );
         default:
@@ -98,13 +99,18 @@ export const settingInitialValues = (form: FormInstance, data: Array<GenerateRul
 
 function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
+    const ruleId = useRef<number>(-1);
 
     const queryGenerateRuleParameter = useCallback(() => {
-        if (!props.rule.id) return;
+        if (!props.rule || ruleId.current === props.rule.id) return;
+        ruleId.current = props.rule.id;
         getGenerateRuleParameterListByRule(props.rule.id, 1, 16)
             .then(({ data }) => {
                 setGenerateRuleParameterList(data.data);
+                // 设置初始值
                 settingInitialValues(props.parameterForm, data.data);
+                // 设置关联ID
+                props.onParameterListChange(data.data);
             })
             .catch(() => null);
     }, [props, setGenerateRuleParameterList]);

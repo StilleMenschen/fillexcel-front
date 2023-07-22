@@ -1,43 +1,97 @@
-import { Breadcrumb, Button, Col, Form, Input, Row, Select, Switch } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Breadcrumb, Button, Col, Form, Input, Row, Select, Switch, Typography } from "antd";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import GenerateRuleSelect from "../generate-rule/generate-rule-select.tsx";
 import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { message } from "../../store/feedback.ts";
 import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
-import { ColumnRule } from "./column-rule-service.ts";
+import { addColumnRule, AddOrUpdateColumnRule } from "./column-rule-service.ts";
+import { useImmer } from "use-immer";
+import { addDataParameter, DataParameter } from "./column-rule-parameter-service.ts";
+import { AxiosResponse } from "axios";
+import { GenerateRuleParameter } from "../generate-rule/generate-rule-parameter-service.ts";
 
-const temp: GenerateRule = {
-    id: 0,
-    rule_name: "string",
-    function_name: "string",
-    fill_order: 0,
-    description: "string",
-    created_at: "string",
-    updated_at: "string"
+type ParameterMap = {
+    [key: string]: string | number | boolean;
+};
+
+const saveColumnRule = (requirement_id: number, rule_id: number, columnRule: AddOrUpdateColumnRule) => {
+    return addColumnRule({
+        ...columnRule,
+        requirement_id,
+        rule_id
+    });
+};
+
+const parallelSaveParameter = (ruleId: number, parameterList: Array<GenerateRuleParameter>, values: ParameterMap) => {
+    return Promise.all<AxiosResponse<DataParameter>>(
+        parameterList.map((param) => {
+            return addDataParameter({
+                param_rule_id: param.id,
+                column_rule_id: ruleId,
+                name: param.name,
+                value: String(values[param.name]),
+                data_set_id: 0
+            });
+        })
+    );
 };
 
 function ColumnRuleAdd() {
     const { fillRuleId } = useParams();
     const [editForm] = Form.useForm();
     const [parameterForm] = Form.useForm();
-    const [rule, setRule] = useState<GenerateRule>(temp);
+    const parameterList = useRef<Array<GenerateRuleParameter>>([]);
+    const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
+    const [hintObj, updateHintObj] = useImmer({ show: false, text: "" });
 
-    const handleAddColumnRule = (columnRule: ColumnRule) => {
-        console.log(columnRule);
+    const navigate = useNavigate();
+
+    const handleAddColumnRule = (columnRule: AddOrUpdateColumnRule) => {
+        if (!generateRule?.id) {
+            message.error("请先选择生成规则");
+            return;
+        }
+        updateHintObj((draft) => {
+            draft.show = true;
+            draft.text = "处理参数校验...";
+        });
+        let parameters = {};
         parameterForm
             .validateFields()
-            .then((value) => {
-                console.log(value);
-                message.success("校验通过");
+            .then((values: ParameterMap) => {
+                updateHintObj((draft) => {
+                    draft.text = "处理列规则...";
+                });
+                parameters = values;
+                return saveColumnRule(Number(fillRuleId), generateRule.id, columnRule);
+            })
+            .then(({ data }) => {
+                updateHintObj((draft) => {
+                    draft.text = "处理规则参数...";
+                });
+                return parallelSaveParameter(data.id, parameterList.current, parameters);
+            })
+            .then(() => {
+                message.success("新增成功");
+                navigate(`/fillRule/${fillRuleId}`);
             })
             .catch(() => {
                 message.error("校验失败");
+            })
+            .finally(() => {
+                updateHintObj((draft) => {
+                    draft.show = false;
+                });
             });
     };
 
     const handleGenerateRuleSelect = (value: GenerateRule) => {
-        setRule(value);
+        setGenerateRule(value);
+    };
+
+    const handleParameterListChange = (paramList: Array<GenerateRuleParameter>) => {
+        parameterList.current = paramList;
     };
 
     return (
@@ -87,11 +141,20 @@ function ColumnRuleAdd() {
                             <Button type="primary" htmlType="submit">
                                 保存
                             </Button>
+                            {hintObj.show && (
+                                <Typography.Text style={{ paddingLeft: "1.2rem" }} type="warning">
+                                    {hintObj.text}
+                                </Typography.Text>
+                            )}
                         </Form.Item>
                     </Form>
                 </Col>
                 <Col span={11} offset={1}>
-                    <GenerateRuleParameterForm parameterForm={parameterForm} rule={rule} />
+                    <GenerateRuleParameterForm
+                        parameterForm={parameterForm}
+                        rule={generateRule}
+                        onParameterListChange={handleParameterListChange}
+                    />
                 </Col>
             </Row>
         </>
