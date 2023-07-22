@@ -28,7 +28,7 @@ function LoginDialog() {
     };
 
     return (
-        <Modal title="登录" closeIcon={false} open={!signInfo.logged} footer={null}>
+        <Modal title="登录" closeIcon={false} open={!signInfo.logged} forceRender={true} footer={null}>
             <Form
                 form={loginForm}
                 name="login-form"

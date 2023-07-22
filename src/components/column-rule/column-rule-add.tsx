@@ -4,14 +4,27 @@ import GenerateRuleSelect from "../generate-rule/generate-rule-select.tsx";
 import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
 import { useState } from "react";
 import { message } from "../../store/feedback.ts";
+import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
+import { ColumnRule } from "./column-rule-service.ts";
+
+const temp: GenerateRule = {
+    id: 0,
+    rule_name: "string",
+    function_name: "string",
+    fill_order: 0,
+    description: "string",
+    created_at: "string",
+    updated_at: "string"
+};
 
 function ColumnRuleAdd() {
     const { fillRuleId } = useParams();
     const [editForm] = Form.useForm();
     const [parameterForm] = Form.useForm();
-    const [ruleId, setRuleId] = useState<number>(0);
+    const [rule, setRule] = useState<GenerateRule>(temp);
 
-    const handleAddColumnRule = () => {
+    const handleAddColumnRule = (columnRule: ColumnRule) => {
+        console.log(columnRule);
         parameterForm
             .validateFields()
             .then((value) => {
@@ -23,8 +36,8 @@ function ColumnRuleAdd() {
             });
     };
 
-    const handleGenerateRuleSelect = (value: number) => {
-        setRuleId(value);
+    const handleGenerateRuleSelect = (value: GenerateRule) => {
+        setRule(value);
     };
 
     return (
@@ -47,13 +60,19 @@ function ColumnRuleAdd() {
                             column_type: "string",
                             associated_of: false
                         }}>
-                        <Form.Item label="单元格列" name="column_name">
-                            <Input placeholder="请输入列名，如A、F、AC" allowClear />
+                        <Form.Item
+                            label="单元格列"
+                            name="column_name"
+                            rules={[
+                                { required: true, message: "请填写单元格列值，如A、F、AC" },
+                                { pattern: /^[A-Z]{1,3}$/g, message: "单元格列值范围在 A - ZZZ 之间" }
+                            ]}>
+                            <Input placeholder="请填写单元格列值，如A、F、AC" allowClear />
                         </Form.Item>
-                        <Form.Item label="生成规则" name="rule_id">
+                        <Form.Item label="生成规则" extra="选择生成规则" required>
                             <GenerateRuleSelect onChange={handleGenerateRuleSelect} />
                         </Form.Item>
-                        <Form.Item label="数据类型" name="column_type">
+                        <Form.Item label="数据类型" extra="如果生成规则生成的数据是数字则选择数值类型" name="column_type">
                             <Select
                                 options={[
                                     { value: "string", label: "字符串" },
@@ -61,10 +80,10 @@ function ColumnRuleAdd() {
                                 ]}
                             />
                         </Form.Item>
-                        <Form.Item label="数据关联" extra="关联外部数据？" name="associated_of">
-                            <Switch checked={false} />
+                        <Form.Item label="数据关联" extra="是否需要关联外部数据集（自动设置）" name="associated_of">
+                            <Switch disabled />
                         </Form.Item>
-                        <Form.Item>
+                        <Form.Item style={{ paddingLeft: "4rem" }}>
                             <Button type="primary" htmlType="submit">
                                 保存
                             </Button>
@@ -72,7 +91,7 @@ function ColumnRuleAdd() {
                     </Form>
                 </Col>
                 <Col span={11} offset={1}>
-                    <GenerateRuleParameterForm parameterForm={parameterForm} ruleId={ruleId} />
+                    <GenerateRuleParameterForm parameterForm={parameterForm} rule={rule} />
                 </Col>
             </Row>
         </>
