@@ -1,17 +1,26 @@
-import { Breadcrumb, Button, Checkbox, Col, Form, Input, Row, Select } from "antd";
+import { Breadcrumb, Button, Col, Form, Input, Row, Select, Switch } from "antd";
 import { Link, useParams } from "react-router-dom";
-import { message } from "../../store/feedback.ts";
 import GenerateRuleSelect from "../generate-rule/generate-rule-select.tsx";
 import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
 import { useState } from "react";
+import { message } from "../../store/feedback.ts";
 
 function ColumnRuleAdd() {
     const { fillRuleId } = useParams();
     const [editForm] = Form.useForm();
+    const [parameterForm] = Form.useForm();
     const [ruleId, setRuleId] = useState<number>(0);
 
     const handleAddColumnRule = () => {
-        message.info("新增列规则");
+        parameterForm
+            .validateFields()
+            .then((value) => {
+                console.log(value);
+                message.success("校验通过");
+            })
+            .catch(() => {
+                message.error("校验失败");
+            });
     };
 
     const handleGenerateRuleSelect = (value: number) => {
@@ -52,8 +61,8 @@ function ColumnRuleAdd() {
                                 ]}
                             />
                         </Form.Item>
-                        <Form.Item label="数据关联" name="associated_of">
-                            <Checkbox>关联外部数据？</Checkbox>
+                        <Form.Item label="数据关联" extra="关联外部数据？" name="associated_of">
+                            <Switch checked={false} />
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit">
@@ -63,7 +72,7 @@ function ColumnRuleAdd() {
                     </Form>
                 </Col>
                 <Col span={11} offset={1}>
-                    <GenerateRuleParameterForm ruleId={ruleId} />
+                    <GenerateRuleParameterForm parameterForm={parameterForm} ruleId={ruleId} />
                 </Col>
             </Row>
         </>
