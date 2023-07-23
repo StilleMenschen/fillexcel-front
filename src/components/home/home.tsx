@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Layout, message } from "antd";
 import Headers from "../headers/headers.tsx";
@@ -11,7 +11,7 @@ import { message as messageUnit } from "../../store/feedback.ts";
 function Home() {
     const [messageApi, contextHolder] = message.useMessage();
 
-    useMemo(() => {
+    useEffect(() => {
         messageUnit.success = (msg) => {
             void messageApi.success(msg);
         };

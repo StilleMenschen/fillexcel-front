@@ -1,5 +1,5 @@
 import { Select } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { GenerateRule, getGenerateRuleList } from "./generate-rule-service.ts";
 import { BaseOptionType } from "rc-select/lib/Select";
 
@@ -24,14 +24,13 @@ const initGenerateRuleMap = (data: Array<GenerateRule>) => {
 function GenerateRuleSelect(props: GenerateRuleSelectProp) {
     const [generateRuleList, setGenerateRuleList] = useState<Array<GenerateRule>>([]);
 
-    useMemo(() => {
+    useEffect(() => {
         getGenerateRuleList(1, 16)
             .then(({ data }) => {
                 setGenerateRuleList(data.data);
                 props.onLoad(initGenerateRuleMap(data.data));
             })
             .catch(() => null);
-        return true;
     }, []);
 
     return (

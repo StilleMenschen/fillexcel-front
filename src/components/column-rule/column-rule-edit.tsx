@@ -33,7 +33,7 @@ function ColumnRuleEdit() {
     // 基础数据
     const parameterList = useRef<Array<GenerateRuleParameter>>([]);
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
-    const [generateRuleId, setGenerateRuleId] = useState<number | null>(null);
+    const [generateRuleId, setGenerateRuleId] = useState<number>(-1);
     const ruleMap = useRef<GenerateRuleMap>({});
     const [hintObj, updateHintObj] = useImmer({ show: false, text: "" });
     // 编辑数据
@@ -67,7 +67,7 @@ function ColumnRuleEdit() {
     };
 
     const handleUpdateColumnRule = (columnRule: AddOrUpdateColumnRule) => {
-        if (!generateRuleId) {
+        if (generateRuleId == -1) {
             message.error("请先选择生成规则");
             return;
         }
@@ -93,7 +93,7 @@ function ColumnRuleEdit() {
                 return parallelSaveParameter(data.id, parameterList.current, parameters);
             })
             .then(() => {
-                message.success("新增成功");
+                message.success("保存成功");
                 navigate(`/fillRule/${fillRuleId}`);
             })
             .catch(() => null)

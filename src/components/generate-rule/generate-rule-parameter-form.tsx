@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "./generate-rule-parameter-service.ts";
 import { Button, Form, FormInstance, Input, InputNumber, Switch } from "antd";
 import { GenerateRule } from "./generate-rule-service.ts";
@@ -114,7 +114,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
     const ruleId = useRef<number>(-1);
 
-    useMemo(() => {
+    useEffect(() => {
         if (!props.rule || ruleId.current === props.rule.id) return;
         ruleId.current = props.rule.id;
         getGenerateRuleParameterListByRule(props.rule.id, 1, 16)
@@ -126,8 +126,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
                 props.onParameterListChange(data.data);
             })
             .catch(() => null);
-        return true;
-    }, [props.rule, props.defaultParameterList]);
+    }, [props.rule]);
 
     return (
         <Form form={props.parameterForm} labelCol={{ span: 3 }} wrapperCol={{ span: 21 }} autoComplete="off">

@@ -15,7 +15,7 @@ import {
     Typography
 } from "antd";
 import { useImmer } from "use-immer";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ColumnRule, deleteColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
 import { DATA_TYPE } from "../../store/define.ts";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
@@ -33,7 +33,7 @@ function ColumnRuleList() {
     // 导航到编辑/新增页
     const navigate = useNavigate();
 
-    const handleColumnRuleQuery = useCallback(() => {
+    const handleColumnRuleQuery = () => {
         const columnName = queryForm.getFieldValue("columnName") as string;
         getColumnRuleListByRequirement(Number(fillRuleId), pageObj.number, pageObj.size, columnName)
             .then(({ data }) => {
@@ -43,24 +43,15 @@ function ColumnRuleList() {
                 setColumnRuleList(data.data);
             })
             .catch(() => null);
-    }, [fillRuleId, pageObj, queryForm]);
+    };
 
-    useMemo(() => {
+    useEffect(() => {
         handleColumnRuleQuery();
-        return true;
-    }, []);
-
-    const fetchFillRule = useCallback(() => {
         getRequirement(Number(fillRuleId))
             .then(({ data }) => {
                 setFillRuleData(data);
             })
             .catch(() => null);
-    }, [fillRuleId]);
-
-    useMemo(() => {
-        fetchFillRule();
-        return true;
     }, []);
 
     const handlePageChange: PaginationProps["onChange"] = (number, size) => {

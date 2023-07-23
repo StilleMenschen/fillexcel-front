@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Form, Input, InputNumber, Modal, Upload } from "antd";
 import {
@@ -14,7 +14,7 @@ import { RcFile, UploadFile } from "antd/es/upload/interface";
 import { useImmer } from "use-immer";
 
 export interface EditProps {
-    editId: number | null;
+    editId: number;
     openEdit: boolean;
     setOpenEdit: CallableFunction;
     onFillRuleQuery: CallableFunction;
@@ -37,10 +37,8 @@ function FillRuleEdit(props: EditProps) {
         props.setOpenEdit(false);
     };
 
-    useMemo(() => {
-        if (!props.editId) {
-            return false;
-        }
+    useEffect(() => {
+        if (props.editId <= 0) return;
         getRequirement(props.editId)
             .then(({ data }) => {
                 const { id, file_id, original_filename, remark, start_line, line_number } = data;
@@ -55,8 +53,7 @@ function FillRuleEdit(props: EditProps) {
                 editForm.setFieldValue("line_number", line_number);
             })
             .catch(() => null);
-        return true;
-    }, [props.editId]);
+    }, []);
 
     const handleSubmit = (data: AddOrUpdateRequirement) => {
         if (!fileItem.id || !fileItem.name) {
@@ -71,7 +68,7 @@ function FillRuleEdit(props: EditProps) {
             start_line: data.start_line,
             line_number: data.line_number
         };
-        if (!props.editId) {
+        if (props.editId <= 0) {
             addRequirement(formData)
                 .then(() => {
                     message.success("保存成功");
@@ -108,7 +105,13 @@ function FillRuleEdit(props: EditProps) {
     };
 
     return (
-        <Modal open={props.openEdit} onCancel={handleClose} title="新增填充规则" maskClosable={false} footer={null}>
+        <Modal
+            open={props.openEdit}
+            onCancel={handleClose}
+            title="新增填充规则"
+            forceRender={true}
+            maskClosable={false}
+            footer={null}>
             <Form
                 form={editForm}
                 onFinish={handleSubmit}
@@ -119,7 +122,7 @@ function FillRuleEdit(props: EditProps) {
                 name="editForm"
                 layout="vertical"
                 autoComplete="off">
-                {props.editId && (
+                {props.editId > 0 && (
                     <Form.Item name="id" label="ID" initialValue={props.editId}>
                         <Input disabled />
                     </Form.Item>

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
 import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
 import { DeleteOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons";
@@ -19,11 +19,11 @@ function FillRuleList() {
     // 表格组件分页
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [requirementList, setRequirementList] = useState<Array<Requirement>>([]);
-    const editId = useRef<number | null>(null);
+    const editId = useRef<number>(-1);
     // 导航到配置页
     const navigate = useNavigate();
 
-    const handleFillRuleQuery = useCallback(() => {
+    const handleFillRuleQuery = () => {
         const query = getQueryFormData();
         getRequirementList({ username, ...query }, pageObj.number, pageObj.size)
             .then(({ data }) => {
@@ -33,16 +33,15 @@ function FillRuleList() {
                 });
             })
             .catch(() => null);
-    }, [username, pageObj, updatePageObj]);
+    };
 
     const getQueryFormData = () => ({
         remark: queryForm.getFieldValue("remark") as string,
         original_filename: queryForm.getFieldValue("original_filename") as string
     });
 
-    useMemo(() => {
+    useEffect(() => {
         handleFillRuleQuery();
-        return true;
     }, []);
 
     const handleEdit = (id: number) => {
@@ -89,7 +88,7 @@ function FillRuleList() {
                     <Button
                         type="primary"
                         onClick={() => {
-                            editId.current = null;
+                            editId.current = -1;
                             setOpenEdit(true);
                         }}>
                         新增
