@@ -5,9 +5,9 @@ import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-
 import { useRef, useState } from "react";
 import { message } from "../../store/feedback.ts";
 import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
-import { addColumnRule, AddOrUpdateColumnRule } from "./column-rule-service.ts";
+import { AddOrUpdateColumnRule, getColumnRule, updateColumnRule } from "./column-rule-service.ts";
 import { useImmer } from "use-immer";
-import { addDataParameter } from "./column-rule-parameter-service.ts";
+import { addDataParameter, DataParameter, getDataParameterListByRule } from "./column-rule-parameter-service.ts";
 import { GenerateRuleParameter } from "../generate-rule/generate-rule-parameter-service.ts";
 
 type ParameterMap = {
@@ -26,23 +26,47 @@ const parallelSaveParameter = (ruleId: number, parameterList: Array<GenerateRule
     );
 };
 
-function ColumnRuleAdd() {
-    const { fillRuleId } = useParams();
+function ColumnRuleEdit() {
+    const { fillRuleId, columnRuleId } = useParams();
     const [editForm] = Form.useForm();
     const [parameterForm] = Form.useForm();
+    // 基础数据
     const parameterList = useRef<Array<GenerateRuleParameter>>([]);
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
     const [generateRuleId, setGenerateRuleId] = useState<number | null>(null);
     const ruleMap = useRef<GenerateRuleMap>({});
     const [hintObj, updateHintObj] = useImmer({ show: false, text: "" });
+    // 编辑数据
+    const [defaultParameterList, setDefaultParameterList] = useState<Array<DataParameter>>([]);
 
     const navigate = useNavigate();
 
-    const handleGenerateRuleLoad = (data: GenerateRuleMap) => {
-        ruleMap.current = data;
+    const loadEditDate = (gen_rule_data: GenerateRuleMap) => {
+        const crId = Number(columnRuleId);
+        let gen_rule_id = -1;
+        getColumnRule(crId)
+            .then(({ data }) => {
+                editForm.setFieldValue("column_name", data.column_name);
+                editForm.setFieldValue("column_type", data.column_type);
+                editForm.setFieldValue("associated_of", data.associated_of);
+                gen_rule_id = data.rule_id;
+                return getDataParameterListByRule(crId, 1, 16);
+            })
+            .then(({ data }) => {
+                setDefaultParameterList(data.data);
+                setGenerateRuleId(gen_rule_id);
+                setGenerateRule(gen_rule_data[gen_rule_id]);
+            })
+            .catch(() => null);
+        return true;
     };
 
-    const handleAddColumnRule = (columnRule: AddOrUpdateColumnRule) => {
+    const handleGenerateRuleLoad = (data: GenerateRuleMap) => {
+        ruleMap.current = data;
+        loadEditDate(data);
+    };
+
+    const handleUpdateColumnRule = (columnRule: AddOrUpdateColumnRule) => {
         if (!generateRuleId) {
             message.error("请先选择生成规则");
             return;
@@ -59,7 +83,8 @@ function ColumnRuleAdd() {
                     draft.text = "处理列规则...";
                 });
                 parameters = values;
-                return addColumnRule({ ...columnRule, requirement_id: Number(fillRuleId), rule_id: generateRuleId });
+                const crId = Number(columnRuleId);
+                return updateColumnRule(crId, { ...columnRule, requirement_id: Number(fillRuleId), rule_id: generateRuleId });
             })
             .then(({ data }) => {
                 updateHintObj((draft) => {
@@ -80,9 +105,9 @@ function ColumnRuleAdd() {
     };
 
     const handleGenerateRuleSelect = (value: number) => {
-        setGenerateRuleId(value);
         const item = ruleMap.current[value];
         setGenerateRule(item);
+        setGenerateRuleId(value);
         if (["calculate_expressions", "random_number_iter"].indexOf(item.function_name) != -1) {
             editForm.setFieldValue("column_type", "number");
         } else {
@@ -100,7 +125,7 @@ function ColumnRuleAdd() {
                 items={[
                     { title: <Link to="/fillRule">填充规则</Link> },
                     { title: <Link to={`/fillRule/${fillRuleId}`}>列规则</Link> },
-                    { title: "新增" }
+                    { title: "编辑" }
                 ]}
             />
             <div className="little-space"></div>
@@ -109,9 +134,9 @@ function ColumnRuleAdd() {
                     <Form
                         name="queryRuleForm"
                         form={editForm}
-                        onFinish={handleAddColumnRule}
+                        onFinish={handleUpdateColumnRule}
                         initialValues={{
-                            column_type: "string",
+                            column_type: "number",
                             associated_of: false
                         }}>
                         <Form.Item
@@ -161,6 +186,7 @@ function ColumnRuleAdd() {
                     <GenerateRuleParameterForm
                         parameterForm={parameterForm}
                         rule={generateRule}
+                        defaultParameterList={defaultParameterList}
                         onParameterListChange={handleParameterListChange}
                     />
                 </Col>
@@ -169,4 +195,4 @@ function ColumnRuleAdd() {
     );
 }
 
-export default ColumnRuleAdd;
+export default ColumnRuleEdit;

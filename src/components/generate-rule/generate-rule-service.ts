@@ -14,6 +14,6 @@ export function getGenerateRuleList(page: number, size: number): Promise<ResultR
     return httpService.get("/fills/generateRule", { params: { page, size } });
 }
 
-export function getGenerateRule(id: number): Promise<ResultResponse<Array<GenerateRule>>> {
+export function getGenerateRule(id: number): Promise<GenerateRule> {
     return httpService.get(`/fills/generateRule/${id}`);
 }

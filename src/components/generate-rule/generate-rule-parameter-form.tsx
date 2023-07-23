@@ -1,12 +1,14 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "./generate-rule-parameter-service.ts";
 import { Button, Form, FormInstance, Input, InputNumber, Switch } from "antd";
 import { GenerateRule } from "./generate-rule-service.ts";
 import { message } from "../../store/feedback.ts";
 import { Rule } from "rc-field-form/lib/interface";
+import { DataParameter } from "../column-rule/column-rule-parameter-service.ts";
 
 interface GenerateRuleParameterFormProp {
     rule: GenerateRule | null;
+    defaultParameterList?: Array<DataParameter>;
     parameterForm: FormInstance;
     onParameterListChange: (parameterList: Array<GenerateRuleParameter>) => void;
 }
@@ -82,17 +84,28 @@ export const renderInput = (parameter: GenerateRuleParameter, rule: GenerateRule
     }
 };
 
-export const settingInitialValues = (form: FormInstance, data: Array<GenerateRuleParameter>) => {
+export const settingInitialValues = (
+    form: FormInstance,
+    data: Array<GenerateRuleParameter>,
+    previousData?: Array<DataParameter>
+) => {
+    const previousDataMap = new Map();
+    if (previousData) {
+        previousData.forEach((param) => {
+            previousDataMap.set(param.name, param.value);
+        });
+    }
     data.forEach((grp) => {
+        const val = previousDataMap.get(grp.name) || grp.default_value;
         switch (grp.data_type) {
             case "boolean":
-                form.setFieldValue(grp.name, grp.default_value == "true");
+                form.setFieldValue(grp.name, val == "true");
                 break;
             case "number":
-                form.setFieldValue(grp.name, Number(grp.default_value));
+                form.setFieldValue(grp.name, Number(val));
                 break;
             default:
-                form.setFieldValue(grp.name, grp.default_value);
+                form.setFieldValue(grp.name, val);
         }
     });
 };
@@ -101,23 +114,20 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
     const ruleId = useRef<number>(-1);
 
-    const queryGenerateRuleParameter = useCallback(() => {
+    useMemo(() => {
         if (!props.rule || ruleId.current === props.rule.id) return;
         ruleId.current = props.rule.id;
         getGenerateRuleParameterListByRule(props.rule.id, 1, 16)
             .then(({ data }) => {
                 setGenerateRuleParameterList(data.data);
                 // 设置初始值
-                settingInitialValues(props.parameterForm, data.data);
+                settingInitialValues(props.parameterForm, data.data, props.defaultParameterList);
                 // 设置关联ID
                 props.onParameterListChange(data.data);
             })
             .catch(() => null);
-    }, [props, setGenerateRuleParameterList]);
-
-    useMemo(() => {
-        queryGenerateRuleParameter();
-    }, [queryGenerateRuleParameter]);
+        return true;
+    }, [props.rule, props.defaultParameterList]);
 
     return (
         <Form form={props.parameterForm} labelCol={{ span: 3 }} wrapperCol={{ span: 21 }} autoComplete="off">

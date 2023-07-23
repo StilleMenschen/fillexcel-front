@@ -1,17 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Typography, Tooltip } from "antd";
+import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
 import { DeleteOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
-import { deleteRequirement, getRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
+import { deleteRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
 import FillRuleEdit from "./fill-rule-edit.tsx";
 import { message } from "../../store/feedback.ts";
 import { useNavigate } from "react-router-dom";
-
-interface QueryRequirement {
-    remark: string | null;
-    original_filename: string | null;
-}
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
 
@@ -24,51 +19,42 @@ function FillRuleList() {
     // 表格组件分页
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [requirementList, setRequirementList] = useState<Array<Requirement>>([]);
-    const editData = useRef<Requirement | null>(null);
+    const editId = useRef<number | null>(null);
     // 导航到配置页
     const navigate = useNavigate();
 
-    const handleFillRuleQuery = useCallback(
-        (query: QueryRequirement) => {
-            getRequirementList({ username, ...query }, pageObj.number, pageObj.size)
-                .then(({ data }) => {
-                    setRequirementList(data.data);
-                    updatePageObj((draft) => {
-                        draft.total = data.page.total;
-                    });
-                })
-                .catch(() => null);
-        },
-        [username, pageObj, updatePageObj]
-    );
-
-    const getQueryFormData = useCallback(
-        () => ({
-            remark: queryForm.getFieldValue("remark") as string,
-            original_filename: queryForm.getFieldValue("original_filename") as string
-        }),
-        [queryForm]
-    );
-
-    useMemo(() => {
-        handleFillRuleQuery(getQueryFormData());
-        return true;
-    }, [handleFillRuleQuery, getQueryFormData]);
-
-    const handleEdit = (id: number) => {
-        getRequirement(id)
+    const handleFillRuleQuery = useCallback(() => {
+        const query = getQueryFormData();
+        getRequirementList({ username, ...query }, pageObj.number, pageObj.size)
             .then(({ data }) => {
-                editData.current = data;
-                setOpenEdit(true);
+                setRequirementList(data.data);
+                updatePageObj((draft) => {
+                    draft.total = data.page.total;
+                });
             })
             .catch(() => null);
+    }, [username, pageObj, updatePageObj]);
+
+    const getQueryFormData = () => ({
+        remark: queryForm.getFieldValue("remark") as string,
+        original_filename: queryForm.getFieldValue("original_filename") as string
+    });
+
+    useMemo(() => {
+        handleFillRuleQuery();
+        return true;
+    }, []);
+
+    const handleEdit = (id: number) => {
+        editId.current = id;
+        setOpenEdit(true);
     };
 
     const handleDeleteRequirement = (id: number) => {
         deleteRequirement(id)
             .then(() => {
-                message.warning(`数据已删除`);
-                handleFillRuleQuery(getQueryFormData());
+                message.warning("已删除");
+                handleFillRuleQuery();
             })
             .catch(() => null);
     };
@@ -103,7 +89,7 @@ function FillRuleList() {
                     <Button
                         type="primary"
                         onClick={() => {
-                            editData.current = null;
+                            editId.current = null;
                             setOpenEdit(true);
                         }}>
                         新增
@@ -171,12 +157,10 @@ function FillRuleList() {
             </Table>
             {openEdit && (
                 <FillRuleEdit
-                    editData={editData.current}
+                    editId={editId.current}
                     openEdit={openEdit}
                     setOpenEdit={setOpenEdit}
-                    onFillRuleQuery={() => {
-                        handleFillRuleQuery(getQueryFormData());
-                    }}
+                    onFillRuleQuery={handleFillRuleQuery}
                 />
             )}
         </>

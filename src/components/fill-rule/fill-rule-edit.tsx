@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Form, Input, InputNumber, Modal, Upload } from "antd";
 import {
     AddOrUpdateRequirement,
     addRequirement,
-    Requirement,
+    getRequirement,
     updateRequirement,
     uploadRequirementFile
 } from "./fill-rule-service.ts";
@@ -14,7 +14,7 @@ import { RcFile, UploadFile } from "antd/es/upload/interface";
 import { useImmer } from "use-immer";
 
 export interface EditProps {
-    editData: Requirement | null;
+    editId: number | null;
     openEdit: boolean;
     setOpenEdit: CallableFunction;
     onFillRuleQuery: CallableFunction;
@@ -37,25 +37,26 @@ function FillRuleEdit(props: EditProps) {
         props.setOpenEdit(false);
     };
 
-    const setEditFormData = useCallback(() => {
-        if (props.editData) {
-            const { id, file_id, original_filename, remark, start_line, line_number } = props.editData;
-            updateFileItem((draft) => {
-                draft.id = file_id;
-                draft.name = original_filename;
-            });
-            setFileList([{ uid: file_id, name: original_filename }]);
-            editForm.setFieldValue("id", id);
-            editForm.setFieldValue("remark", remark);
-            editForm.setFieldValue("start_line", start_line);
-            editForm.setFieldValue("line_number", line_number);
-        }
-    }, [editForm, props, updateFileItem]);
-
     useMemo(() => {
-        setEditFormData();
+        if (!props.editId) {
+            return false;
+        }
+        getRequirement(props.editId)
+            .then(({ data }) => {
+                const { id, file_id, original_filename, remark, start_line, line_number } = data;
+                updateFileItem((draft) => {
+                    draft.id = file_id;
+                    draft.name = original_filename;
+                });
+                setFileList([{ uid: file_id, name: original_filename }]);
+                editForm.setFieldValue("id", id);
+                editForm.setFieldValue("remark", remark);
+                editForm.setFieldValue("start_line", start_line);
+                editForm.setFieldValue("line_number", line_number);
+            })
+            .catch(() => null);
         return true;
-    }, [setEditFormData]);
+    }, [props.editId]);
 
     const handleSubmit = (data: AddOrUpdateRequirement) => {
         if (!fileItem.id || !fileItem.name) {
@@ -70,7 +71,7 @@ function FillRuleEdit(props: EditProps) {
             start_line: data.start_line,
             line_number: data.line_number
         };
-        if (!props.editData) {
+        if (!props.editId) {
             addRequirement(formData)
                 .then(() => {
                     message.success("保存成功");
@@ -78,7 +79,7 @@ function FillRuleEdit(props: EditProps) {
                 })
                 .catch(() => null);
         } else {
-            updateRequirement(props.editData.id, formData)
+            updateRequirement(props.editId, formData)
                 .then(() => {
                     message.success("保存成功");
                     handleClose();
@@ -118,8 +119,8 @@ function FillRuleEdit(props: EditProps) {
                 name="editForm"
                 layout="vertical"
                 autoComplete="off">
-                {props.editData && (
-                    <Form.Item name="id" label="ID" initialValue={props.editData.id}>
+                {props.editId && (
+                    <Form.Item name="id" label="ID" initialValue={props.editId}>
                         <Input disabled />
                     </Form.Item>
                 )}

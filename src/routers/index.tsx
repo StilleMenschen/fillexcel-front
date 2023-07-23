@@ -8,6 +8,7 @@ import DataSet from "../components/data-set/data-set.tsx";
 import FillRuleList from "../components/fill-rule/fill-rule-list.tsx";
 import ColumnRuleList from "../components/column-rule/column-rule-list.tsx";
 import ColumnRuleAdd from "../components/column-rule/column-rule-add.tsx";
+import ColumnRuleEdit from "../components/column-rule/column-rule-edit.tsx";
 
 const router = createBrowserRouter([
     {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
                     {
                         path: ":fillRuleId/add",
                         element: <ColumnRuleAdd />
+                    },
+                    {
+                        path: ":fillRuleId/edit/:columnRuleId",
+                        element: <ColumnRuleEdit />
                     }
                 ]
             },

@@ -27,8 +27,7 @@ function Home() {
         messageUnit.loading = (msg) => {
             void messageApi.loading(msg);
         };
-        return true;
-    }, [messageApi]);
+    }, []);
 
     return (
         <>

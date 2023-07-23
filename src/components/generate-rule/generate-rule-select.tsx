@@ -1,14 +1,16 @@
 import { Select } from "antd";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { GenerateRule, getGenerateRuleList } from "./generate-rule-service.ts";
 import { BaseOptionType } from "rc-select/lib/Select";
 
 export interface GenerateRuleSelectProp {
-    onChange: (value: GenerateRule) => void;
+    onLoad: (data: GenerateRuleMap) => void;
+    value: number | null;
+    onChange: (value: number) => void;
 }
 
 export interface GenerateRuleMap {
-    [key: string]: GenerateRule;
+    [key: number]: GenerateRule;
 }
 
 const initGenerateRuleMap = (data: Array<GenerateRule>) => {
@@ -21,31 +23,26 @@ const initGenerateRuleMap = (data: Array<GenerateRule>) => {
 
 function GenerateRuleSelect(props: GenerateRuleSelectProp) {
     const [generateRuleList, setGenerateRuleList] = useState<Array<GenerateRule>>([]);
-    const ruleMap = useRef<GenerateRuleMap>({});
 
-    const queryGenerateRule = useCallback(() => {
+    useMemo(() => {
         getGenerateRuleList(1, 16)
             .then(({ data }) => {
                 setGenerateRuleList(data.data);
-                setTimeout(() => {
-                    ruleMap.current = initGenerateRuleMap(data.data);
-                }, 0);
+                props.onLoad(initGenerateRuleMap(data.data));
             })
             .catch(() => null);
-    }, [setGenerateRuleList]);
-
-    useMemo(() => {
-        queryGenerateRule();
-    }, [queryGenerateRule]);
+        return true;
+    }, []);
 
     return (
         <Select<number, BaseOptionType>
+            value={props.value}
             onChange={(id) => {
-                props.onChange(ruleMap.current[id]);
+                props.onChange(id);
             }}
             options={generateRuleList.map((gr) => ({
-                value: gr.id,
-                label: gr.description
+                label: gr.description,
+                value: gr.id
             }))}
         />
     );

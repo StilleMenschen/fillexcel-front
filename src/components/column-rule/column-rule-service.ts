@@ -21,10 +21,10 @@ export interface AddOrUpdateColumnRule {
 }
 
 export function getColumnRuleListByRequirement(
-    requirementId: number | string,
+    requirementId: number,
     page: number,
     size: number,
-    columnName?: number | string
+    columnName?: string
 ): Promise<ResultResponse<Array<ColumnRule>>> {
     return httpService.get("/fills/columnRule", { params: { requirementId, page, size, columnName } });
 }

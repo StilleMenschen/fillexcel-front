@@ -1,11 +1,26 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Breadcrumb, Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import {
+    Breadcrumb,
+    Button,
+    Card,
+    Col,
+    Form,
+    Input,
+    PaginationProps,
+    Popconfirm,
+    Row,
+    Space,
+    Table,
+    Tooltip,
+    Typography
+} from "antd";
 import { useImmer } from "use-immer";
 import { useCallback, useMemo, useState } from "react";
 import { ColumnRule, deleteColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
 import { DATA_TYPE } from "../../store/define.ts";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { message } from "../../store/feedback.ts";
+import { getRequirement, Requirement } from "../fill-rule/fill-rule-service.ts";
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
 
@@ -14,12 +29,13 @@ function ColumnRuleList() {
     const [queryForm] = Form.useForm();
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [columnRuleList, setColumnRuleList] = useState<Array<ColumnRule>>([]);
+    const [fillRuleData, setFillRuleData] = useState<Requirement>();
     // 导航到编辑/新增页
     const navigate = useNavigate();
 
     const handleColumnRuleQuery = useCallback(() => {
         const columnName = queryForm.getFieldValue("columnName") as string;
-        getColumnRuleListByRequirement(fillRuleId || "", pageObj.number, pageObj.size, columnName)
+        getColumnRuleListByRequirement(Number(fillRuleId), pageObj.number, pageObj.size, columnName)
             .then(({ data }) => {
                 updatePageObj((draft) => {
                     draft.total = data.page.total;
@@ -27,12 +43,25 @@ function ColumnRuleList() {
                 setColumnRuleList(data.data);
             })
             .catch(() => null);
-    }, [fillRuleId, pageObj, queryForm, updatePageObj, setColumnRuleList]);
+    }, [fillRuleId, pageObj, queryForm]);
 
     useMemo(() => {
         handleColumnRuleQuery();
         return true;
-    }, [handleColumnRuleQuery]);
+    }, []);
+
+    const fetchFillRule = useCallback(() => {
+        getRequirement(Number(fillRuleId))
+            .then(({ data }) => {
+                setFillRuleData(data);
+            })
+            .catch(() => null);
+    }, [fillRuleId]);
+
+    useMemo(() => {
+        fetchFillRule();
+        return true;
+    }, []);
 
     const handlePageChange: PaginationProps["onChange"] = (number, size) => {
         // 如果分页数有变
@@ -72,66 +101,87 @@ function ColumnRuleList() {
                     <Button
                         type="primary"
                         onClick={() => {
-                            navigate(`/fillRule/${fillRuleId || ""}/add`);
+                            navigate(`/fillRule/${fillRuleId}/add`);
                         }}>
                         新增
                     </Button>
                 </Form.Item>
             </Form>
             <div className="little-space"></div>
-            <Table<ColumnRule>
-                rowKey="id"
-                dataSource={columnRuleList}
-                pagination={{
-                    current: pageObj.number,
-                    pageSize: pageObj.size,
-                    pageSizeOptions: [8, 16],
-                    showSizeChanger: true,
-                    total: pageObj.total,
-                    showTotal: showTotal,
-                    onChange: handlePageChange
-                }}>
-                <Table.Column<ColumnRule> title="规则ID" dataIndex="rule_id" key="rule_id" />
-                <Table.Column<ColumnRule> title="列名" dataIndex="column_name" key="column_name" />
-                <Table.Column<ColumnRule>
-                    title="数据类型"
-                    key="column_type"
-                    render={(_, row) => (
-                        <Typography.Text> {DATA_TYPE.get(row.column_type) || row.column_type} </Typography.Text>
-                    )}
-                />
-                <Table.Column<ColumnRule>
-                    title="是否有关联数据"
-                    key="associated_of"
-                    render={(_, row) => <Typography.Text> {row.associated_of ? "是" : "否"} </Typography.Text>}
-                />
-                <Table.Column<ColumnRule> title="更新于" dataIndex="updated_at" key="updated_at" />
-                <Table.Column<ColumnRule>
-                    title="操作"
-                    key="operation"
-                    fixed="right"
-                    width={140}
-                    render={(_, row) => (
-                        <Space size="small">
-                            <Popconfirm
-                                title="确定要删除此规则？"
-                                description={<Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>}
-                                placement="left"
-                                cancelButtonProps={{
-                                    danger: true
-                                }}
-                                okType="default"
-                                onCancel={() => handleColumnRule(row.id)}
-                                okText="取消"
-                                cancelText="删除">
-                                <Tooltip title="删除">
-                                    <Button shape="circle" icon={<DeleteOutlined style={{ fontSize: "1.12rem" }} />} />
-                                </Tooltip>
-                            </Popconfirm>
-                        </Space>
-                    )}
-                />
-            </Table>
+            <Row gutter={[0, 2]}>
+                <Col span={18}>
+                    <Table<ColumnRule>
+                        rowKey="id"
+                        dataSource={columnRuleList}
+                        pagination={{
+                            current: pageObj.number,
+                            pageSize: pageObj.size,
+                            pageSizeOptions: [8, 16],
+                            showSizeChanger: true,
+                            total: pageObj.total,
+                            showTotal: showTotal,
+                            onChange: handlePageChange
+                        }}>
+                        <Table.Column<ColumnRule> title="列名" dataIndex="column_name" key="column_name" />
+                        <Table.Column<ColumnRule>
+                            title="数据类型"
+                            key="column_type"
+                            render={(_, row) => (
+                                <Typography.Text> {DATA_TYPE.get(row.column_type) || row.column_type} </Typography.Text>
+                            )}
+                        />
+                        <Table.Column<ColumnRule>
+                            title="是否有关联数据"
+                            key="associated_of"
+                            render={(_, row) => <Typography.Text> {row.associated_of ? "是" : "否"} </Typography.Text>}
+                        />
+                        <Table.Column<ColumnRule> title="更新于" dataIndex="updated_at" key="updated_at" />
+                        <Table.Column<ColumnRule>
+                            title="操作"
+                            key="operation"
+                            fixed="right"
+                            width={140}
+                            render={(_, row) => (
+                                <Space size="small">
+                                    <Tooltip title="编辑">
+                                        <Button
+                                            shape="circle"
+                                            onClick={() => navigate(`/fillRule/${fillRuleId}/edit/${row.id}`)}
+                                            icon={<EditOutlined style={{ fontSize: "1.12rem" }} />}
+                                        />
+                                    </Tooltip>
+                                    <Popconfirm
+                                        title="确定要删除此规则？"
+                                        description={
+                                            <Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>
+                                        }
+                                        placement="left"
+                                        cancelButtonProps={{
+                                            danger: true
+                                        }}
+                                        okType="default"
+                                        onCancel={() => handleColumnRule(row.id)}
+                                        okText="取消"
+                                        cancelText="删除">
+                                        <Tooltip title="删除">
+                                            <Button shape="circle" icon={<DeleteOutlined style={{ fontSize: "1.12rem" }} />} />
+                                        </Tooltip>
+                                    </Popconfirm>
+                                </Space>
+                            )}
+                        />
+                    </Table>
+                </Col>
+                <Col span={4}>
+                    <Card title={fillRuleData?.remark} style={{ width: "92%", marginLeft: "8%" }}>
+                        <Typography.Paragraph>
+                            从第 {fillRuleData?.start_line} 行开始填入 {fillRuleData?.line_number} 行数据
+                        </Typography.Paragraph>
+                        <Typography.Paragraph>文件：{fillRuleData?.original_filename}</Typography.Paragraph>
+                        <Typography.Paragraph>更新于：{fillRuleData?.updated_at}</Typography.Paragraph>
+                    </Card>
+                </Col>
+            </Row>
         </>
     );
 }

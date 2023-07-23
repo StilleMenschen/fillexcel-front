@@ -38,14 +38,3 @@ export function addDataParameter(
 export function getDataParameter(id: number): Promise<AxiosResponse<DataParameter>> {
     return httpService.get(`/fills/dataParameter/${id}`);
 }
-
-export function updateDataParameter(
-    id: number,
-    dataParameter: AddOrUpdateDataParameter
-): Promise<AxiosResponse<DataParameter>> {
-    return httpService.put(`/fills/dataParameter/${id}`, dataParameter);
-}
-
-export function deleteDataParameter(id: number): Promise<AxiosResponse<DataParameter>> {
-    return httpService.delete(`/fills/dataParameter/${id}`);
-}
