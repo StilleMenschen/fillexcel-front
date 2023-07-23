@@ -16,7 +16,7 @@ export interface AddOrUpdateColumnRule {
     requirement_id: number;
     rule_id: number;
     column_name: string;
-    column_type: string;
+    column_type: "string" | "number";
     associated_of: boolean;
 }
 

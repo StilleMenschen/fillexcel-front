@@ -83,6 +83,11 @@ function ColumnRuleAdd() {
 
     const handleGenerateRuleSelect = (value: GenerateRule) => {
         setGenerateRule(value);
+        if (["calculate_expressions", "random_number_iter"].indexOf(value.function_name) != -1) {
+            editForm.setFieldValue("column_type", "number");
+        } else {
+            editForm.setFieldValue("column_type", "string");
+        }
     };
 
     const handleParameterListChange = (paramList: Array<GenerateRuleParameter>) => {
