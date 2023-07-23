@@ -7,8 +7,7 @@ import { message } from "../../store/feedback.ts";
 import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
 import { addColumnRule, AddOrUpdateColumnRule } from "./column-rule-service.ts";
 import { useImmer } from "use-immer";
-import { addDataParameter, DataParameter } from "./column-rule-parameter-service.ts";
-import { AxiosResponse } from "axios";
+import { addDataParameter } from "./column-rule-parameter-service.ts";
 import { GenerateRuleParameter } from "../generate-rule/generate-rule-parameter-service.ts";
 
 type ParameterMap = {
@@ -24,16 +23,14 @@ const saveColumnRule = (requirement_id: number, rule_id: number, columnRule: Add
 };
 
 const parallelSaveParameter = (ruleId: number, parameterList: Array<GenerateRuleParameter>, values: ParameterMap) => {
-    return Promise.all<AxiosResponse<DataParameter>>(
-        parameterList.map((param) => {
-            return addDataParameter({
-                param_rule_id: param.id,
-                column_rule_id: ruleId,
-                name: param.name,
-                value: String(values[param.name]),
-                data_set_id: 0
-            });
-        })
+    return addDataParameter(
+        parameterList.map((param) => ({
+            param_rule_id: param.id,
+            column_rule_id: ruleId,
+            name: param.name,
+            value: String(values[param.name]),
+            data_set_id: 0
+        }))
     );
 };
 
@@ -76,9 +73,7 @@ function ColumnRuleAdd() {
                 message.success("新增成功");
                 navigate(`/fillRule/${fillRuleId}`);
             })
-            .catch(() => {
-                message.error("校验失败");
-            })
+            .catch(() => null)
             .finally(() => {
                 updateHintObj((draft) => {
                     draft.show = false;

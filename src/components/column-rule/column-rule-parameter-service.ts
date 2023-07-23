@@ -29,8 +29,10 @@ export function getDataParameterListByRule(
     return httpService.get("/fills/dataParameter", { params: { columnRuleId, page, size, columnName } });
 }
 
-export function addDataParameter(dataParameter: AddOrUpdateDataParameter): Promise<AxiosResponse<DataParameter>> {
-    return httpService.post("/fills/dataParameter", dataParameter);
+export function addDataParameter(
+    dataParameterList: Array<AddOrUpdateDataParameter>
+): Promise<AxiosResponse<Array<DataParameter>>> {
+    return httpService.post("/fills/dataParameter", dataParameterList);
 }
 
 export function getDataParameter(id: number): Promise<AxiosResponse<DataParameter>> {
