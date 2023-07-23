@@ -9,6 +9,7 @@ import FillRuleList from "../components/fill-rule/fill-rule-list.tsx";
 import ColumnRuleList from "../components/column-rule/column-rule-list.tsx";
 import ColumnRuleAdd from "../components/column-rule/column-rule-add.tsx";
 import ColumnRuleEdit from "../components/column-rule/column-rule-edit.tsx";
+import FileRecordList from "../components/fille-record/file-recod-list.tsx";
 
 const router = createBrowserRouter([
     {
@@ -62,15 +63,15 @@ const router = createBrowserRouter([
                     return null;
                 },
                 element: <DataSet />
-            }
-            /* {
+            },
+            {
                 path: "/fileRecord",
                 loader: () => {
                     setNavBar("fileRecord");
                     return null;
                 },
-                element: <FileRecordTable />
-            }*/
+                element: <FileRecordList />
+            }
         ]
     },
     {

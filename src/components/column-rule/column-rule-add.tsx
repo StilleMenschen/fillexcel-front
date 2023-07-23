@@ -79,14 +79,30 @@ function ColumnRuleAdd() {
             });
     };
 
+    const setFormField = (name: string, value: unknown) => {
+        editForm.setFieldValue(name, value);
+    };
+
     const handleGenerateRuleSelect = (value: number) => {
-        setGenerateRuleId(value);
         const item = ruleMap.current[value];
+        setGenerateRuleId(value);
         setGenerateRule(item);
-        if (["calculate_expressions", "random_number_iter"].indexOf(item.function_name) != -1) {
-            editForm.setFieldValue("column_type", "number");
-        } else {
-            editForm.setFieldValue("column_type", "string");
+        switch (item.function_name) {
+            case "join_string":
+                setFormField("column_type", "string");
+                setFormField("associated_of", true);
+                break;
+            case "calculate_expressions":
+                setFormField("column_type", "number");
+                setFormField("associated_of", true);
+                break;
+            case "random_number_iter":
+                setFormField("column_type", "number");
+                setFormField("associated_of", false);
+                break;
+            default:
+                setFormField("column_type", "string");
+                setFormField("associated_of", false);
         }
     };
 
@@ -142,7 +158,12 @@ function ColumnRuleAdd() {
                                 ]}
                             />
                         </Form.Item>
-                        <Form.Item label="数据关联" extra="是否需要关联外部数据集（自动设置）" name="associated_of" required>
+                        <Form.Item
+                            label="数据关联"
+                            extra="是否需要关联外部数据集（自动设置）"
+                            name="associated_of"
+                            valuePropName="checked"
+                            required>
                             <Switch disabled />
                         </Form.Item>
                         <Form.Item style={{ paddingLeft: "4.8rem" }}>

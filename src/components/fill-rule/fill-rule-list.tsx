@@ -42,7 +42,7 @@ function FillRuleList() {
 
     useEffect(() => {
         handleFillRuleQuery();
-    }, []);
+    }, [pageObj]);
 
     const handleEdit = (id: number) => {
         editId.current = id;

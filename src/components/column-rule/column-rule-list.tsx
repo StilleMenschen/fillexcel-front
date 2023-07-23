@@ -37,16 +37,19 @@ function ColumnRuleList() {
         const columnName = queryForm.getFieldValue("columnName") as string;
         getColumnRuleListByRequirement(Number(fillRuleId), pageObj.number, pageObj.size, columnName)
             .then(({ data }) => {
+                setColumnRuleList(data.data);
                 updatePageObj((draft) => {
                     draft.total = data.page.total;
                 });
-                setColumnRuleList(data.data);
             })
             .catch(() => null);
     };
 
     useEffect(() => {
         handleColumnRuleQuery();
+    }, [pageObj]);
+
+    useEffect(() => {
         getRequirement(Number(fillRuleId))
             .then(({ data }) => {
                 setFillRuleData(data);
@@ -99,7 +102,7 @@ function ColumnRuleList() {
                 </Form.Item>
             </Form>
             <div className="little-space"></div>
-            <Row gutter={[0, 2]}>
+            <Row>
                 <Col span={18}>
                     <Table<ColumnRule>
                         rowKey="id"
@@ -164,7 +167,7 @@ function ColumnRuleList() {
                     </Table>
                 </Col>
                 <Col span={4}>
-                    <Card title={fillRuleData?.remark} style={{ width: "92%", marginLeft: "8%" }}>
+                    <Card title={fillRuleData?.remark} style={{ width: "94%", marginLeft: "6%" }}>
                         <Typography.Paragraph>
                             从第 {fillRuleData?.start_line} 行开始填入 {fillRuleData?.line_number} 行数据
                         </Typography.Paragraph>

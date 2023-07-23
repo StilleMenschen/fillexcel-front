@@ -1,6 +1,6 @@
 import { ResultResponse, httpService } from "../../http";
 
-export interface FileRecordItem {
+export interface FileRecord {
     id: number;
     requirement_id: number;
     username: string;
@@ -9,6 +9,10 @@ export interface FileRecordItem {
     created_at: string;
 }
 
-export function getFileRecordList(username: string | null): Promise<ResultResponse<Array<FileRecordItem>>> {
-    return httpService.get("/fills/fileRecord", { params: { username } });
+export function getFileRecordList(
+    username: string | null,
+    page: number,
+    size: number
+): Promise<ResultResponse<Array<FileRecord>>> {
+    return httpService.get("/fills/fileRecord", { params: { username, page, size } });
 }
