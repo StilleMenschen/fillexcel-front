@@ -75,7 +75,7 @@ httpService.interceptors.response.use(
             if (response.status) {
                 if (400 == response.status) {
                     message.warning("传入数据有误，请重新填写");
-                } else if ([401, 403].indexOf(response.status) !== -1) {
+                } else if (response.status == 401) {
                     setLogout();
                     if (response.config.url?.indexOf("/auth/token") === -1) {
                         message.warning("登录失效，请重新登录");
