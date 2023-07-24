@@ -18,7 +18,7 @@ import { useImmer } from "use-immer";
 import { useEffect, useState } from "react";
 import { ColumnRule, deleteColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
 import { DATA_TYPE } from "../../store/define.ts";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import { message } from "../../store/feedback.ts";
 import { getRequirement, Requirement } from "../fill-rule/fill-rule-service.ts";
 
@@ -141,7 +141,7 @@ function ColumnRuleList() {
                                         <Button
                                             shape="circle"
                                             onClick={() => navigate(`/fillRule/${fillRuleId}/edit/${row.id}`)}
-                                            icon={<EditOutlined style={{ fontSize: "1.12rem" }} />}
+                                            icon={<EditFilled style={{ fontSize: "1.12rem" }} />}
                                         />
                                     </Tooltip>
                                     <Popconfirm
@@ -158,7 +158,7 @@ function ColumnRuleList() {
                                         okText="取消"
                                         cancelText="删除">
                                         <Tooltip title="删除">
-                                            <Button shape="circle" icon={<DeleteOutlined style={{ fontSize: "1.12rem" }} />} />
+                                            <Button shape="circle" icon={<DeleteFilled style={{ fontSize: "1.12rem" }} />} />
                                         </Tooltip>
                                     </Popconfirm>
                                 </Space>

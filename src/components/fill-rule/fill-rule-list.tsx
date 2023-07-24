@@ -1,14 +1,46 @@
 import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
 import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
-import { DeleteOutlined, EditOutlined, SettingOutlined } from "@ant-design/icons";
+import { DeleteFilled, EditFilled, SettingFilled, SnippetsFilled } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
-import { deleteRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
+import { deleteRequirement, generateFile, getRequirementList, Requirement } from "./fill-rule-service.ts";
 import FillRuleEdit from "./fill-rule-edit.tsx";
 import { message } from "../../store/feedback.ts";
 import { useNavigate } from "react-router-dom";
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
+
+interface GenerateButtonProps {
+    requirementId: number;
+}
+
+/**
+ * 独立的生成文件操作按钮，防止频繁点击
+ */
+function GenerateButton(props: GenerateButtonProps) {
+    const [disabled, setDisabled] = useState(false);
+
+    const handleGenerateFile = () => {
+        setDisabled(true);
+        generateFile(props.requirementId)
+            .then(() => {
+                message.info("提交生成成功");
+            })
+            .catch(() => null)
+            .finally(() => {
+                setDisabled(false);
+            });
+    };
+
+    return (
+        <Button
+            shape="circle"
+            icon={<SnippetsFilled style={{ fontSize: "1.12rem" }} />}
+            disabled={disabled}
+            onClick={handleGenerateFile}
+        />
+    );
+}
 
 function FillRuleList() {
     // 查询
@@ -114,7 +146,13 @@ function FillRuleList() {
                 <Table.Column<Requirement> title="填充行数" dataIndex="line_number" width={100} key="line_number" />
                 <Table.Column<Requirement> title="更新于" dataIndex="updated_at" width={172} key="updated_at" />
                 <Table.Column<Requirement>
-                    title="操作"
+                    title="生成"
+                    key="generates"
+                    width={64}
+                    render={(_, row) => <GenerateButton key={row.id} requirementId={row.id} />}
+                />
+                <Table.Column<Requirement>
+                    title="编辑"
                     key="operation"
                     fixed="right"
                     width={140}
@@ -124,7 +162,7 @@ function FillRuleList() {
                                 <Button
                                     type="primary"
                                     shape="circle"
-                                    icon={<SettingOutlined style={{ fontSize: "1.12rem" }} />}
+                                    icon={<SettingFilled style={{ fontSize: "1.12rem" }} />}
                                     onClick={() => navigate(`/fillRule/${row.id}`)}
                                 />
                             </Tooltip>
@@ -132,7 +170,7 @@ function FillRuleList() {
                                 <Button
                                     shape="circle"
                                     onClick={() => handleEdit(row.id)}
-                                    icon={<EditOutlined style={{ fontSize: "1.12rem" }} />}
+                                    icon={<EditFilled style={{ fontSize: "1.12rem" }} />}
                                 />
                             </Tooltip>
                             <Popconfirm
@@ -147,7 +185,7 @@ function FillRuleList() {
                                 okText="取消"
                                 cancelText="删除">
                                 <Tooltip title="删除">
-                                    <Button shape="circle" icon={<DeleteOutlined style={{ fontSize: "1.12rem" }} />} />
+                                    <Button shape="circle" icon={<DeleteFilled style={{ fontSize: "1.12rem" }} />} />
                                 </Tooltip>
                             </Popconfirm>
                         </Space>

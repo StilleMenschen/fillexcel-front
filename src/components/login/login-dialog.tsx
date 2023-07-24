@@ -43,7 +43,7 @@ function LoginDialog() {
                     <Input.Password allowClear />
                 </Form.Item>
                 <Form.Item>
-                    <Button style={{ marginTop: "1rem", width: "100%" }} type="primary" htmlType="submit">
+                    <Button style={{ marginTop: "1rem" }} block type="primary" htmlType="submit">
                         登录
                     </Button>
                 </Form.Item>

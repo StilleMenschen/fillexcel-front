@@ -67,3 +67,7 @@ export function uploadRequirementFile(username: string, file: File): Promise<Axi
         }
     });
 }
+
+export function generateFile(id: number) {
+    return httpService.post(`/fills/${id}`);
+}

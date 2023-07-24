@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileRecord, downloadFile, getFileRecordList } from "./file-recod-service";
+import { downloadFile, FileRecord, getFileRecordList } from "./file-recod-service";
 import { Button, PaginationProps, Space, Table, Tooltip } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useImmer } from "use-immer";
@@ -7,6 +7,53 @@ import { useUser } from "../../store/account.ts";
 import { message } from "../../store/feedback.ts";
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
+
+interface DownloadButtonProps {
+    fileId: number;
+    filename: string;
+}
+
+/**
+ * 独立的下载控制按钮，防止频繁点击
+ */
+function DownloadButton(props: DownloadButtonProps) {
+    const [disabled, setDisabled] = useState(false);
+
+    const handleDownloadFile = () => {
+        message.info("文件下载处理中...");
+        setDisabled(true);
+        downloadFile(props.fileId)
+            .then((response) => {
+                // 创建一个url对象，指向响应数据
+                const url = window.URL.createObjectURL(response.data);
+                // 创建一个a标签，设置href为url对象，download为文件名称
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = props.filename;
+                // 触发a标签的点击事件，开始下载文件
+                a.click();
+                // 释放url对象
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(() => null)
+            .finally(() => {
+                setTimeout(() => {
+                    setDisabled(false);
+                }, 2000);
+            });
+    };
+
+    return (
+        <Tooltip title="文件下载">
+            <Button
+                shape="circle"
+                icon={<DownloadOutlined style={{ fontSize: "1.12rem" }} />}
+                disabled={disabled}
+                onClick={handleDownloadFile}
+            />
+        </Tooltip>
+    );
+}
 
 function FileRecordList() {
     const { username } = useUser();
@@ -23,11 +70,6 @@ function FileRecordList() {
                 });
             })
             .catch(() => null);
-    };
-
-    const handleDownloadFile = (id: number, filename: string) => {
-        message.info("文件下载处理中...");
-        downloadFile(id, filename).catch(() => null);
     };
 
     useEffect(() => {
@@ -50,6 +92,7 @@ function FileRecordList() {
 
     return (
         <>
+            <Button onClick={handleFileRecordQuery}>查询啦</Button>
             <Table<FileRecord>
                 rowKey="id"
                 dataSource={fileRecordList}
@@ -66,19 +109,13 @@ function FileRecordList() {
                 <Table.Column<FileRecord> title="文件名" dataIndex="filename" key="filename" />
                 <Table.Column<FileRecord> title="创建于" dataIndex="created_at" key="created_at" />
                 <Table.Column<FileRecord>
-                    title="操作"
+                    title="下载"
                     key="operation"
                     fixed="right"
-                    width={140}
+                    width={64}
                     render={(_, row) => (
                         <Space size="small">
-                            <Tooltip title="文件下载">
-                                <Button
-                                    shape="circle"
-                                    onClick={() => handleDownloadFile(row.id, row.filename)}
-                                    icon={<DownloadOutlined style={{ fontSize: "1.12rem" }} />}
-                                />
-                            </Tooltip>
+                            <DownloadButton key={row.id} fileId={row.id} filename={row.filename} />
                         </Space>
                     )}
                 />

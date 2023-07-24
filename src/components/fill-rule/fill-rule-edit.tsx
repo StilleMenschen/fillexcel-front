@@ -166,7 +166,7 @@ function FillRuleEdit(props: EditProps) {
                     </Upload>
                 </Form.Item>
                 <Form.Item>
-                    <Button style={{ width: "100%" }} size="large" type="primary" htmlType="submit">
+                    <Button block size="large" type="primary" htmlType="submit">
                         保存
                     </Button>
                 </Form.Item>

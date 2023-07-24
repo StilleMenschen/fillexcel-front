@@ -15,6 +15,7 @@ const items: MenuProps["items"] = [
         key: "3",
         label: (
             <Typography.Text
+                style={{ display: "block", width: "100%", height: "100%" }}
                 onClick={() => {
                     setLogout();
                 }}>
