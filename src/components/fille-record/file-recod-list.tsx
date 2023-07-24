@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { FileRecord, getFileRecordList } from "./file-recod-service";
-import { PaginationProps, Table } from "antd";
+import { FileRecord, downloadFile, getFileRecordList } from "./file-recod-service";
+import { Button, PaginationProps, Space, Table, Tooltip } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
 import { useImmer } from "use-immer";
 import { useUser } from "../../store/account.ts";
+import { message } from "../../store/feedback.ts";
 
 const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
 
@@ -21,6 +23,11 @@ function FileRecordList() {
                 });
             })
             .catch(() => null);
+    };
+
+    const handleDownloadFile = (id: number, filename: string) => {
+        message.info("文件下载处理中...");
+        downloadFile(id, filename).catch(() => null);
     };
 
     useEffect(() => {
@@ -58,6 +65,23 @@ function FileRecordList() {
                 <Table.Column<FileRecord> title="文件ID" dataIndex="file_id" key="file_id" />
                 <Table.Column<FileRecord> title="文件名" dataIndex="filename" key="filename" />
                 <Table.Column<FileRecord> title="创建于" dataIndex="created_at" key="created_at" />
+                <Table.Column<FileRecord>
+                    title="操作"
+                    key="operation"
+                    fixed="right"
+                    width={140}
+                    render={(_, row) => (
+                        <Space size="small">
+                            <Tooltip title="文件下载">
+                                <Button
+                                    shape="circle"
+                                    onClick={() => handleDownloadFile(row.id, row.filename)}
+                                    icon={<DownloadOutlined style={{ fontSize: "1.12rem" }} />}
+                                />
+                            </Tooltip>
+                        </Space>
+                    )}
+                />
             </Table>
         </>
     );

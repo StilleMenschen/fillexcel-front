@@ -71,7 +71,7 @@ function ColumnRuleList() {
         }
     };
 
-    const handleColumnRule = (id: number) => {
+    const handleDeleteColumnRule = (id: number) => {
         deleteColumnRule(id)
             .then(() => {
                 message.success("已删除");
@@ -154,7 +154,7 @@ function ColumnRuleList() {
                                             danger: true
                                         }}
                                         okType="default"
-                                        onCancel={() => handleColumnRule(row.id)}
+                                        onCancel={() => handleDeleteColumnRule(row.id)}
                                         okText="取消"
                                         cancelText="删除">
                                         <Tooltip title="删除">
