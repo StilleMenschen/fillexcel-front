@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { Button, Form, Input, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import { Button, Form, Input, Popconfirm, Space, Table, Tooltip, Typography, notification } from "antd";
 import { DeleteFilled, EditFilled, SettingFilled, SnippetsFilled } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
 import { deleteRequirement, generateFile, getRequirementList, Requirement } from "./fill-rule-service.ts";
@@ -18,13 +18,25 @@ interface GenerateButtonProps {
  * 独立的生成文件操作按钮，防止频繁点击
  */
 function GenerateButton(props: GenerateButtonProps) {
+    const [notify, contextHolder] = notification.useNotification();
     const [disabled, setDisabled] = useState(false);
 
     const handleGenerateFile = () => {
         setDisabled(true);
         generateFile(props.requirementId)
-            .then(() => {
-                message.info("已提交生成请求，稍后可在“文件记录”中下载生成后的文件");
+            .then(({ data }) => {
+                notify.success({
+                    message: "已提交生成请求",
+                    description: (
+                        <Typography.Paragraph>
+                            稍后可在“生成记录”中下载生成后的文件
+                            <br />
+                            文件ID: {data.fileId}
+                        </Typography.Paragraph>
+                    ),
+                    placement: "bottomRight",
+                    duration: 6
+                });
             })
             .catch(() => null)
             .finally(() => {
@@ -33,14 +45,15 @@ function GenerateButton(props: GenerateButtonProps) {
     };
 
     return (
-        <Tooltip title="生成文件">
+        <>
+            {contextHolder}
             <Button
                 shape="circle"
                 icon={<SnippetsFilled style={{ fontSize: "1.12rem" }} />}
                 disabled={disabled}
                 onClick={handleGenerateFile}
             />
-        </Tooltip>
+        </>
     );
 }
 
@@ -151,7 +164,11 @@ function FillRuleList() {
                     title="生成"
                     key="generates"
                     width={64}
-                    render={(_, row) => <GenerateButton key={row.id} requirementId={row.id} />}
+                    render={(_, row) => (
+                        <Tooltip title="生成文件">
+                            <GenerateButton key={row.id} requirementId={row.id} />
+                        </Tooltip>
+                    )}
                 />
                 <Table.Column<Requirement>
                     title="编辑"

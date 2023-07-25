@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { downloadFile, FileRecord, getFileRecordList } from "./file-recod-service";
-import { Button, Table, Tooltip } from "antd";
+import { Button, Form, Input, Table, Tooltip } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useImmer } from "use-immer";
 import { useUser } from "../../store/account.ts";
@@ -58,12 +58,14 @@ function DownloadButton(props: DownloadButtonProps) {
 
 function FileRecordList() {
     const { username } = useUser();
+    const [queryForm] = Form.useForm();
     // 表格组件分页
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [fileRecordList, setFileRecordList] = useState<Array<FileRecord>>([]);
 
     const handleFileRecordQuery = () => {
-        getFileRecordList(username, pageObj.number, pageObj.size)
+        const filename = queryForm.getFieldValue("filename") as string;
+        getFileRecordList(username, filename, pageObj.number, pageObj.size)
             .then(({ data }) => {
                 setFileRecordList(data.data);
                 updatePageObj((draft) => {
@@ -93,7 +95,15 @@ function FileRecordList() {
 
     return (
         <>
-            <Button onClick={handleFileRecordQuery}>查询啦</Button>
+            <Form layout="inline" name="queryRecordForm" form={queryForm} onFinish={handleFileRecordQuery}>
+                <Form.Item label="文件名" name="filename">
+                    <Input placeholder="请输入文件名" allowClear />
+                </Form.Item>
+                <Form.Item>
+                    <Button htmlType="submit">查询</Button>
+                </Form.Item>
+            </Form>
+            <div className="little-space"></div>
             <Table<FileRecord>
                 rowKey="id"
                 dataSource={fileRecordList}

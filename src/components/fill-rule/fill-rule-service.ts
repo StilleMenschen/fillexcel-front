@@ -33,6 +33,11 @@ export interface FileResult {
     createdAt: string;
 }
 
+export interface GenerateFileResult {
+    fileId: string;
+    took: number;
+}
+
 export function getRequirementList(
     queryParams: RequirementQueryParams,
     page: number,
@@ -68,6 +73,6 @@ export function uploadRequirementFile(username: string, file: File): Promise<Axi
     });
 }
 
-export function generateFile(id: number) {
+export function generateFile(id: number): Promise<AxiosResponse<GenerateFileResult>> {
     return httpService.post(`/fills/${id}`);
 }

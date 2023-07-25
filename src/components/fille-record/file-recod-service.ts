@@ -11,10 +11,11 @@ export interface FileRecord {
 
 export function getFileRecordList(
     username: string | null,
+    filename: string | null,
     page: number,
     size: number
 ): Promise<ResultResponse<Array<FileRecord>>> {
-    return httpService.get("/fills/fileRecord", { params: { username, page, size } });
+    return httpService.get("/fills/fileRecord", { params: { username, filename, page, size } });
 }
 
 export function downloadFile(id: number) {
