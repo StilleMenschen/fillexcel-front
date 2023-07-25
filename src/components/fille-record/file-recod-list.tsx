@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { downloadFile, FileRecord, getFileRecordList } from "./file-recod-service";
-import { Button, PaginationProps, Space, Table, Tooltip } from "antd";
+import { Button, PaginationProps, Table, Tooltip } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useImmer } from "use-immer";
 import { useUser } from "../../store/account.ts";
@@ -113,11 +113,7 @@ function FileRecordList() {
                     key="operation"
                     fixed="right"
                     width={64}
-                    render={(_, row) => (
-                        <Space size="small">
-                            <DownloadButton key={row.id} fileId={row.id} filename={row.filename} />
-                        </Space>
-                    )}
+                    render={(_, row) => <DownloadButton key={row.id} fileId={row.id} filename={row.filename} />}
                 />
             </Table>
         </>

@@ -24,7 +24,7 @@ function GenerateButton(props: GenerateButtonProps) {
         setDisabled(true);
         generateFile(props.requirementId)
             .then(() => {
-                message.info("提交生成成功");
+                message.info("已提交生成请求，稍后可在“文件记录”中下载生成后的文件");
             })
             .catch(() => null)
             .finally(() => {
@@ -33,12 +33,14 @@ function GenerateButton(props: GenerateButtonProps) {
     };
 
     return (
-        <Button
-            shape="circle"
-            icon={<SnippetsFilled style={{ fontSize: "1.12rem" }} />}
-            disabled={disabled}
-            onClick={handleGenerateFile}
-        />
+        <Tooltip title="生成文件">
+            <Button
+                shape="circle"
+                icon={<SnippetsFilled style={{ fontSize: "1.12rem" }} />}
+                disabled={disabled}
+                onClick={handleGenerateFile}
+            />
+        </Tooltip>
     );
 }
 
