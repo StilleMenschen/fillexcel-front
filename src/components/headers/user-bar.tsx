@@ -1,8 +1,8 @@
 import { useUser } from "../../store/account.ts";
 import { setLogout } from "../../store/sign-info.ts";
-import { MenuProps, Avatar, Dropdown, Typography } from "antd";
+import { Avatar, Dropdown, Typography } from "antd";
 
-const items: MenuProps["items"] = [
+const items = [
     {
         key: "1",
         label: <Typography.Text>Profile</Typography.Text>

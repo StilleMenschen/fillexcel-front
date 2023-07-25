@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { MenuProps, Menu } from "antd";
+import { Menu } from "antd";
 import { setNavBar, useNavBar } from "../../store/navigation.ts";
+import { MenuClickEventHandler } from "rc-menu/lib/interface";
 
-const menuList: MenuProps["items"] = [
+const menuList = [
     {
         key: "Home",
         label: "说明"
@@ -32,7 +33,7 @@ function NavBar() {
     const navigate = useNavigate();
     const nav = useNavBar();
 
-    const handleClick: MenuProps["onClick"] = (e) => {
+    const handleClick: MenuClickEventHandler = (e) => {
         setNavBar(e.key);
         navigate(paths.get(e.key) || "/");
     };

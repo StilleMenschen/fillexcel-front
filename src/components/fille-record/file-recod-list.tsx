@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { downloadFile, FileRecord, getFileRecordList } from "./file-recod-service";
-import { Button, PaginationProps, Table, Tooltip } from "antd";
+import { Button, Table, Tooltip } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useImmer } from "use-immer";
 import { useUser } from "../../store/account.ts";
 import { message } from "../../store/feedback.ts";
 
-const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
+const showTotal = (total: number) => `总计 ${total}`;
 
 interface DownloadButtonProps {
     fileId: number;
@@ -34,6 +34,7 @@ function DownloadButton(props: DownloadButtonProps) {
                 a.click();
                 // 释放url对象
                 window.URL.revokeObjectURL(url);
+                a.href = "#";
             })
             .catch(() => null)
             .finally(() => {
@@ -76,7 +77,7 @@ function FileRecordList() {
         handleFileRecordQuery();
     }, [pageObj]);
 
-    const handlePageChange: PaginationProps["onChange"] = (number, size) => {
+    const handlePageChange = (number: number, size: number) => {
         // 如果分页数有变
         if (pageObj.size !== size) {
             updatePageObj((draft) => {

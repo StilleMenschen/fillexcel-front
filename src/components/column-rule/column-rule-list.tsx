@@ -1,19 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-    Breadcrumb,
-    Button,
-    Card,
-    Col,
-    Form,
-    Input,
-    PaginationProps,
-    Popconfirm,
-    Row,
-    Space,
-    Table,
-    Tooltip,
-    Typography
-} from "antd";
+import { Breadcrumb, Button, Card, Col, Form, Input, Popconfirm, Row, Space, Table, Tooltip, Typography } from "antd";
 import { useImmer } from "use-immer";
 import { useEffect, useState } from "react";
 import { ColumnRule, deleteColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
@@ -22,7 +8,7 @@ import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import { message } from "../../store/feedback.ts";
 import { getRequirement, Requirement } from "../fill-rule/fill-rule-service.ts";
 
-const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
+const showTotal = (total: number) => `总计 ${total}`;
 
 function ColumnRuleList() {
     const { fillRuleId } = useParams();
@@ -57,7 +43,7 @@ function ColumnRuleList() {
             .catch(() => null);
     }, []);
 
-    const handlePageChange: PaginationProps["onChange"] = (number, size) => {
+    const handlePageChange = (number: number, size: number) => {
         // 如果分页数有变
         if (pageObj.size !== size) {
             updatePageObj((draft) => {

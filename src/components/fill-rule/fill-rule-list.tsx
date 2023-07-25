@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { Button, Form, Input, PaginationProps, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import { Button, Form, Input, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
 import { DeleteFilled, EditFilled, SettingFilled, SnippetsFilled } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
 import { deleteRequirement, generateFile, getRequirementList, Requirement } from "./fill-rule-service.ts";
@@ -8,7 +8,7 @@ import FillRuleEdit from "./fill-rule-edit.tsx";
 import { message } from "../../store/feedback.ts";
 import { useNavigate } from "react-router-dom";
 
-const showTotal: PaginationProps["showTotal"] = (total) => `总计 ${total}`;
+const showTotal = (total: number) => `总计 ${total}`;
 
 interface GenerateButtonProps {
     requirementId: number;
@@ -92,7 +92,7 @@ function FillRuleList() {
             .catch(() => null);
     };
 
-    const handlePageChange: PaginationProps["onChange"] = (number, size) => {
+    const handlePageChange = (number: number, size: number) => {
         // 如果分页数有变
         if (pageObj.size !== size) {
             updatePageObj((draft) => {
