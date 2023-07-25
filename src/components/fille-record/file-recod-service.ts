@@ -21,3 +21,7 @@ export function getFileRecordList(
 export function downloadFile(id: number) {
     return httpService.get(`/fills/fileRecord/${id}`, { responseType: "blob" });
 }
+
+export function deleteFileRecord(id: number) {
+    return httpService.delete(`/fills/fileRecord/${id}`);
+}

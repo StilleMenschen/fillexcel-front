@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { downloadFile, FileRecord, getFileRecordList } from "./file-recod-service";
-import { Button, Form, Input, Table, Tooltip } from "antd";
-import { DownloadOutlined } from "@ant-design/icons";
+import { deleteFileRecord, downloadFile, FileRecord, getFileRecordList } from "./file-recod-service";
+import { Button, Form, Input, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import { DeleteFilled, DownloadOutlined } from "@ant-design/icons";
 import { useImmer } from "use-immer";
 import { useUser } from "../../store/account.ts";
 import { message } from "../../store/feedback.ts";
@@ -36,7 +36,9 @@ function DownloadButton(props: DownloadButtonProps) {
                 window.URL.revokeObjectURL(url);
                 a.href = "#";
             })
-            .catch(() => null)
+            .catch(() => {
+                message.error("文件下载异常，请稍后再试");
+            })
             .finally(() => {
                 setTimeout(() => {
                     setDisabled(false);
@@ -77,7 +79,7 @@ function FileRecordList() {
 
     useEffect(() => {
         handleFileRecordQuery();
-    }, [pageObj]);
+    }, [pageObj.number, pageObj.size]);
 
     const handlePageChange = (number: number, size: number) => {
         // 如果分页数有变
@@ -91,6 +93,14 @@ function FileRecordList() {
                 draft.number = number;
             });
         }
+    };
+
+    const handleDeleteFileRecord = (id: number) => {
+        deleteFileRecord(id)
+            .then(() => {
+                message.warning("已删除");
+            })
+            .catch(() => null);
     };
 
     return (
@@ -120,11 +130,30 @@ function FileRecordList() {
                 <Table.Column<FileRecord> title="文件名" dataIndex="filename" key="filename" />
                 <Table.Column<FileRecord> title="创建于" dataIndex="created_at" key="created_at" />
                 <Table.Column<FileRecord>
-                    title="下载"
+                    title="操作"
                     key="operation"
                     fixed="right"
-                    width={64}
-                    render={(_, row) => <DownloadButton key={row.id} fileId={row.id} filename={row.filename} />}
+                    width={112}
+                    render={(_, row) => (
+                        <Space size="small">
+                            <DownloadButton key={row.id} fileId={row.id} filename={row.filename} />
+                            <Popconfirm
+                                title="确定要删除此记录吗？"
+                                description={<Typography.Text type="warning">关联的文件也会被同步删除！</Typography.Text>}
+                                placement="left"
+                                cancelButtonProps={{
+                                    danger: true
+                                }}
+                                okType="default"
+                                onCancel={() => handleDeleteFileRecord(row.id)}
+                                okText="取消"
+                                cancelText="删除">
+                                <Tooltip title="删除">
+                                    <Button shape="circle" icon={<DeleteFilled style={{ fontSize: "1.12rem" }} />} />
+                                </Tooltip>
+                            </Popconfirm>
+                        </Space>
+                    )}
                 />
             </Table>
         </>

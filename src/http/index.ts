@@ -16,10 +16,6 @@ export interface BackendResult<T> {
     page: Pager;
 }
 
-export interface BackendResultResponse<T> extends AxiosResponse {
-    data: T;
-}
-
 export interface ResultResponse<T> extends AxiosResponse {
     data: BackendResult<T>;
 }
@@ -31,7 +27,7 @@ interface PreRequest extends InternalAxiosRequestConfig {
 
 interface Errors {
     request: AxiosRequestConfig | null;
-    response: AxiosResponse<BackendResult<object>> | null;
+    response: AxiosResponse | null;
     message: string | null;
 }
 
@@ -73,18 +69,28 @@ httpService.interceptors.response.use(
             // console.log(error.response.headers);
             const response = error.response;
             if (response.status) {
-                if (400 == response.status) {
-                    message.warning("传入数据有误，请重新填写");
-                } else if (response.status == 401) {
-                    setLogout();
-                    if (response.config.url?.indexOf("/auth/token") === -1) {
-                        message.warning("登录失效，请重新登录");
-                    }
-                } else if (response.data && response.data.message) {
-                    message.error(response.data.message);
-                } else {
-                    message.error("后端服务访问异常");
+                switch (response.status) {
+                    case 400:
+                        message.warning("传入数据有误，请重新填写");
+                        break;
+                    case 401:
+                        setLogout();
+                        if (response.config.url?.indexOf("/auth/token") === -1) {
+                            message.warning("登录失效，请重新登录");
+                        }
+                        break;
+                    case 403:
+                        message.warning("没有权限访问");
+                        break;
                 }
+            }
+            // 如果后端接口有返回提示信息
+            if (response.data && response.data.message) {
+                message.error(response.data.message);
+            }
+            // 不是文件下载的情况
+            else if (response.config.responseType != "blob") {
+                message.error("后端服务访问异常");
             }
         } else if (error.request) {
             // 请求已经成功发起，但没有收到响应

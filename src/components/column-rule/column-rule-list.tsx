@@ -1,72 +1,15 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-    Breadcrumb,
-    Button,
-    Card,
-    Col,
-    Form,
-    Input,
-    Popconfirm,
-    Row,
-    Space,
-    Table,
-    Tooltip,
-    Typography,
-    notification
-} from "antd";
+import { Breadcrumb, Button, Card, Col, Form, Input, Popconfirm, Row, Space, Table, Tooltip, Typography } from "antd";
 import { useImmer } from "use-immer";
 import { useEffect, useState } from "react";
 import { ColumnRule, deleteColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
 import { DATA_TYPE } from "../../store/define.ts";
 import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import { message } from "../../store/feedback.ts";
-import { generateFile, getRequirement, Requirement } from "../fill-rule/fill-rule-service.ts";
+import { getRequirement, Requirement } from "../fill-rule/fill-rule-service.ts";
+import GenerateButton from "../fill-rule/generate-button.tsx";
 
 const showTotal = (total: number) => `总计 ${total}`;
-
-interface GenerateButtonProps {
-    requirementId: number;
-}
-
-/**
- * 独立的生成文件操作按钮，防止频繁点击
- */
-function GenerateButton(props: GenerateButtonProps) {
-    const [notify, contextHolder] = notification.useNotification();
-    const [disabled, setDisabled] = useState(false);
-
-    const handleGenerateFile = () => {
-        setDisabled(true);
-        generateFile(props.requirementId)
-            .then(({ data }) => {
-                notify.success({
-                    message: "已提交生成请求",
-                    description: (
-                        <Typography.Paragraph>
-                            稍后可在“生成记录”中下载生成后的文件
-                            <br />
-                            文件ID: {data.fileId}
-                        </Typography.Paragraph>
-                    ),
-                    placement: "bottomRight",
-                    duration: 6
-                });
-            })
-            .catch(() => null)
-            .finally(() => {
-                setDisabled(false);
-            });
-    };
-
-    return (
-        <>
-            {contextHolder}
-            <Button block disabled={disabled} onClick={handleGenerateFile}>
-                生成文件
-            </Button>
-        </>
-    );
-}
 
 function ColumnRuleList() {
     const { fillRuleId } = useParams();
@@ -91,7 +34,7 @@ function ColumnRuleList() {
 
     useEffect(() => {
         handleColumnRuleQuery();
-    }, [pageObj]);
+    }, [pageObj.number, pageObj.size]);
 
     useEffect(() => {
         getRequirement(Number(fillRuleId))
@@ -118,7 +61,7 @@ function ColumnRuleList() {
     const handleDeleteColumnRule = (id: number) => {
         deleteColumnRule(id)
             .then(() => {
-                message.success("已删除");
+                message.warning("已删除");
                 handleColumnRuleQuery();
             })
             .catch(() => null);
@@ -189,9 +132,9 @@ function ColumnRuleList() {
                                         />
                                     </Tooltip>
                                     <Popconfirm
-                                        title="确定要删除此规则？"
+                                        title="确定要删除此规则吗？"
                                         description={
-                                            <Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>
+                                            <Typography.Text type="warning">所有关联的参数配置也会被同步删除！</Typography.Text>
                                         }
                                         placement="left"
                                         cancelButtonProps={{

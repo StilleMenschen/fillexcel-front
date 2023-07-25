@@ -6,12 +6,10 @@ import { message } from "./feedback.ts";
 
 let user: User = {
     id: -1,
-    username: "Anonymous",
+    username: localStorage.getItem("username") || "Anonymous",
     email: "",
     date_joined: ""
 };
-
-let username = localStorage.getItem("username");
 
 let listeners: Array<CallableFunction> = [];
 
@@ -33,8 +31,8 @@ const emitChange = () => {
 };
 
 export const fetchUserInfo = (name: string | null) => {
-    username = name || username;
-    if (username) {
+    const username = name || user.username;
+    if (username && username != "Anonymous") {
         getUserInfo(username)
             .then(({ data }) => {
                 setUser(data);
@@ -48,8 +46,7 @@ export const fetchUserInfo = (name: string | null) => {
 
 export const setUser = (data: User) => {
     user = { ...data };
-    username = data.username;
-    localStorage.setItem("username", username);
+    localStorage.setItem("username", user.username);
     emitChange();
 };
 

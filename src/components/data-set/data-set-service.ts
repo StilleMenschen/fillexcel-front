@@ -1,6 +1,6 @@
 import { ResultResponse, httpService } from "../../http";
 
-interface DataSet {
+export interface DataSet {
     id: number;
     username: string;
     description: string;

@@ -1,61 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { Button, Form, Input, Popconfirm, Space, Table, Tooltip, Typography, notification } from "antd";
-import { DeleteFilled, EditFilled, SettingFilled, SnippetsFilled } from "@ant-design/icons";
+import { Button, Form, Input, Popconfirm, Space, Table, Tooltip, Typography } from "antd";
+import { DeleteFilled, EditFilled, SettingFilled } from "@ant-design/icons";
 import { useUser } from "../../store/account.ts";
-import { deleteRequirement, generateFile, getRequirementList, Requirement } from "./fill-rule-service.ts";
+import { deleteRequirement, getRequirementList, Requirement } from "./fill-rule-service.ts";
 import FillRuleEdit from "./fill-rule-edit.tsx";
 import { message } from "../../store/feedback.ts";
 import { useNavigate } from "react-router-dom";
+import GenerateButton from "./generate-button.tsx";
 
 const showTotal = (total: number) => `总计 ${total}`;
-
-interface GenerateButtonProps {
-    requirementId: number;
-}
-
-/**
- * 独立的生成文件操作按钮，防止频繁点击
- */
-function GenerateButton(props: GenerateButtonProps) {
-    const [notify, contextHolder] = notification.useNotification();
-    const [disabled, setDisabled] = useState(false);
-
-    const handleGenerateFile = () => {
-        setDisabled(true);
-        generateFile(props.requirementId)
-            .then(({ data }) => {
-                notify.success({
-                    message: "已提交生成请求",
-                    description: (
-                        <Typography.Paragraph>
-                            稍后可在“生成记录”中下载生成后的文件
-                            <br />
-                            文件ID: {data.fileId}
-                        </Typography.Paragraph>
-                    ),
-                    placement: "bottomRight",
-                    duration: 6
-                });
-            })
-            .catch(() => null)
-            .finally(() => {
-                setDisabled(false);
-            });
-    };
-
-    return (
-        <>
-            {contextHolder}
-            <Button
-                shape="circle"
-                icon={<SnippetsFilled style={{ fontSize: "1.12rem" }} />}
-                disabled={disabled}
-                onClick={handleGenerateFile}
-            />
-        </>
-    );
-}
 
 function FillRuleList() {
     // 查询
@@ -89,7 +43,7 @@ function FillRuleList() {
 
     useEffect(() => {
         handleFillRuleQuery();
-    }, [pageObj]);
+    }, [pageObj.number, pageObj.size]);
 
     const handleEdit = (id: number) => {
         editId.current = id;
@@ -164,11 +118,7 @@ function FillRuleList() {
                     title="生成"
                     key="generates"
                     width={64}
-                    render={(_, row) => (
-                        <Tooltip title="生成文件">
-                            <GenerateButton key={row.id} requirementId={row.id} />
-                        </Tooltip>
-                    )}
+                    render={(_, row) => <GenerateButton icon={true} key={row.id} requirementId={row.id} />}
                 />
                 <Table.Column<Requirement>
                     title="编辑"
@@ -193,7 +143,7 @@ function FillRuleList() {
                                 />
                             </Tooltip>
                             <Popconfirm
-                                title="确定要删除此规则？"
+                                title="确定要删除此规则吗？"
                                 description={<Typography.Text type="warning">所有关联的列规则也会被同步删除！</Typography.Text>}
                                 placement="left"
                                 cancelButtonProps={{
