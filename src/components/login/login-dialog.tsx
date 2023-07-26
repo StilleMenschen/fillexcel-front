@@ -3,6 +3,7 @@ import { fetchToken } from "./login-service.ts";
 import { setLogin, useSignInfo } from "../../store/sign-info.ts";
 import { fetchUserInfo } from "../../store/account.ts";
 import { message } from "../../store/feedback.ts";
+import { useNavigate } from "react-router-dom";
 
 interface LoginUser {
     username: string;
@@ -12,15 +13,18 @@ interface LoginUser {
 function LoginDialog() {
     const [loginForm] = Form.useForm();
     const signInfo = useSignInfo();
+    const navigate = useNavigate();
 
     const handleLogin = (user: LoginUser) => {
         // 处理登录逻辑，例如发送登录请求等
         fetchToken(user.username, user.password)
             .then(({ data }) => {
-                message.success("登录成功");
                 setLogin(data.access);
+                message.success("登录成功");
                 // 获取用户信息
                 fetchUserInfo(user.username);
+                // 到首页
+                navigate("/");
             })
             .catch(() => {
                 message.error("账号或密码不正确");

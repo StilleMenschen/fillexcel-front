@@ -82,11 +82,12 @@ httpService.interceptors.response.use(
                     case 403:
                         message.warning("没有权限访问");
                         break;
+                    default:
+                        // 如果后端接口有返回提示信息
+                        if (response.data && response.data.message) {
+                            message.error(response.data.message);
+                        }
                 }
-            }
-            // 如果后端接口有返回提示信息
-            if (response.data && response.data.message) {
-                message.error(response.data.message);
             }
             // 不是文件下载的情况
             else if (response.config.responseType != "blob") {

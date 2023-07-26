@@ -21,12 +21,12 @@ export interface AddOrUpdateColumnRule {
 }
 
 export function getColumnRuleListByRequirement(
-    requirementId: number,
+    requirement_id: number,
     page: number,
     size: number,
-    columnName?: string
+    column_name?: string
 ): Promise<ResultResponse<Array<ColumnRule>>> {
-    return httpService.get("/fills/columnRule", { params: { requirementId, page, size, columnName } });
+    return httpService.get("/fills/columnRule", { params: { requirement_id, page, size, column_name } });
 }
 
 export function addColumnRule(columnRule: AddOrUpdateColumnRule): Promise<AxiosResponse<ColumnRule>> {

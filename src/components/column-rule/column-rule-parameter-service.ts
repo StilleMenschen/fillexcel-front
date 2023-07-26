@@ -21,12 +21,11 @@ export interface AddOrUpdateDataParameter {
 }
 
 export function getDataParameterListByRule(
-    columnRuleId: number | string,
+    column_rule_id: number | string,
     page: number,
-    size: number,
-    columnName?: number | string
+    size: number
 ): Promise<ResultResponse<Array<DataParameter>>> {
-    return httpService.get("/fills/dataParameter", { params: { columnRuleId, page, size, columnName } });
+    return httpService.get("/fills/dataParameter", { params: { column_rule_id, page, size } });
 }
 
 export function addDataParameter(

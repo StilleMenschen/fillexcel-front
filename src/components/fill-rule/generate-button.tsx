@@ -45,13 +45,14 @@ function GenerateButton(props: GenerateButtonProps) {
                 <Tooltip title="生成文件">
                     <Button
                         shape="circle"
+                        type="primary"
                         icon={<SnippetsFilled style={{ fontSize: "1.12rem" }} />}
                         disabled={disabled}
                         onClick={handleGenerateFile}
                     />
                 </Tooltip>
             ) : (
-                <Button block disabled={disabled} onClick={handleGenerateFile}>
+                <Button type="primary" block disabled={disabled} onClick={handleGenerateFile}>
                     生成文件
                 </Button>
             )}

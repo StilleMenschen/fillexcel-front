@@ -129,7 +129,6 @@ function FillRuleList() {
                         <Space size="small">
                             <Tooltip title="配置">
                                 <Button
-                                    type="primary"
                                     shape="circle"
                                     icon={<SettingFilled style={{ fontSize: "1.12rem" }} />}
                                     onClick={() => navigate(`/fillRule/${row.id}`)}

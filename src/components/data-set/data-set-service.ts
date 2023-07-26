@@ -9,6 +9,11 @@ export interface DataSet {
     updated_at: string;
 }
 
-export function getDataSetList(username: string, page: number, size: number): Promise<ResultResponse<Array<DataSet>>> {
-    return httpService.get("/fills/dataSet", { params: { username, page, size } });
+export function getDataSetList(
+    username: string,
+    description: string,
+    page: number,
+    size: number
+): Promise<ResultResponse<Array<DataSet>>> {
+    return httpService.get("/fills/dataSet", { params: { username, description, page, size } });
 }

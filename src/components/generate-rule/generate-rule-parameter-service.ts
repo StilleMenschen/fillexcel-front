@@ -15,11 +15,11 @@ export interface GenerateRuleParameter {
 }
 
 export function getGenerateRuleParameterListByRule(
-    ruleId: number,
+    rule_id: number,
     page: number,
     size: number
 ): Promise<ResultResponse<Array<GenerateRuleParameter>>> {
-    return httpService.get("/fills/generateRuleParameter", { params: { ruleId, page, size } });
+    return httpService.get("/fills/generateRuleParameter", { params: { rule_id, page, size } });
 }
 
 export function getGenerateRuleParameterById(id: number): Promise<ResultResponse<Array<GenerateRuleParameter>>> {
