@@ -13,7 +13,7 @@ import { useUser } from "../../store/account.ts";
 import { RcFile, UploadFile } from "antd/es/upload/interface";
 import { useImmer } from "use-immer";
 
-export interface EditProps {
+interface EditProps {
     editId: number;
     openEdit: boolean;
     setOpenEdit: CallableFunction;
@@ -108,7 +108,7 @@ function FillRuleEdit(props: EditProps) {
         <Modal
             open={props.openEdit}
             onCancel={handleClose}
-            title="新增填充规则"
+            title={`${props.editId <= 0 ? "新增" : "编辑"}填充规则`}
             forceRender={true}
             maskClosable={false}
             footer={null}>

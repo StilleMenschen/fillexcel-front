@@ -4,7 +4,7 @@ import ErrorPage from "../components/error-page/error-page.tsx";
 import Instructions from "../components/instructions/instructions.tsx";
 import { fetchUserInfo } from "../store/account.ts";
 import { setNavBar } from "../store/navigation.ts";
-import DataSet from "../components/data-set/data-set.tsx";
+import DataSetList from "../components/data-set/data-set-list.tsx";
 import FillRuleList from "../components/fill-rule/fill-rule-list.tsx";
 import ColumnRuleList from "../components/column-rule/column-rule-list.tsx";
 import ColumnRuleAdd from "../components/column-rule/column-rule-add.tsx";
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
                     setNavBar("dataSet");
                     return null;
                 },
-                element: <DataSet />
+                element: <DataSetList />
             },
             {
                 path: "/fileRecord",
