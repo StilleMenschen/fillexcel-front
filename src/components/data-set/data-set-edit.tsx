@@ -1,8 +1,8 @@
-import { Button, Card, Form, Input, Modal, Select } from "antd";
-import { AddOrUpdateDataSet, addDataSet, getDataSet, updateDataSet } from "./data-set-service";
+import { Button, Form, Input, Modal, Select, Typography } from "antd";
+import { addDataSet, AddOrUpdateDataSet, getDataSet, updateDataSet } from "./data-set-service";
 import { useUser } from "../../store/account";
 import { message } from "../../store/feedback";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface EditProps {
     editId: number;
@@ -14,6 +14,7 @@ interface EditProps {
 function DataSetEdit(props: EditProps) {
     const { username } = useUser();
     const [editForm] = Form.useForm();
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         if (props.editId <= 0) {
@@ -33,20 +34,23 @@ function DataSetEdit(props: EditProps) {
     };
 
     const handleSubmit = (data: AddOrUpdateDataSet) => {
+        setSaving(true);
         if (props.editId <= 0) {
             addDataSet({ ...data, username })
                 .then(() => {
                     message.success("保存成功");
                     handleClose();
                 })
-                .catch(() => null);
+                .catch(() => null)
+                .finally(() => setSaving(false));
         } else {
             updateDataSet(props.editId, { ...data, username })
                 .then(() => {
                     message.success("保存成功");
                     handleClose();
                 })
-                .catch(() => null);
+                .catch(() => null)
+                .finally(() => setSaving(false));
         }
     };
 
@@ -61,20 +65,26 @@ function DataSetEdit(props: EditProps) {
             <Form
                 form={editForm}
                 onFinish={handleSubmit}
+                name="editForm"
+                layout="vertical"
+                autoComplete="off"
+                disabled={saving}
                 initialValues={{
                     description: "",
                     data_type: "string"
-                }}
-                name="editForm"
-                layout="vertical"
-                autoComplete="off">
+                }}>
                 {props.editId > 0 && (
                     <Form.Item name="id" label="ID" initialValue={props.editId}>
                         <Input disabled />
                     </Form.Item>
                 )}
                 <Form.Item name="description" label="描述">
-                    <Input multiple />
+                    <Input.TextArea
+                        autoSize={{ minRows: 2, maxRows: 8 }}
+                        showCount
+                        maxLength={248}
+                        placeholder="请输入数据描述"
+                    />
                 </Form.Item>
                 <Form.Item label="数据类型" name="data_type">
                     <Select
@@ -90,18 +100,17 @@ function DataSetEdit(props: EditProps) {
                     </Button>
                 </Form.Item>
             </Form>
-            <Card
-                size="small"
-                title="数据类型说明"
-                extra={
-                    <a href="#" onClick={() => message.info("Card")}>
-                        More
-                    </a>
-                }>
-                <p>Card content</p>
-                <p>Card content</p>
-                <p>Card content</p>
-            </Card>
+            <Typography.Title level={4}>数据类型说明</Typography.Title>
+            <Typography.Paragraph>
+                字符串：
+                <br />
+                表示一组自定义的词或句子，如一组水果：“橘子”、“香橙”、“椰子”；
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+                字典：
+                <br />
+                表示一组自定义属性的对象描述，如一组学生信息：(name=小张, age=18)、(name=小明, age=20)、(name=大刘, age=22)。
+            </Typography.Paragraph>
         </Modal>
     );
 }

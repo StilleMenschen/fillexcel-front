@@ -29,6 +29,7 @@ const parallelSaveParameter = (ruleId: number, parameterList: Array<GenerateRule
 function ColumnRuleAdd() {
     const { fillRuleId } = useParams();
     const [editForm] = Form.useForm();
+    const [saving, setSaving] = useState(false);
     const [parameterForm] = Form.useForm();
     const parameterList = useRef<Array<GenerateRuleParameter>>([]);
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
@@ -47,6 +48,7 @@ function ColumnRuleAdd() {
             message.error("请先选择生成规则");
             return;
         }
+        setSaving(true);
         updateHintObj((draft) => {
             draft.show = true;
             draft.text = "处理参数校验...";
@@ -73,6 +75,7 @@ function ColumnRuleAdd() {
             })
             .catch(() => null)
             .finally(() => {
+                setSaving(false);
                 updateHintObj((draft) => {
                     draft.show = false;
                 });
@@ -126,6 +129,7 @@ function ColumnRuleAdd() {
                         name="queryRuleForm"
                         form={editForm}
                         onFinish={handleAddColumnRule}
+                        disabled={saving}
                         initialValues={{
                             column_type: "string",
                             associated_of: false
@@ -180,8 +184,9 @@ function ColumnRuleAdd() {
                 </Col>
                 <Col span={11} offset={1}>
                     <GenerateRuleParameterForm
-                        parameterForm={parameterForm}
                         rule={generateRule}
+                        parameterForm={parameterForm}
+                        saving={saving}
                         onParameterListChange={handleParameterListChange}
                     />
                 </Col>

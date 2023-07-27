@@ -7,6 +7,7 @@ import { DeleteFilled, EditFilled, SettingFilled } from "@ant-design/icons";
 import { DATA_TYPE } from "../../store/define.ts";
 import DataSetEdit from "./data-set-edit.tsx";
 import { message } from "../../store/feedback.ts";
+import { useNavigate } from "react-router-dom";
 
 const showTotal = (total: number) => `总计 ${total}`;
 
@@ -19,6 +20,8 @@ function DataSetList() {
     // 编辑
     const editId = useRef(-1);
     const [openEdit, setOpenEdit] = useState(false);
+    // 导航
+    const navigate = useNavigate();
 
     const handleDataSetQuery = () => {
         const description = queryForm.getFieldValue("description") as string;
@@ -56,6 +59,17 @@ function DataSetList() {
             updatePageObj((draft) => {
                 draft.number = number;
             });
+        }
+    };
+
+    const navigateWhenDataType = (dataType: string, dataSetId: number) => {
+        switch (dataType) {
+            case "string":
+                navigate(`/dataSet/string/${dataSetId}`);
+                break;
+            case "dict":
+                message.info("施工中...");
+                break;
         }
     };
 
@@ -112,7 +126,7 @@ function DataSetList() {
                                 <Button
                                     shape="circle"
                                     icon={<SettingFilled style={{ fontSize: "1.12rem" }} />}
-                                    onClick={() => message.info("施工中")}
+                                    onClick={() => navigateWhenDataType(row.data_type, row.id)}
                                 />
                             </Tooltip>
                             <Tooltip title="编辑">
@@ -128,9 +142,9 @@ function DataSetList() {
                             <Popconfirm
                                 title="确定要删除此数据集吗？"
                                 description={
-                                    <Typography.Text type="warning">
-                                        所有关联的数据配置也会<strong>被全部同步删除</strong>！
-                                    </Typography.Text>
+                                    <Typography.Paragraph type="danger">
+                                        所有关联的数据配置也会被全部同步删除！
+                                    </Typography.Paragraph>
                                 }
                                 placement="left"
                                 cancelButtonProps={{

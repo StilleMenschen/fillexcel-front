@@ -8,12 +8,13 @@ import { DataParameter } from "../column-rule/column-rule-parameter-service.ts";
 
 interface GenerateRuleParameterFormProp {
     rule: GenerateRule | null;
-    defaultParameterList?: Array<DataParameter>;
     parameterForm: FormInstance;
+    saving: boolean;
+    defaultParameterList?: Array<DataParameter>;
     onParameterListChange: (parameterList: Array<GenerateRuleParameter>) => void;
 }
 // 额外的校验规则
-export const extraRuleMap = new Map<string, Array<Rule>>([
+const extraRuleMap = new Map<string, Array<Rule>>([
     ["join_string.columns", [{ pattern: /^[A-Z]+(,[A-Z]+)*$/g, message: "必须是大写字母表示的列，以英文逗号分隔" }]],
     ["calculate_expressions.expressions", [{ pattern: /^[0-9A-Z-+*/.{}() ]+$/g, message: "请输入有效的计算表达式" }]],
     ["time_serial_iter.repeat", [{ type: "integer", min: 1, max: 65535, message: "请输入大于1-65535之间的整数" }]],
@@ -22,7 +23,7 @@ export const extraRuleMap = new Map<string, Array<Rule>>([
     ["random_number_iter.stop", [{ type: "number", min: 1, max: 65535, message: "请输入大于1-65535之间的数字" }]]
 ]);
 
-export const renderInput = (parameter: GenerateRuleParameter, rule: GenerateRule | null) => {
+const renderInput = (parameter: GenerateRuleParameter, rule: GenerateRule | null) => {
     if (parameter.need_outside_data) {
         return (
             <Form.Item key={parameter.id} label={parameter.description} extra={parameter.hints} name={parameter.name}>
@@ -84,11 +85,7 @@ export const renderInput = (parameter: GenerateRuleParameter, rule: GenerateRule
     }
 };
 
-export const settingInitialValues = (
-    form: FormInstance,
-    data: Array<GenerateRuleParameter>,
-    previousData?: Array<DataParameter>
-) => {
+const settingInitialValues = (form: FormInstance, data: Array<GenerateRuleParameter>, previousData?: Array<DataParameter>) => {
     const previousDataMap = new Map();
     if (previousData) {
         previousData.forEach((param) => {
@@ -129,7 +126,12 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     }, [props.rule]);
 
     return (
-        <Form form={props.parameterForm} labelCol={{ span: 3 }} wrapperCol={{ span: 21 }} autoComplete="off">
+        <Form
+            form={props.parameterForm}
+            disabled={props.saving}
+            labelCol={{ span: 3 }}
+            wrapperCol={{ span: 21 }}
+            autoComplete="off">
             {generateRuleParameterList.map((grp) => renderInput(grp, props.rule))}
         </Form>
     );

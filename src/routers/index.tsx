@@ -10,6 +10,7 @@ import ColumnRuleList from "../components/column-rule/column-rule-list.tsx";
 import ColumnRuleAdd from "../components/column-rule/column-rule-add.tsx";
 import ColumnRuleEdit from "../components/column-rule/column-rule-edit.tsx";
 import FileRecordList from "../components/fille-record/file-recod-list.tsx";
+import DataSetStringEdit from "../components/data-set/data-set-string-edit.tsx";
 
 const router = createBrowserRouter([
     {
@@ -62,7 +63,17 @@ const router = createBrowserRouter([
                     setNavBar("dataSet");
                     return null;
                 },
-                element: <DataSetList />
+                element: <Outlet />,
+                children: [
+                    {
+                        index: true,
+                        element: <DataSetList />
+                    },
+                    {
+                        path: "string/:dataSetId",
+                        element: <DataSetStringEdit />
+                    }
+                ]
             },
             {
                 path: "/fileRecord",

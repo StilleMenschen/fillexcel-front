@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Breadcrumb, Button, Card, Col, Form, Input, Popconfirm, Row, Space, Table, Tooltip, Typography } from "antd";
+import { Breadcrumb, Button, Card, Col, Divider, Form, Input, Popconfirm, Row, Space, Table, Tooltip, Typography } from "antd";
 import { useImmer } from "use-immer";
 import { useEffect, useState } from "react";
 import { ColumnRule, deleteColumnRule, getColumnRuleListByRequirement } from "./column-rule-service.ts";
@@ -90,7 +90,7 @@ function ColumnRuleList() {
             </Form>
             <div className="little-space"></div>
             <Row>
-                <Col span={18}>
+                <Col flex="auto">
                     <Table<ColumnRule>
                         rowKey="id"
                         dataSource={columnRuleList}
@@ -114,7 +114,7 @@ function ColumnRuleList() {
                         <Table.Column<ColumnRule>
                             title="是否有关联数据"
                             key="associated_of"
-                            render={(_, row) => <Typography.Text> {row.associated_of ? "是" : "否"} </Typography.Text>}
+                            render={(value) => <Typography.Text> {value ? "是" : "否"} </Typography.Text>}
                         />
                         <Table.Column<ColumnRule> title="更新于" dataIndex="updated_at" key="updated_at" />
                         <Table.Column<ColumnRule>
@@ -134,7 +134,9 @@ function ColumnRuleList() {
                                     <Popconfirm
                                         title="确定要删除此规则吗？"
                                         description={
-                                            <Typography.Text type="warning">所有关联的参数配置也会被同步删除！</Typography.Text>
+                                            <Typography.Paragraph type="danger">
+                                                所有关联的参数配置也会被同步删除！
+                                            </Typography.Paragraph>
                                         }
                                         placement="left"
                                         cancelButtonProps={{
@@ -153,8 +155,10 @@ function ColumnRuleList() {
                         />
                     </Table>
                 </Col>
-                <Col span={4}>
-                    <Card title={fillRuleData?.remark} style={{ width: "94%", marginLeft: "6%" }}>
+                <Col flex="18.75rem">
+                    <Card style={{ width: "94%", marginLeft: "6%", maxWidth: "20rem" }}>
+                        <Typography.Paragraph>{fillRuleData?.remark}</Typography.Paragraph>
+                        <Divider />
                         <Typography.Paragraph>
                             从第 {fillRuleData?.start_line} 行开始填入 {fillRuleData?.line_number} 行数据
                         </Typography.Paragraph>

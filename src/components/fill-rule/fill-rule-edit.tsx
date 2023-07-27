@@ -31,6 +31,7 @@ function FillRuleEdit(props: EditProps) {
     const [fileItem, updateFileItem] = useImmer<FileItem>({ id: "", name: "" });
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [uploading, setUploading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleClose = () => {
         props.onFillRuleQuery();
@@ -68,20 +69,23 @@ function FillRuleEdit(props: EditProps) {
             start_line: data.start_line,
             line_number: data.line_number
         };
+        setSaving(true);
         if (props.editId <= 0) {
             addRequirement(formData)
                 .then(() => {
                     message.success("保存成功");
                     handleClose();
                 })
-                .catch(() => null);
+                .catch(() => null)
+                .finally(() => setSaving(false));
         } else {
             updateRequirement(props.editId, formData)
                 .then(() => {
                     message.success("保存成功");
                     handleClose();
                 })
-                .catch(() => null);
+                .catch(() => null)
+                .finally(() => setSaving(false));
         }
     };
 
@@ -115,6 +119,7 @@ function FillRuleEdit(props: EditProps) {
             <Form
                 form={editForm}
                 onFinish={handleSubmit}
+                disabled={saving}
                 initialValues={{
                     start_line: 1,
                     line_number: 2
@@ -128,7 +133,12 @@ function FillRuleEdit(props: EditProps) {
                     </Form.Item>
                 )}
                 <Form.Item name="remark" label="备注" rules={[{ required: true }]}>
-                    <Input />
+                    <Input.TextArea
+                        autoSize={{ minRows: 2, maxRows: 8 }}
+                        showCount
+                        maxLength={248}
+                        placeholder="请输入规则备注"
+                    />
                 </Form.Item>
                 <Form.Item
                     wrapperCol={{ span: 24 }}

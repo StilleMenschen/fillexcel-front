@@ -139,7 +139,7 @@ function FileRecordList() {
                             <DownloadButton key={row.id} fileId={row.id} filename={row.filename} />
                             <Popconfirm
                                 title="确定要删除此记录吗？"
-                                description={<Typography.Text type="warning">关联的文件也会被同步删除！</Typography.Text>}
+                                description={<Typography.Paragraph>关联的文件也会被同步删除！</Typography.Paragraph>}
                                 placement="left"
                                 cancelButtonProps={{
                                     danger: true

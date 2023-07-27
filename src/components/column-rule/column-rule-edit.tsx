@@ -30,6 +30,7 @@ function ColumnRuleEdit() {
     const { fillRuleId, columnRuleId } = useParams();
     const [editForm] = Form.useForm();
     const [parameterForm] = Form.useForm();
+    const [saving, setSaving] = useState(false);
     // 基础数据
     const parameterList = useRef<Array<GenerateRuleParameter>>([]);
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
@@ -71,6 +72,7 @@ function ColumnRuleEdit() {
             message.error("请先选择生成规则");
             return;
         }
+        setSaving(true);
         updateHintObj((draft) => {
             draft.show = true;
             draft.text = "处理参数校验...";
@@ -98,6 +100,7 @@ function ColumnRuleEdit() {
             })
             .catch(() => null)
             .finally(() => {
+                setSaving(false);
                 updateHintObj((draft) => {
                     draft.show = false;
                 });
@@ -151,6 +154,7 @@ function ColumnRuleEdit() {
                         name="queryRuleForm"
                         form={editForm}
                         onFinish={handleUpdateColumnRule}
+                        disabled={saving}
                         initialValues={{
                             column_type: "number",
                             associated_of: false
@@ -205,8 +209,9 @@ function ColumnRuleEdit() {
                 </Col>
                 <Col span={11} offset={1}>
                     <GenerateRuleParameterForm
-                        parameterForm={parameterForm}
                         rule={generateRule}
+                        parameterForm={parameterForm}
+                        saving={saving}
                         defaultParameterList={defaultParameterList}
                         onParameterListChange={handleParameterListChange}
                     />
