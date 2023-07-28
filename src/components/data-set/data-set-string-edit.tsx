@@ -1,15 +1,18 @@
-import { Breadcrumb, Button, Card, Col, Divider, Input, Modal, Row, Table, Typography } from "antd";
+import { Breadcrumb, Button, Card, Col, Divider, Input, List, Modal, Popconfirm, Row, Space, Typography } from "antd";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
     addDataSetValue,
     DataSet,
     DataSetValue,
+    deleteDataSetValue,
     getDataSet,
     getDataSetValueList,
     updateDataSetValue
 } from "./data-set-service.ts";
 import { useImmer } from "use-immer";
+import { DeleteFilled } from "@ant-design/icons";
+import { message } from "../../store/feedback.ts";
 
 const showTotal = (total: number) => `总计 ${total}`;
 
@@ -67,6 +70,15 @@ function DataSetStringEdit() {
             .catch(() => null);
     };
 
+    const handleDeleteDataSetValue = (id: number) => {
+        deleteDataSetValue(id)
+            .then(() => {
+                message.warning("已删除");
+                handleDataSetValueQuery();
+            })
+            .catch(() => null);
+    };
+
     const handlePageChange = (number: number, size: number) => {
         // 如果分页数有变
         if (pageObj.size !== size) {
@@ -87,9 +99,8 @@ function DataSetStringEdit() {
             <div className="little-space"></div>
             <Row>
                 <Col flex="auto">
-                    <Table<DataSetValue>
+                    <List<DataSetValue>
                         rowKey="id"
-                        showHeader={false}
                         dataSource={dataSetValueList}
                         pagination={{
                             current: pageObj.number,
@@ -98,26 +109,41 @@ function DataSetStringEdit() {
                             showSizeChanger: true,
                             total: pageObj.total,
                             showTotal: showTotal,
-                            onChange: handlePageChange
-                        }}>
-                        <Table.Column<DataSetValue>
-                            title="值"
-                            key="item"
-                            render={(_, row, idx) => (
-                                <Input
-                                    value={row.item}
-                                    onChange={(e) => {
-                                        updateDataSetValueList((draft) => {
-                                            const item = draft[idx];
-                                            item.item = e.target.value;
-                                        });
-                                        console.log("change...");
-                                    }}
-                                    onBlur={() => handleUpdateItem(row.id, row)}
-                                />
-                            )}
-                        />
-                    </Table>
+                            onChange: handlePageChange,
+                            position: "both",
+                            align: "end"
+                        }}
+                        header={<Typography.Text>输入框失去焦点后会自动保存</Typography.Text>}
+                        renderItem={(row, idx) => (
+                            <>
+                                <div className="little-space"></div>
+                                <Space.Compact block>
+                                    <Input
+                                        value={row.item}
+                                        onChange={(e) => {
+                                            updateDataSetValueList((draft) => {
+                                                const item = draft[idx];
+                                                item.item = e.target.value;
+                                            });
+                                        }}
+                                        onBlur={() => handleUpdateItem(row.id, row)}
+                                    />
+                                    <Popconfirm
+                                        title="确定要删除此记录吗？"
+                                        placement="left"
+                                        cancelButtonProps={{
+                                            danger: true
+                                        }}
+                                        okType="default"
+                                        onCancel={() => handleDeleteDataSetValue(row.id)}
+                                        okText="取消"
+                                        cancelText="删除">
+                                        <Button title="删除" icon={<DeleteFilled />} />
+                                    </Popconfirm>
+                                </Space.Compact>
+                            </>
+                        )}
+                    />
                 </Col>
                 <Col flex="18.75rem">
                     <Card style={{ width: "94%", marginLeft: "6%", maxWidth: "20rem" }}>
@@ -132,7 +158,7 @@ function DataSetStringEdit() {
                 </Col>
             </Row>
             <Modal
-                title="Modal"
+                title="新增"
                 open={openEdit}
                 onOk={() => {
                     handleAddItem();
