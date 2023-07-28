@@ -70,8 +70,12 @@ function ColumnRuleList() {
     return (
         <>
             <Breadcrumb items={[{ title: <Link to="/fillRule">填充规则</Link> }, { title: "列规则" }]} />
-            <div className="little-space"></div>
-            <Form layout="inline" name="queryRuleForm" form={queryForm} onFinish={handleColumnRuleQuery}>
+            <Form
+                className="little-top-space"
+                layout="inline"
+                name="queryRuleForm"
+                form={queryForm}
+                onFinish={handleColumnRuleQuery}>
                 <Form.Item label="列名" name="columnName">
                     <Input placeholder="请输入列名" allowClear />
                 </Form.Item>
@@ -88,8 +92,7 @@ function ColumnRuleList() {
                     </Button>
                 </Form.Item>
             </Form>
-            <div className="little-space"></div>
-            <Row>
+            <Row className="little-top-space">
                 <Col flex="auto">
                     <Table<ColumnRule>
                         rowKey="id"

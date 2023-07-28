@@ -122,8 +122,7 @@ function ColumnRuleAdd() {
                     { title: "新增" }
                 ]}
             />
-            <div className="little-space"></div>
-            <Row justify="start">
+            <Row className="little-top-space" justify="start">
                 <Col span={12}>
                     <Form
                         name="queryRuleForm"

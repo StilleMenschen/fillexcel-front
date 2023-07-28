@@ -113,8 +113,8 @@ function FileRecordList() {
                     <Button htmlType="submit">查询</Button>
                 </Form.Item>
             </Form>
-            <div className="little-space"></div>
             <Table<FileRecord>
+                className="little-top-space"
                 rowKey="id"
                 dataSource={fileRecordList}
                 pagination={{

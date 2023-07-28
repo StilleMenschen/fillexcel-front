@@ -91,8 +91,8 @@ function FillRuleList() {
                     </Button>
                 </Form.Item>
             </Form>
-            <div className="little-space"></div>
             <Table<Requirement>
+                className="little-top-space"
                 rowKey="id"
                 dataSource={requirementList}
                 pagination={{

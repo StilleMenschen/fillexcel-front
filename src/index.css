@@ -33,8 +33,6 @@ html, body {
   background-color: #232222;
 }
 
-#root .little-space {
-  height: 0.48rem;
-  line-height: 0.48rem;
-  width: 0;
+#root .little-top-space {
+  margin-top: 0.48rem;
 }

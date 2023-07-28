@@ -93,8 +93,8 @@ function DataSetList() {
                     </Button>
                 </Form.Item>
             </Form>
-            <div className="little-space"></div>
             <Table<DataSet>
+                className="little-top-space"
                 rowKey="id"
                 dataSource={dataSetList}
                 pagination={{
