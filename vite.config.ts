@@ -1,9 +1,9 @@
 /// <reference lib="es2018.regexp" />
 
-import {defineConfig} from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import viteCompression from "vite-plugin-compression";
-import legacy from '@vitejs/plugin-legacy'
+import legacy from "@vitejs/plugin-legacy";
 // 按组件的目录名称分包
 const moduleMatch = new RegExp(/[\\/]src[\\/](components|http|routers|store)[\\/]/i);
 
@@ -22,7 +22,7 @@ export default defineConfig({
     plugins: [
         react(),
         legacy({
-            targets: "chrome >= 78, not dead, > 0.3%, Firefox ESR",
+            targets: "chrome >= 78, not dead, > 0.3%, Firefox ESR"
         }),
         viteCompression({
             // 超过 240 KiB 压缩
@@ -46,7 +46,7 @@ export default defineConfig({
                     }
                     // 按组件的目录名称分包
                     if (moduleMatch.test(id)) {
-                        return 'app';
+                        return "app";
                     }
                 }
             }
