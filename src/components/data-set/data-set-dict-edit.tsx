@@ -69,9 +69,9 @@ function DataSetDictEdit() {
                             align: "end"
                         }}
                         renderItem={(row, idx) => (
-                            <Typography.Text>
+                            <Typography.Paragraph>
                                 [{idx}] = {row.item}
-                            </Typography.Text>
+                            </Typography.Paragraph>
                         )}
                     />
                 </Col>

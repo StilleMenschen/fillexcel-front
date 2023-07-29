@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal, Select, Typography } from "antd";
-import { addDataSet, AddOrUpdateDataSet, getDataSet, updateDataSet } from "./data-set-service";
+import { addDataSet, AddOrUpdateDataSet, getDataSet, getDataSetDefineList, updateDataSet } from "./data-set-service";
 import { useUser } from "../../store/account";
 import { message } from "../../store/feedback";
 import { useEffect, useState } from "react";
@@ -15,6 +15,7 @@ function DataSetEdit(props: EditProps) {
     const { username } = useUser();
     const [editForm] = Form.useForm();
     const [saving, setSaving] = useState(false);
+    const [showDataType, setShowDataType] = useState(false);
 
     useEffect(() => {
         if (props.editId <= 0) {
@@ -22,11 +23,23 @@ function DataSetEdit(props: EditProps) {
         }
         getDataSet(props.editId)
             .then(({ data }) => {
+                loadDataDefine(data.data_type);
                 editForm.setFieldValue("description", data.description);
                 editForm.setFieldValue("data_type", data.data_type);
+                setShowDataType(data.data_type == "dict");
             })
             .catch(() => null);
     }, [props.editId]);
+
+    const loadDataDefine = (dateType: string) => {
+        if (props.editId <= 0 || dateType != "dict") return;
+        getDataSetDefineList(props.editId, 1, 64)
+            .then(({ data }) => {
+                const defines = data.data.map((it) => it.name).join(",");
+                editForm.setFieldValue("data_define", defines);
+            })
+            .catch(() => null);
+    };
 
     const handleClose = () => {
         props.onDataSetQuery();
@@ -92,8 +105,24 @@ function DataSetEdit(props: EditProps) {
                             { value: "string", label: "字符串" },
                             { value: "dict", label: "字典" }
                         ]}
+                        onChange={(value) => setShowDataType(value == "dict")}
                     />
                 </Form.Item>
+                {showDataType && (
+                    <Form.Item
+                        label="数据定义"
+                        name="data_define"
+                        rules={[
+                            { pattern: /^[a-zA-Z]+(,[a-zA-Z]+)*$/g, message: "字段属性以英文单词表示，多个以英文逗号隔开" }
+                        ]}>
+                        <Input.TextArea
+                            autoSize={{ minRows: 2, maxRows: 8 }}
+                            showCount
+                            maxLength={512}
+                            placeholder="请输入数据定义（字段属性以英文单词表示，多个以英文逗号隔开）"
+                        />
+                    </Form.Item>
+                )}
                 <Form.Item>
                     <Button block size="large" type="primary" htmlType="submit">
                         保存

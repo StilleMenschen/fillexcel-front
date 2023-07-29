@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import { httpService, ResultResponse } from "../../http";
 
+// 数据集
 export interface DataSet {
     id: number;
     username: string;
@@ -17,6 +18,8 @@ export interface AddOrUpdateDataSet {
     data_type: string;
 }
 
+// 数据集列表
+
 export interface DataSetValue {
     id: number;
     data_set_id: number;
@@ -31,6 +34,25 @@ export interface AddOrUpdateDataSetValue {
     item: string;
     data_type: string;
 }
+
+// 字典数据集
+
+export interface DataSetDefine {
+    id: number;
+    data_set_id: number;
+    name: string;
+    data_type: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AddOrUpdateDataSetDefine {
+    data_set_id: number;
+    name: string;
+    data_type: string;
+}
+
+// 数据集
 
 export function getDataSetList(
     username: string,
@@ -58,6 +80,8 @@ export function deleteDataSet(id: number): Promise<AxiosResponse<unknown>> {
     return httpService.delete(`/fills/dataSet/${id}`);
 }
 
+// 数据集列表
+
 export function getDataSetValueList(
     data_set_id: number,
     page: number,
@@ -76,4 +100,14 @@ export function updateDataSetValue(id: number, dataSet: AddOrUpdateDataSetValue)
 
 export function deleteDataSetValue(id: number): Promise<AxiosResponse<unknown>> {
     return httpService.delete(`/fills/dataSetValue/${id}`);
+}
+
+// 字典数据集定义
+
+export function getDataSetDefineList(
+    data_set_id: number,
+    page: number,
+    size: number
+): Promise<ResultResponse<Array<DataSetDefine>>> {
+    return httpService.get("/fills/dataSetDefine", { params: { data_set_id, page, size } });
 }
