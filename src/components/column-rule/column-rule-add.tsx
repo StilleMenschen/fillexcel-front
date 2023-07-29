@@ -21,7 +21,7 @@ const parallelSaveParameter = (ruleId: number, parameterList: Array<GenerateRule
             column_rule_id: ruleId,
             name: param.name,
             value: String(values[param.name]),
-            data_set_id: 0
+            data_set_id: param.name == "data_set_id" ? Number(values[param.name]) : -1
         }))
     );
 };
@@ -92,6 +92,7 @@ function ColumnRuleAdd() {
         setGenerateRule(item);
         switch (item.function_name) {
             case "join_string":
+            case "value_list_iter":
                 setFormField("column_type", "string");
                 setFormField("associated_of", true);
                 break;
