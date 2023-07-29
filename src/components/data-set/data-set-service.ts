@@ -35,10 +35,11 @@ export interface AddOrUpdateDataSetValue {
 export function getDataSetList(
     username: string,
     description: string,
+    data_type: string | null,
     page: number,
     size: number
 ): Promise<ResultResponse<Array<DataSet>>> {
-    return httpService.get("/fills/dataSet", { params: { username, description, page, size } });
+    return httpService.get("/fills/dataSet", { params: { username, description, data_type, page, size } });
 }
 
 export function addDataSet(dataSet: AddOrUpdateDataSet): Promise<AxiosResponse<DataSet>> {

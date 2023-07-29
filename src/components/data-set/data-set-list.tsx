@@ -25,7 +25,7 @@ function DataSetList() {
 
     const handleDataSetQuery = () => {
         const description = queryForm.getFieldValue("description") as string;
-        getDataSetList(username, description, pageObj.number, pageObj.size)
+        getDataSetList(username, description, null, pageObj.number, pageObj.size)
             .then(({ data }) => {
                 setDataSetList(data.data);
                 updatePageObj((draft) => {

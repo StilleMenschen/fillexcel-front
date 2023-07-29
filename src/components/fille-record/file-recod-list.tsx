@@ -99,6 +99,7 @@ function FileRecordList() {
         deleteFileRecord(id)
             .then(() => {
                 message.warning("已删除");
+                handleFileRecordQuery();
             })
             .catch(() => null);
     };

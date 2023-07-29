@@ -22,7 +22,7 @@ function DataSetSmallList(props: DataSetSmallListProps) {
 
     const handleDataSetQuery = () => {
         const description = queryForm.getFieldValue("description") as string;
-        getDataSetList(username, description, pageObj.number, pageObj.size)
+        getDataSetList(username, description, "string", pageObj.number, pageObj.size)
             .then(({ data }) => {
                 setDataSetList(data.data);
                 updatePageObj((draft) => {
