@@ -104,7 +104,7 @@ function FillRuleList() {
                     showTotal: showTotal,
                     onChange: handlePageChange
                 }}>
-                <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" ellipsis={true} />
+                <Table.Column<Requirement> title="备注" dataIndex="remark" key="remark" />
                 <Table.Column<Requirement> title="文件名" dataIndex="original_filename" width={360} key="original_filename" />
                 <Table.Column<Requirement> title="起始行" dataIndex="start_line" width={80} key="start_line" />
                 <Table.Column<Requirement> title="填充行数" dataIndex="line_number" width={100} key="line_number" />

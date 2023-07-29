@@ -17,7 +17,7 @@ export interface AddOrUpdateDataParameter {
     param_rule_id: number;
     name: string;
     value: string;
-    data_set_id: number;
+    data_set_id: number | null;
 }
 
 export function getDataParameterListByRule(

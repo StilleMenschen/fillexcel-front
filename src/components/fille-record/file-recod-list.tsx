@@ -127,7 +127,7 @@ function FileRecordList() {
                     showTotal: showTotal,
                     onChange: handlePageChange
                 }}>
-                <Table.Column<FileRecord> title="文件ID" dataIndex="file_id" key="file_id" />
+                <Table.Column<FileRecord> title="ID" dataIndex="file_id" key="file_id" />
                 <Table.Column<FileRecord> title="文件名" dataIndex="filename" key="filename" />
                 <Table.Column<FileRecord> title="创建于" dataIndex="created_at" key="created_at" />
                 <Table.Column<FileRecord>

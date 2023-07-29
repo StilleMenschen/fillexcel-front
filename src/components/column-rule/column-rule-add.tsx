@@ -1,14 +1,13 @@
-import { Breadcrumb, Button, Col, Form, Input, Row, Select, Switch, Typography } from "antd";
+import { Breadcrumb, Button, Col, Form, Input, Row, Select, Steps, Switch } from "antd";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import GenerateRuleSelect, { GenerateRuleMap } from "../generate-rule/generate-rule-select.tsx";
-import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
 import { useRef, useState } from "react";
 import { message } from "../../store/feedback.ts";
 import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
 import { addColumnRule, AddOrUpdateColumnRule } from "./column-rule-service.ts";
-import { useImmer } from "use-immer";
 import { addDataParameter } from "./column-rule-parameter-service.ts";
+import GenerateRuleSelect, { GenerateRuleMap } from "../generate-rule/generate-rule-select.tsx";
 import { GenerateRuleParameter } from "../generate-rule/generate-rule-parameter-service.ts";
+import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
 
 type ParameterMap = {
     [key: string]: string | number | boolean;
@@ -16,28 +15,33 @@ type ParameterMap = {
 
 const parallelSaveParameter = (ruleId: number, parameterList: Array<GenerateRuleParameter>, values: ParameterMap) => {
     return addDataParameter(
-        parameterList.map((param) => ({
-            param_rule_id: param.id,
-            column_rule_id: ruleId,
-            name: param.name,
-            value: String(values[param.name]),
-            data_set_id: param.name == "data_set_id" ? Number(values[param.name]) : -1
-        }))
+        parameterList.map((param) => {
+            const val = values[param.name];
+            return {
+                param_rule_id: param.id,
+                column_rule_id: ruleId,
+                name: param.name,
+                value: String(val),
+                data_set_id: param.name == "data_set_id" ? Number(val) : null
+            };
+        })
     );
 };
 
 function ColumnRuleAdd() {
     const { fillRuleId } = useParams();
     const [editForm] = Form.useForm();
-    const [saving, setSaving] = useState(false);
     const [parameterForm] = Form.useForm();
+    const [saving, setSaving] = useState(false);
     const parameterList = useRef<Array<GenerateRuleParameter>>([]);
+    // 规则数据
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
     const [generateRuleId, setGenerateRuleId] = useState<number | null>(null);
     const ruleMap = useRef<GenerateRuleMap>({});
-    const [hintObj, updateHintObj] = useImmer({ show: false, text: "" });
-
+    // 路由
     const navigate = useNavigate();
+    // 步骤
+    const [stepCount, setStepCount] = useState(0);
 
     const handleGenerateRuleLoad = (data: GenerateRuleMap) => {
         ruleMap.current = data;
@@ -48,37 +52,28 @@ function ColumnRuleAdd() {
             message.error("请先选择生成规则");
             return;
         }
+        setStepCount(0);
         setSaving(true);
-        updateHintObj((draft) => {
-            draft.show = true;
-            draft.text = "处理参数校验...";
-        });
         let parameters = {};
         parameterForm
             .validateFields()
             .then((values: ParameterMap) => {
-                updateHintObj((draft) => {
-                    draft.text = "处理列规则...";
-                });
+                setStepCount(1);
                 parameters = values;
                 return addColumnRule({ ...columnRule, requirement_id: Number(fillRuleId), rule_id: generateRuleId });
             })
             .then(({ data }) => {
-                updateHintObj((draft) => {
-                    draft.text = "处理规则参数...";
-                });
+                setStepCount(2);
                 return parallelSaveParameter(data.id, parameterList.current, parameters);
             })
             .then(() => {
-                message.success("新增成功");
+                message.success("保存成功");
+                setStepCount(3);
                 navigate(`/fillRule/${fillRuleId}`);
             })
             .catch(() => null)
             .finally(() => {
                 setSaving(false);
-                updateHintObj((draft) => {
-                    draft.show = false;
-                });
             });
     };
 
@@ -93,6 +88,7 @@ function ColumnRuleAdd() {
         switch (item.function_name) {
             case "join_string":
             case "value_list_iter":
+            case "associated_fill":
                 setFormField("column_type", "string");
                 setFormField("associated_of", true);
                 break;
@@ -174,13 +170,19 @@ function ColumnRuleAdd() {
                             <Button type="primary" htmlType="submit">
                                 保存
                             </Button>
-                            {hintObj.show && (
-                                <Typography.Text style={{ paddingLeft: "1.2rem" }} type="warning">
-                                    {hintObj.text}
-                                </Typography.Text>
-                            )}
                         </Form.Item>
                     </Form>
+                    {saving && (
+                        <Steps
+                            current={stepCount}
+                            items={[
+                                { title: "参数校验" },
+                                { title: "保存规则" },
+                                { title: "保存规则参数" },
+                                { title: "保存完成" }
+                            ]}
+                        />
+                    )}
                 </Col>
                 <Col span={11} offset={1}>
                     <GenerateRuleParameterForm

@@ -216,13 +216,13 @@ function DataSetStringEdit() {
                         pagination={{
                             current: pageObj.number,
                             pageSize: pageObj.size,
-                            pageSizeOptions: [8, 16],
+                            pageSizeOptions: [8, 16, 32],
                             showSizeChanger: true,
                             total: pageObj.total,
                             showTotal: showTotal,
                             onChange: handlePageChange,
                             position: "both",
-                            align: "end"
+                            align: "center"
                         }}
                         footer={<AddInput onAdd={handleAddItem} />}
                         renderItem={(row, idx) => (

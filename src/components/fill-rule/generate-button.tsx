@@ -25,7 +25,7 @@ function GenerateButton(props: GenerateButtonProps) {
                         <Typography.Paragraph>
                             稍后可在“生成记录”中下载生成后的文件
                             <br />
-                            文件ID: {data.fileId}
+                            ID: {data.fileId}
                         </Typography.Paragraph>
                     ),
                     placement: "bottomRight",

@@ -11,6 +11,7 @@ import ColumnRuleAdd from "../components/column-rule/column-rule-add.tsx";
 import ColumnRuleEdit from "../components/column-rule/column-rule-edit.tsx";
 import FileRecordList from "../components/fille-record/file-recod-list.tsx";
 import DataSetStringEdit from "../components/data-set/data-set-string-edit.tsx";
+import DataSetDictEdit from "../components/data-set/data-set-dict-edit.tsx";
 
 const router = createBrowserRouter([
     {
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
                     {
                         path: "string/:dataSetId",
                         element: <DataSetStringEdit />
+                    },
+                    {
+                        path: "dict/:dataSetId",
+                        element: <DataSetDictEdit />
                     }
                 ]
             },

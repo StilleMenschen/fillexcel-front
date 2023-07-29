@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "./generate-rule-parameter-service.ts";
 import { Button, Form, FormInstance, Input, InputNumber, Space, Switch } from "antd";
 import { GenerateRule } from "./generate-rule-service.ts";
@@ -25,7 +25,6 @@ const extraRuleMap = new Map<string, Array<Rule>>([
 
 function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
-    const ruleId = useRef<number>(-1);
     const [openDataSetSelect, setOpenDataSetSelect] = useState(false);
     const [dataSetId, setDataSetId] = useState(-1);
 
@@ -56,8 +55,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     };
 
     useEffect(() => {
-        if (!props.rule || ruleId.current === props.rule.id) return;
-        ruleId.current = props.rule.id;
+        if (!props.rule) return;
         getGenerateRuleParameterListByRule(props.rule.id, 1, 16)
             .then(({ data }) => {
                 setGenerateRuleParameterList(data.data);
@@ -78,6 +76,59 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
         setDataSetId(dataSetId);
     };
 
+    const formItemList = generateRuleParameterList.map((parameter) => {
+        const ruleFunctionName = props.rule?.function_name;
+        const itemAttr = {
+            key: parameter.id,
+            label: parameter.description,
+            extra: parameter.hints,
+            name: parameter.name
+        };
+        switch (ruleFunctionName) {
+            case "value_list_iter":
+            case "associated_fill":
+                return (
+                    <Form.Item
+                        {...itemAttr}
+                        rules={[
+                            { required: true, message: "请先选择数据集" },
+                            { type: "integer", min: 1, message: "请先选择数据集" }
+                        ]}>
+                        <Space.Compact>
+                            <Button onClick={() => setOpenDataSetSelect(true)}>选择数据集</Button>
+                            <InputNumber value={dataSetId} disabled style={{ width: "100%" }} />
+                        </Space.Compact>
+                    </Form.Item>
+                );
+        }
+        // 根据规则名称补充校验
+        const ruleKey = `${ruleFunctionName}.${parameter.name}`;
+        const extraRule = extraRuleMap.get(ruleKey) || [];
+        const rules = [{ required: parameter.required, message: "请填写该值" }, ...extraRule];
+        switch (parameter.data_type) {
+            case "string":
+                return (
+                    <Form.Item {...itemAttr} rules={rules}>
+                        <Input placeholder={parameter.hints} />
+                    </Form.Item>
+                );
+            case "number":
+                return (
+                    <Form.Item {...itemAttr} rules={rules}>
+                        <InputNumber style={{ width: "100%" }} placeholder={parameter.hints} />
+                    </Form.Item>
+                );
+            case "boolean":
+                return (
+                    <Form.Item {...itemAttr} valuePropName="checked">
+                        <Switch />
+                    </Form.Item>
+                );
+            default:
+                throw Error("生成输入框失败，未知的类型");
+        }
+    });
+
     return (
         <>
             <Form
@@ -86,82 +137,12 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
                 labelCol={{ span: 3 }}
                 wrapperCol={{ span: 21 }}
                 autoComplete="off">
-                {generateRuleParameterList.map((parameter) => {
-                    if (parameter.need_outside_data) {
-                        return (
-                            <Form.Item
-                                key={parameter.id}
-                                label={parameter.description}
-                                extra={parameter.hints}
-                                name={parameter.name}
-                                rules={[
-                                    { required: true, message: "请先选择数据集" },
-                                    { type: "integer", min: 1, message: "请先选择数据集" }
-                                ]}>
-                                <Space.Compact>
-                                    <Button onClick={() => setOpenDataSetSelect(true)}>选择数据集</Button>
-                                    <InputNumber value={dataSetId} disabled style={{ width: "100%" }} />
-                                </Space.Compact>
-                            </Form.Item>
-                        );
-                    }
-                    // 这里的key和上面的规则名称相关联
-                    const ruleKey = `${props.rule?.function_name}.${parameter.name}`;
-                    const extraRule = extraRuleMap.get(ruleKey) || [];
-                    switch (parameter.data_type) {
-                        case "string":
-                            return (
-                                <Form.Item
-                                    key={parameter.id}
-                                    label={parameter.description}
-                                    extra={parameter.hints}
-                                    name={parameter.name}
-                                    rules={[
-                                        {
-                                            required: parameter.required,
-                                            message: "请填写该值"
-                                        },
-                                        ...extraRule
-                                    ]}>
-                                    <Input placeholder={parameter.hints} />
-                                </Form.Item>
-                            );
-                        case "number":
-                            return (
-                                <Form.Item
-                                    key={parameter.id}
-                                    label={parameter.description}
-                                    extra={parameter.hints}
-                                    name={parameter.name}
-                                    rules={[
-                                        {
-                                            required: parameter.required,
-                                            message: "请填写该值"
-                                        },
-                                        ...extraRule
-                                    ]}>
-                                    <InputNumber style={{ width: "100%" }} placeholder={parameter.hints} />
-                                </Form.Item>
-                            );
-                        case "boolean":
-                            return (
-                                <Form.Item
-                                    key={parameter.id}
-                                    label={parameter.description}
-                                    extra={parameter.hints}
-                                    name={parameter.name}
-                                    valuePropName="checked">
-                                    <Switch />
-                                </Form.Item>
-                            );
-                        default:
-                            throw Error("生成输入框失败，未知的类型");
-                    }
-                })}
+                {formItemList}
             </Form>
             {openDataSetSelect && (
                 <DataSetSmallList
                     open={openDataSetSelect}
+                    dataType="string"
                     onClose={handleCloseDataSetSelect}
                     onSelectDataSetId={handleSelectDataSetId}
                 />

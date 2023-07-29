@@ -68,7 +68,7 @@ function DataSetList() {
                 navigate(`/dataSet/string/${dataSetId}`);
                 break;
             case "dict":
-                message.info("施工中...");
+                navigate(`/dataSet/dict/${dataSetId}`);
                 break;
         }
     };
@@ -109,12 +109,12 @@ function DataSetList() {
                 <Table.Column<DataSet> title="ID" dataIndex="id" key="id" />
                 <Table.Column<DataSet> title="描述" dataIndex="description" key="description" />
                 <Table.Column<DataSet>
-                    title="子元素类型"
+                    title="类型"
                     key="data_type"
+                    width={78}
                     render={(_, row) => <Typography.Text> {DATA_TYPE.get(row.data_type) || row.data_type} </Typography.Text>}
                 />
                 <Table.Column<DataSet> title="更新于" dataIndex="updated_at" width={172} key="updated_at" />
-                <Table.Column<DataSet> title="创建于" dataIndex="created_at" width={172} key="created_at" />
                 <Table.Column<DataSet>
                     title="编辑"
                     key="operation"

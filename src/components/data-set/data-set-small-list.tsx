@@ -3,13 +3,13 @@ import { useUser } from "../../store/account.ts";
 import { useImmer } from "use-immer";
 import { useEffect, useState } from "react";
 import { DataSet, getDataSetList } from "./data-set-service.ts";
-import { CloseCircleFilled } from "@ant-design/icons";
 
 const showTotal = (total: number) => `总计 ${total}`;
 
 interface DataSetSmallListProps {
     open: boolean;
     onClose: () => void;
+    dataType: string;
     onSelectDataSetId: (dataSetId: number) => void;
 }
 
@@ -22,7 +22,7 @@ function DataSetSmallList(props: DataSetSmallListProps) {
 
     const handleDataSetQuery = () => {
         const description = queryForm.getFieldValue("description") as string;
-        getDataSetList(username, description, "string", pageObj.number, pageObj.size)
+        getDataSetList(username, description, props.dataType, pageObj.number, pageObj.size)
             .then(({ data }) => {
                 setDataSetList(data.data);
                 updatePageObj((draft) => {
@@ -60,7 +60,6 @@ function DataSetSmallList(props: DataSetSmallListProps) {
             title="选择数据集"
             placement="right"
             size="large"
-            closeIcon={<CloseCircleFilled />}
             maskClosable={false}
             open={props.open}
             onClose={props.onClose}>
