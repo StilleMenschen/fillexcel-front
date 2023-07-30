@@ -1,11 +1,11 @@
 import { Breadcrumb, Button, Col, Form, Input, Row, Select, Steps, Switch } from "antd";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import GenerateRuleSelect from "../generate-rule/generate-rule-select.tsx";
-import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
+import ColumnRuleParameterForm from "./column-rule-parameter-form.tsx";
 import { useEffect, useState } from "react";
 import { message } from "../../store/feedback.ts";
 import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
-import { AddOrUpdateColumnRule, getColumnRule, updateColumnRule } from "./column-rule-service.ts";
+import { AddOrUpdateColumnRule, ColumnRule, getColumnRule, updateColumnRule } from "./column-rule-service.ts";
 import { DataParameter, getDataParameterListByRule } from "./column-rule-parameter-service.ts";
 import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "../generate-rule/generate-rule-parameter-service.ts";
 import { parallelSaveParameter, ParameterMap, setTypeAndAssociate } from "./cloumn-rule-common.ts";
@@ -18,6 +18,7 @@ function ColumnRuleEdit() {
     const [saving, setSaving] = useState(false);
     // 规则数据
     const { generateRuleMap } = useGenerateRuleMap();
+    const [columnRule, setColumnRule] = useState<ColumnRule | null>(null);
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
     const [generateRuleId, setGenerateRuleId] = useState<number>(-1);
     const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
@@ -33,6 +34,7 @@ function ColumnRuleEdit() {
         let genRuleId = -1;
         getColumnRule(crId)
             .then(({ data }) => {
+                setColumnRule(data);
                 editForm.setFieldValue("column_name", data.column_name);
                 editForm.setFieldValue("column_type", data.column_type);
                 editForm.setFieldValue("associated_of", data.associated_of);
@@ -165,11 +167,12 @@ function ColumnRuleEdit() {
                     )}
                 </Col>
                 <Col span={12}>
-                    <GenerateRuleParameterForm
-                        rule={generateRule}
+                    <ColumnRuleParameterForm
+                        generateRule={generateRule}
                         parameterForm={parameterForm}
                         saving={saving}
                         generateRuleParameterList={generateRuleParameterList}
+                        columnRule={columnRule}
                         dataParameterList={dataParameterList}
                     />
                 </Col>

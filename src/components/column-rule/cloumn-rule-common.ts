@@ -18,7 +18,7 @@ export function parallelSaveParameter(rule: ColumnRule, parameterList: Array<Gen
             data_name: String(values["bind_attr_name"])
         })
             .then(() => {
-                message.success(`绑定列属性保存成功 ${rule.column_name} <-> ${values["bind_attr_name"]}`);
+                message.success(`绑定列属性 ${rule.column_name} <-> ${values["bind_attr_name"]} 保存成功`);
             })
             .catch(() => null);
     }

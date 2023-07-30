@@ -6,7 +6,7 @@ import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
 import { addColumnRule, AddOrUpdateColumnRule } from "./column-rule-service.ts";
 import GenerateRuleSelect from "../generate-rule/generate-rule-select.tsx";
 import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "../generate-rule/generate-rule-parameter-service.ts";
-import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
+import ColumnRuleParameterForm from "./column-rule-parameter-form.tsx";
 import { parallelSaveParameter, ParameterMap, setTypeAndAssociate } from "./cloumn-rule-common.ts";
 import { useGenerateRuleMap } from "../../store/generate-rule.ts";
 
@@ -138,8 +138,8 @@ function ColumnRuleAdd() {
                     )}
                 </Col>
                 <Col span={13}>
-                    <GenerateRuleParameterForm
-                        rule={generateRule}
+                    <ColumnRuleParameterForm
+                        generateRule={generateRule}
                         parameterForm={parameterForm}
                         saving={saving}
                         generateRuleParameterList={generateRuleParameterList}

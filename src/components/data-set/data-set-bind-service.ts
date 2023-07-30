@@ -20,10 +20,12 @@ export interface AddOrUpdateDataSetBind {
 
 export function getDataSetBindList(
     data_set_id: number,
+    column_rule_id: number | null,
+    column_name: string | null,
     page: number,
     size: number
 ): Promise<ResultResponse<Array<DataSetBind>>> {
-    return httpService.get("/fills/dataSetBind", { params: { data_set_id, page, size } });
+    return httpService.get("/fills/dataSetBind", { params: { data_set_id, column_rule_id, column_name, page, size } });
 }
 
 export function addDataSetBind(dataSetBind: AddOrUpdateDataSetBind): Promise<AxiosResponse> {

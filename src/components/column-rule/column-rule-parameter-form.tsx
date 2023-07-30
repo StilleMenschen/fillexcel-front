@@ -1,14 +1,18 @@
 import { Fragment, useEffect, useState } from "react";
-import { GenerateRuleParameter } from "./generate-rule-parameter-service.ts";
+import { GenerateRuleParameter } from "../generate-rule/generate-rule-parameter-service.ts";
 import { Button, Form, FormInstance, Input, InputNumber, Select, Switch, Typography } from "antd";
-import { GenerateRule } from "./generate-rule-service.ts";
+import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
 import { Rule } from "rc-field-form/lib/interface";
-import { DataParameter } from "../column-rule/column-rule-parameter-service.ts";
+import { DataParameter } from "./column-rule-parameter-service.ts";
 import DataSetSmallList from "../data-set/data-set-small-list.tsx";
 import { DataSetDefine, getDataSetDefineList } from "../data-set/data-set-define-service.ts";
+import { DataSet, getDataSet } from "../data-set/data-set-service.ts";
+import { ColumnRule } from "./column-rule-service.ts";
+import { getDataSetBindList } from "../data-set/data-set-bind-service.ts";
 
-interface GenerateRuleParameterFormProp {
-    rule: GenerateRule | null;
+interface ColumnRuleParameterFormProps {
+    generateRule: GenerateRule | null;
+    columnRule?: ColumnRule | null;
     parameterForm: FormInstance;
     saving: boolean;
     dataParameterList?: Array<DataParameter>;
@@ -26,10 +30,10 @@ const extraRuleMap = new Map<string, Array<Rule>>([
 
 const specialFunctionNameSet = new Set(["associated_fill", "value_list_iter"]);
 
-function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
+function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
     const [openDataSetSelect, setOpenDataSetSelect] = useState(false);
     // 数据集
-    const [dataSetDescription, setDataSetDescription] = useState("");
+    const [dataSet, setDataSet] = useState<DataSet | null>(null);
     const [dataSetType, setDataSetType] = useState("string");
     const [dataSetDefineList, setDataSetDefineList] = useState<Array<DataSetDefine>>([]);
 
@@ -41,48 +45,89 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
             .catch(() => null);
     };
 
+    const queryDataSet = (dataSetId: number) => {
+        getDataSet(dataSetId)
+            .then(({ data }) => {
+                setDataSet(data);
+                setDataSetType(data.data_type);
+            })
+            .catch(() => null);
+    };
+
+    const queryDataSetBind = (dataSetId: number) => {
+        if (props.columnRule) {
+            const { id, column_name } = props.columnRule;
+            getDataSetBindList(dataSetId, id, column_name, 1, 64)
+                .then(({ data }) => {
+                    const dataSetBind = data.data[0];
+                    props.parameterForm.setFieldValue("bind_attr_name", dataSetBind.data_name);
+                })
+                .catch(() => null);
+        }
+    };
+
+    const notFirstSetRule = () => {
+        // 没有给默认参数或者不是原来设置的生成规则不填入默认参数
+        return props.columnRule?.rule_id == props.generateRule?.id;
+    };
+
+    const setDataSetDefault = (dataSetId: number) => {
+        queryDataSet(dataSetId);
+        if (props.generateRule?.function_name == "associated_fill") {
+            queryDataSetDefineList(dataSetId);
+            queryDataSetBind(dataSetId);
+        }
+    };
+
     const setParameters = (generateRuleParameters: Array<GenerateRuleParameter>, dataParameters?: Array<DataParameter>) => {
         const form = props.parameterForm;
         if (dataParameters) {
-            const previousDataMap = new Map();
-            dataParameters.forEach((param) => {
-                previousDataMap.set(param.name, param.value);
-            });
-            generateRuleParameters.forEach((grp) => {
-                grp.default_value = previousDataMap.get(grp.name) || grp.default_value;
-            });
-        }
-        generateRuleParameters.map((grp) => {
-            const val = grp.default_value;
-            if (!val && val == "") return false;
-            switch (grp.data_type) {
-                case "boolean":
-                    form.setFieldValue(grp.name, val == "true");
-                    break;
-                case "number":
-                    form.setFieldValue(grp.name, Number(val));
-                    if (grp.name == "data_set_id") {
-                        queryDataSetDefineList(Number(val));
+            if (notFirstSetRule()) {
+                const previousDataMap = new Map();
+                dataParameters.forEach((param) => {
+                    previousDataMap.set(param.name, param.value);
+                });
+                generateRuleParameters.forEach((grp) => {
+                    grp.default_value = previousDataMap.get(grp.name) || grp.default_value;
+                    if (grp.need_outside_data) {
+                        setDataSetDefault(Number(grp.default_value));
                     }
-                    break;
-                default:
-                    form.setFieldValue(grp.name, val);
+                });
+            } else if (dataSet != null) {
+                setDataSet(null);
+                setDataSetDefineList([]);
+                props.parameterForm.setFieldValue("data_set_id", null);
+            }
+        }
+        generateRuleParameters.forEach((grp) => {
+            const val = grp.default_value;
+            if (val && val != "") {
+                switch (grp.data_type) {
+                    case "boolean":
+                        form.setFieldValue(grp.name, val == "true");
+                        break;
+                    case "number":
+                        form.setFieldValue(grp.name, Number(val));
+                        break;
+                    default:
+                        form.setFieldValue(grp.name, val);
+                }
             }
         });
     };
 
     useEffect(() => {
         setParameters(props.generateRuleParameterList, props.dataParameterList);
-    }, [props.rule]);
+    }, [props.generateRule]);
 
     const handleCloseDataSetSelect = () => {
         setOpenDataSetSelect(false);
     };
 
-    const handleSelectDataSetId = (dataSetId: number, description: string) => {
-        props.parameterForm.setFieldValue("data_set_id", Number(dataSetId));
-        setDataSetDescription(description);
-        queryDataSetDefineList(dataSetId);
+    const handleSelectDataSetId = (dataSet: DataSet) => {
+        props.parameterForm.setFieldValue("data_set_id", dataSet.id);
+        setDataSet(dataSet);
+        queryDataSetDefineList(dataSet.id);
     };
 
     const renderSpecialItem = (ruleFunctionName: string, parameter: GenerateRuleParameter) => {
@@ -101,7 +146,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
                             { required: true, message: "请先选择数据集" },
                             { type: "integer", min: 1, message: "请先选择数据集" }
                         ]}>
-                        <Input.TextArea value={dataSetDescription} readOnly autoSize={{ minRows: 2, maxRows: 6 }} />
+                        <Input.TextArea value={dataSet?.description} readOnly autoSize={{ minRows: 2, maxRows: 6 }} />
                         <Button
                             className="little-top-space"
                             onClick={() => {
@@ -124,7 +169,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
                                 { required: true, message: "请先选择数据集" },
                                 { type: "integer", min: 1, message: "请先选择数据集" }
                             ]}>
-                            <Input.TextArea value={dataSetDescription} readOnly autoSize={{ minRows: 2, maxRows: 6 }} />
+                            <Input.TextArea value={dataSet?.description} readOnly autoSize={{ minRows: 2, maxRows: 6 }} />
                             <Button
                                 className="little-top-space"
                                 onClick={() => {
@@ -194,7 +239,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     };
 
     const formItemList = props.generateRuleParameterList.map((parameter) => {
-        const ruleFunctionName = String(props.rule?.function_name);
+        const ruleFunctionName = String(props.generateRule?.function_name);
         if (specialFunctionNameSet.has(ruleFunctionName)) {
             return renderSpecialItem(ruleFunctionName, parameter);
         } else {
@@ -226,4 +271,4 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     );
 }
 
-export default GenerateRuleParameterForm;
+export default ColumnRuleParameterForm;
