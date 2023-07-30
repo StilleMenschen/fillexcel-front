@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^5.7.2",
+    "antd": "^5.7.3",
     "axios": "^1.4.0",
     "immer": "^10.0.2",
     "localforage": "^1.10.0",
