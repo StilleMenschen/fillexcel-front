@@ -1,8 +1,19 @@
 import { Link, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
-import { DataSet, DataSetValue, getDataSet, getDataSetValueList } from "./data-set-service.ts";
+import {
+    DataSet,
+    DataSetDefine,
+    DataSetValue,
+    deleteDataSetValue,
+    getDataSet,
+    getDataSetDefineList,
+    getDataSetValueList
+} from "./data-set-service.ts";
 import { useEffect, useState } from "react";
-import { Breadcrumb, Card, Col, Divider, List, Row, Typography } from "antd";
+import { Breadcrumb, Button, Card, Col, Divider, Input, List, Popconfirm, Row, Space, Tag, Typography } from "antd";
+import DataSetDictEditForm from "./data-set-dict-edit-form.tsx";
+import { EditFilled, MinusCircleFilled } from "@ant-design/icons";
+import { message } from "../../store/feedback.ts";
 
 const showTotal = (total: number) => `总计 ${total}`;
 
@@ -11,6 +22,10 @@ function DataSetDictEdit() {
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [dataSetValueList, updateDataSetValueList] = useImmer<Array<DataSetValue>>([]);
     const [dataSet, setDataSet] = useState<DataSet>();
+    const [dataSetDefineList, setDataSetDefineList] = useState<Array<DataSetDefine>>([]);
+    // 新增编辑
+    const [openEdit, setOpenEdit] = useState(false);
+    const [editId, setEditId] = useState(-1);
 
     const handleDataSetValueQuery = () => {
         getDataSetValueList(Number(dataSetId), pageObj.number, pageObj.size)
@@ -19,6 +34,14 @@ function DataSetDictEdit() {
                 updatePageObj((draft) => {
                     draft.total = data.page.total;
                 });
+            })
+            .catch(() => null);
+    };
+
+    const queryDataSetDefineList = (dataSetId: number) => {
+        getDataSetDefineList(dataSetId, 1, 64)
+            .then(({ data }) => {
+                setDataSetDefineList(data.data);
             })
             .catch(() => null);
     };
@@ -33,6 +56,7 @@ function DataSetDictEdit() {
                 setDataSet(data);
             })
             .catch(() => null);
+        queryDataSetDefineList(Number(dataSetId));
     }, []);
 
     const handlePageChange = (number: number, size: number) => {
@@ -47,6 +71,15 @@ function DataSetDictEdit() {
                 draft.number = number;
             });
         }
+    };
+
+    const handleDeleteDataSetValue = (id: number) => {
+        deleteDataSetValue(id)
+            .then(() => {
+                message.warning("已删除");
+                handleDataSetValueQuery();
+            })
+            .catch(() => null);
     };
 
     return (
@@ -66,12 +99,31 @@ function DataSetDictEdit() {
                             showTotal: showTotal,
                             onChange: handlePageChange,
                             position: "bottom",
-                            align: "end"
+                            align: "center"
                         }}
-                        renderItem={(row, idx) => (
-                            <Typography.Paragraph>
-                                [{idx}] = {row.item}
-                            </Typography.Paragraph>
+                        renderItem={(row) => (
+                            <Space.Compact block className="little-top-space">
+                                <Input style={{ textAlign: "center" }} value={row.item} readOnly={true} />
+                                <Button
+                                    icon={<EditFilled />}
+                                    onClick={() => {
+                                        setEditId(row.id);
+                                        setOpenEdit(true);
+                                    }}
+                                />
+                                <Popconfirm
+                                    title="确定要删除此记录吗？"
+                                    placement="left"
+                                    cancelButtonProps={{
+                                        danger: true
+                                    }}
+                                    okType="default"
+                                    onCancel={() => handleDeleteDataSetValue(row.id)}
+                                    okText="取消"
+                                    cancelText="删除">
+                                    <Button title="删除" icon={<MinusCircleFilled />} />
+                                </Popconfirm>
+                            </Space.Compact>
                         )}
                     />
                 </Col>
@@ -81,9 +133,36 @@ function DataSetDictEdit() {
                         <Divider />
                         <Typography.Paragraph>类型：{dataSet?.data_type}</Typography.Paragraph>
                         <Typography.Paragraph>更新于：{dataSet?.updated_at}</Typography.Paragraph>
+                        <Divider />
+                        <Typography.Paragraph>字段属性定义</Typography.Paragraph>
+                        <Space size={[0, 8]} wrap>
+                            {dataSetDefineList.map((define) => (
+                                <Tag>{define.name}</Tag>
+                            ))}
+                        </Space>
+                        <Divider />
+                        <Button
+                            block
+                            type="primary"
+                            onClick={() => {
+                                setEditId(-1);
+                                setOpenEdit(true);
+                            }}>
+                            新增
+                        </Button>
                     </Card>
                 </Col>
             </Row>
+            {openEdit && (
+                <DataSetDictEditForm
+                    dataSetId={Number(dataSetId)}
+                    editId={editId}
+                    dataSetDefineList={dataSetDefineList}
+                    openEditForm={openEdit}
+                    setOpenEditForm={setOpenEdit}
+                    onDataSetDictQuery={handleDataSetValueQuery}
+                />
+            )}
         </>
     );
 }

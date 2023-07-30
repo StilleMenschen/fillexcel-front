@@ -71,9 +71,9 @@ function ColumnRuleList() {
         <>
             <Breadcrumb items={[{ title: <Link to="/fillRule">填充规则</Link> }, { title: "列规则" }]} />
             <Form
+                name="queryRuleForm"
                 className="little-top-space"
                 layout="inline"
-                name="queryRuleForm"
                 form={queryForm}
                 onFinish={handleColumnRuleQuery}>
                 <Form.Item label="列名" name="columnName">

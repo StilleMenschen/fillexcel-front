@@ -6,7 +6,7 @@ import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
 import { addColumnRule, AddOrUpdateColumnRule } from "./column-rule-service.ts";
 import { addDataParameter } from "./column-rule-parameter-service.ts";
 import GenerateRuleSelect, { GenerateRuleMap } from "../generate-rule/generate-rule-select.tsx";
-import { GenerateRuleParameter } from "../generate-rule/generate-rule-parameter-service.ts";
+import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "../generate-rule/generate-rule-parameter-service.ts";
 import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
 
 type ParameterMap = {
@@ -33,11 +33,11 @@ function ColumnRuleAdd() {
     const [editForm] = Form.useForm();
     const [parameterForm] = Form.useForm();
     const [saving, setSaving] = useState(false);
-    const parameterList = useRef<Array<GenerateRuleParameter>>([]);
     // 规则数据
+    const ruleMap = useRef<GenerateRuleMap>({});
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
     const [generateRuleId, setGenerateRuleId] = useState<number | null>(null);
-    const ruleMap = useRef<GenerateRuleMap>({});
+    const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
     // 路由
     const navigate = useNavigate();
     // 步骤
@@ -64,7 +64,7 @@ function ColumnRuleAdd() {
             })
             .then(({ data }) => {
                 setStepCount(2);
-                return parallelSaveParameter(data.id, parameterList.current, parameters);
+                return parallelSaveParameter(data.id, generateRuleParameterList, parameters);
             })
             .then(() => {
                 message.success("保存成功");
@@ -81,10 +81,15 @@ function ColumnRuleAdd() {
         editForm.setFieldValue(name, value);
     };
 
-    const handleGenerateRuleSelect = (value: number) => {
-        const item = ruleMap.current[value];
-        setGenerateRuleId(value);
-        setGenerateRule(item);
+    const handleGenerateRuleSelect = (ruleId: number) => {
+        const item = ruleMap.current[ruleId];
+        setGenerateRuleId(ruleId);
+        getGenerateRuleParameterListByRule(ruleId, 1, 16)
+            .then(({ data }) => {
+                setGenerateRuleParameterList(data.data);
+                setGenerateRule(item);
+            })
+            .catch(() => null);
         switch (item.function_name) {
             case "join_string":
             case "value_list_iter":
@@ -106,10 +111,6 @@ function ColumnRuleAdd() {
         }
     };
 
-    const handleParameterListChange = (paramList: Array<GenerateRuleParameter>) => {
-        parameterList.current = paramList;
-    };
-
     return (
         <>
             <Breadcrumb
@@ -122,7 +123,7 @@ function ColumnRuleAdd() {
             <Row className="little-top-space" justify="start">
                 <Col span={12}>
                     <Form
-                        name="queryRuleForm"
+                        name="columnRuleAddForm"
                         form={editForm}
                         onFinish={handleAddColumnRule}
                         disabled={saving}
@@ -189,7 +190,7 @@ function ColumnRuleAdd() {
                         rule={generateRule}
                         parameterForm={parameterForm}
                         saving={saving}
-                        onParameterListChange={handleParameterListChange}
+                        generateRuleParameterList={generateRuleParameterList}
                     />
                 </Col>
             </Row>

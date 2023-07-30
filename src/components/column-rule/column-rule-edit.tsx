@@ -7,7 +7,7 @@ import { message } from "../../store/feedback.ts";
 import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
 import { AddOrUpdateColumnRule, getColumnRule, updateColumnRule } from "./column-rule-service.ts";
 import { addDataParameter, DataParameter, getDataParameterListByRule } from "./column-rule-parameter-service.ts";
-import { GenerateRuleParameter } from "../generate-rule/generate-rule-parameter-service.ts";
+import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "../generate-rule/generate-rule-parameter-service.ts";
 
 type ParameterMap = {
     [key: string]: string | number | boolean;
@@ -34,32 +34,36 @@ function ColumnRuleEdit() {
     const [parameterForm] = Form.useForm();
     const [saving, setSaving] = useState(false);
     // 规则数据
-    const parameterList = useRef<Array<GenerateRuleParameter>>([]);
+    const ruleMap = useRef<GenerateRuleMap>({});
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
     const [generateRuleId, setGenerateRuleId] = useState<number>(-1);
-    const ruleMap = useRef<GenerateRuleMap>({});
+    const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
     // 编辑数据
-    const [defaultParameterList, setDefaultParameterList] = useState<Array<DataParameter>>([]);
+    const [dataParameterList, setDataParameterList] = useState<Array<DataParameter>>([]);
     // 路由
     const navigate = useNavigate();
     // 步骤
     const [stepCount, setStepCount] = useState(0);
 
-    const loadEditDate = (gen_rule_data: GenerateRuleMap) => {
+    const loadEditDate = (genRuleData: GenerateRuleMap) => {
         const crId = Number(columnRuleId);
-        let gen_rule_id = -1;
+        let genRuleId = -1;
         getColumnRule(crId)
             .then(({ data }) => {
                 editForm.setFieldValue("column_name", data.column_name);
                 editForm.setFieldValue("column_type", data.column_type);
                 editForm.setFieldValue("associated_of", data.associated_of);
-                gen_rule_id = data.rule_id;
+                genRuleId = data.rule_id;
                 return getDataParameterListByRule(crId, 1, 16);
             })
             .then(({ data }) => {
-                setDefaultParameterList(data.data);
-                setGenerateRuleId(gen_rule_id);
-                setGenerateRule(gen_rule_data[gen_rule_id]);
+                setDataParameterList(data.data);
+                return getGenerateRuleParameterListByRule(genRuleId, 1, 16);
+            })
+            .then(({ data }) => {
+                setGenerateRuleParameterList(data.data);
+                setGenerateRuleId(genRuleId);
+                setGenerateRule(genRuleData[genRuleId]);
             })
             .catch(() => null);
         return true;
@@ -88,7 +92,7 @@ function ColumnRuleEdit() {
             })
             .then(({ data }) => {
                 setStepCount(2);
-                return parallelSaveParameter(data.id, parameterList.current, parameters);
+                return parallelSaveParameter(data.id, generateRuleParameterList, parameters);
             })
             .then(() => {
                 message.success("保存成功");
@@ -105,10 +109,15 @@ function ColumnRuleEdit() {
         editForm.setFieldValue(name, value);
     };
 
-    const handleGenerateRuleSelect = (value: number) => {
-        const item = ruleMap.current[value];
-        setGenerateRule(item);
-        setGenerateRuleId(value);
+    const handleGenerateRuleSelect = (ruleId: number) => {
+        const item = ruleMap.current[ruleId];
+        setGenerateRuleId(ruleId);
+        getGenerateRuleParameterListByRule(ruleId, 1, 16)
+            .then(({ data }) => {
+                setGenerateRuleParameterList(data.data);
+                setGenerateRule(item);
+            })
+            .catch(() => null);
         switch (item.function_name) {
             case "join_string":
             case "value_list_iter":
@@ -130,10 +139,6 @@ function ColumnRuleEdit() {
         }
     };
 
-    const handleParameterListChange = (paramList: Array<GenerateRuleParameter>) => {
-        parameterList.current = paramList;
-    };
-
     return (
         <>
             <Breadcrumb
@@ -146,7 +151,7 @@ function ColumnRuleEdit() {
             <Row className="little-top-space" justify="start">
                 <Col span={12}>
                     <Form
-                        name="queryRuleForm"
+                        name="columnRuleEditForm"
                         form={editForm}
                         onFinish={handleUpdateColumnRule}
                         disabled={saving}
@@ -213,8 +218,8 @@ function ColumnRuleEdit() {
                         rule={generateRule}
                         parameterForm={parameterForm}
                         saving={saving}
-                        defaultParameterList={defaultParameterList}
-                        onParameterListChange={handleParameterListChange}
+                        generateRuleParameterList={generateRuleParameterList}
+                        dataParameterList={dataParameterList}
                     />
                 </Col>
             </Row>

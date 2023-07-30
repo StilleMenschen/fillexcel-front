@@ -106,7 +106,7 @@ function FileRecordList() {
 
     return (
         <>
-            <Form layout="inline" name="queryRecordForm" form={queryForm} onFinish={handleFileRecordQuery}>
+            <Form name="queryRecordForm" layout="inline" form={queryForm} onFinish={handleFileRecordQuery}>
                 <Form.Item label="文件名" name="filename">
                     <Input placeholder="请输入文件名" allowClear />
                 </Form.Item>

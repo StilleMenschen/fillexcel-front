@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "./generate-rule-parameter-service.ts";
-import { Button, Form, FormInstance, Input, InputNumber, Space, Switch } from "antd";
+import { GenerateRuleParameter } from "./generate-rule-parameter-service.ts";
+import { Button, Form, FormInstance, Input, InputNumber, Select, Space, Switch } from "antd";
 import { GenerateRule } from "./generate-rule-service.ts";
 import { Rule } from "rc-field-form/lib/interface";
 import { DataParameter } from "../column-rule/column-rule-parameter-service.ts";
 import DataSetSmallList from "../data-set/data-set-small-list.tsx";
+import { DataSetDefine, getDataSetDefineList } from "../data-set/data-set-service.ts";
 
 interface GenerateRuleParameterFormProp {
     rule: GenerateRule | null;
     parameterForm: FormInstance;
     saving: boolean;
-    defaultParameterList?: Array<DataParameter>;
-    onParameterListChange: (parameterList: Array<GenerateRuleParameter>) => void;
+    dataParameterList?: Array<DataParameter>;
+    generateRuleParameterList: Array<GenerateRuleParameter>;
 }
 // 额外的校验规则
 const extraRuleMap = new Map<string, Array<Rule>>([
@@ -23,21 +24,37 @@ const extraRuleMap = new Map<string, Array<Rule>>([
     ["random_number_iter.stop", [{ type: "number", min: 1, max: 65535, message: "请输入大于1-65535之间的数字" }]]
 ]);
 
-function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
-    const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
-    const [openDataSetSelect, setOpenDataSetSelect] = useState(false);
-    const [dataSetId, setDataSetId] = useState(-1);
+const specialFunctionNameSet = new Set(["associated_fill", "value_list_iter"]);
 
-    const settingInitialValues = (data: Array<GenerateRuleParameter>, previousData?: Array<DataParameter>) => {
+function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
+    const [openDataSetSelect, setOpenDataSetSelect] = useState(false);
+    // 数据集
+    const [dataSetId, setDataSetId] = useState(-1);
+    const [dataSetType, setDataSetType] = useState("string");
+    const [dataSetDefineList, setDataSetDefineList] = useState<Array<DataSetDefine>>([]);
+    const [bindDefineName, setBindDefineName] = useState("");
+
+    const queryDataSetDefineList = (dataSetId: number) => {
+        getDataSetDefineList(dataSetId, 1, 64)
+            .then(({ data }) => {
+                setDataSetDefineList(data.data);
+            })
+            .catch(() => null);
+    };
+
+    const setParameters = (generateRuleParameters: Array<GenerateRuleParameter>, dataParameters?: Array<DataParameter>) => {
         const form = props.parameterForm;
-        const previousDataMap = new Map();
-        if (previousData) {
-            previousData.forEach((param) => {
+        if (dataParameters) {
+            const previousDataMap = new Map();
+            dataParameters.forEach((param) => {
                 previousDataMap.set(param.name, param.value);
             });
+            generateRuleParameters.forEach((grp) => {
+                grp.default_value = previousDataMap.get(grp.name) || grp.default_value;
+            });
         }
-        data.forEach((grp) => {
-            const val = previousDataMap.get(grp.name) || grp.default_value;
+        generateRuleParameters.forEach((grp) => {
+            const val = grp.default_value;
             switch (grp.data_type) {
                 case "boolean":
                     form.setFieldValue(grp.name, val == "true");
@@ -46,6 +63,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
                     form.setFieldValue(grp.name, Number(val));
                     if (grp.name == "data_set_id") {
                         setDataSetId(Number(val));
+                        queryDataSetDefineList(Number(val));
                     }
                     break;
                 default:
@@ -55,16 +73,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     };
 
     useEffect(() => {
-        if (!props.rule) return;
-        getGenerateRuleParameterListByRule(props.rule.id, 1, 16)
-            .then(({ data }) => {
-                setGenerateRuleParameterList(data.data);
-                // 设置初始值
-                settingInitialValues(data.data, props.defaultParameterList);
-                // 设置关联ID
-                props.onParameterListChange(data.data);
-            })
-            .catch(() => null);
+        setParameters(props.generateRuleParameterList, props.dataParameterList);
     }, [props.rule]);
 
     const handleCloseDataSetSelect = () => {
@@ -74,10 +83,10 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
     const handleSelectDataSetId = (dataSetId: number) => {
         props.parameterForm.setFieldValue("data_set_id", Number(dataSetId));
         setDataSetId(dataSetId);
+        queryDataSetDefineList(dataSetId);
     };
 
-    const formItemList = generateRuleParameterList.map((parameter) => {
-        const ruleFunctionName = props.rule?.function_name;
+    const renderSpecialItem = (ruleFunctionName: string, parameter: GenerateRuleParameter) => {
         const itemAttr = {
             key: parameter.id,
             label: parameter.description,
@@ -86,7 +95,6 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
         };
         switch (ruleFunctionName) {
             case "value_list_iter":
-            case "associated_fill":
                 return (
                     <Form.Item
                         {...itemAttr}
@@ -95,12 +103,65 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
                             { type: "integer", min: 1, message: "请先选择数据集" }
                         ]}>
                         <Space.Compact>
-                            <Button onClick={() => setOpenDataSetSelect(true)}>选择数据集</Button>
+                            <Button
+                                onClick={() => {
+                                    setDataSetType("string");
+                                    setOpenDataSetSelect(true);
+                                }}>
+                                选择数据集
+                            </Button>
                             <InputNumber value={dataSetId} disabled style={{ width: "100%" }} />
                         </Space.Compact>
                     </Form.Item>
                 );
+            case "associated_fill":
+                return (
+                    <>
+                        <Form.Item
+                            {...itemAttr}
+                            rules={[
+                                { required: true, message: "请先选择数据集" },
+                                { type: "integer", min: 1, message: "请先选择数据集" }
+                            ]}>
+                            <Space.Compact>
+                                <Button
+                                    onClick={() => {
+                                        setDataSetType("dict");
+                                        setOpenDataSetSelect(true);
+                                    }}>
+                                    选择数据集
+                                </Button>
+                                <InputNumber value={dataSetId} disabled style={{ width: "100%" }} />
+                            </Space.Compact>
+                        </Form.Item>
+                        <Form.Item
+                            key="bind_key"
+                            name="bind_key"
+                            label="绑定字段属性"
+                            extra="选择绑定到该单元格的字段属性，如果对应字段属性数据是空的则会跳过填写（每行）">
+                            <Select
+                                value={bindDefineName}
+                                onChange={(value) => setBindDefineName(value)}
+                                options={dataSetDefineList.map((define) => ({
+                                    value: define.name,
+                                    label: define.name
+                                }))}
+                            />
+                        </Form.Item>
+                    </>
+                );
+            default:
+                throw Error("生成输入框失败，未知的类型");
         }
+    };
+
+    const renderNormalItem = (ruleFunctionName: string, parameter: GenerateRuleParameter) => {
+        const itemAttr = {
+            key: parameter.id,
+            label: parameter.description,
+            extra: parameter.hints,
+            name: parameter.name
+        };
         // 根据规则名称补充校验
         const ruleKey = `${ruleFunctionName}.${parameter.name}`;
         const extraRule = extraRuleMap.get(ruleKey) || [];
@@ -127,11 +188,22 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
             default:
                 throw Error("生成输入框失败，未知的类型");
         }
+    };
+
+    const formItemList = props.generateRuleParameterList.map((parameter) => {
+        const ruleFunctionName = String(props.rule?.function_name);
+        if (specialFunctionNameSet.has(ruleFunctionName)) {
+            return renderSpecialItem(ruleFunctionName, parameter);
+        } else {
+            return renderNormalItem(ruleFunctionName, parameter);
+        }
     });
 
     return (
         <>
             <Form
+                key="generateRuleParameterForm"
+                name="generateRuleParameterEditForm"
                 form={props.parameterForm}
                 disabled={props.saving}
                 labelCol={{ span: 3 }}
@@ -142,7 +214,7 @@ function GenerateRuleParameterForm(props: GenerateRuleParameterFormProp) {
             {openDataSetSelect && (
                 <DataSetSmallList
                     open={openDataSetSelect}
-                    dataType="string"
+                    dataType={dataSetType}
                     onClose={handleCloseDataSetSelect}
                     onSelectDataSetId={handleSelectDataSetId}
                 />

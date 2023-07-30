@@ -70,7 +70,7 @@ function FillRuleList() {
 
     return (
         <>
-            <Form layout="inline" form={queryForm} onFinish={handleFillRuleQuery}>
+            <Form name="queryFillRuleForm" layout="inline" form={queryForm} onFinish={handleFillRuleQuery}>
                 <Form.Item label="备注" name="remark">
                     <Input placeholder="请输入备注" allowClear />
                 </Form.Item>

@@ -1,5 +1,13 @@
 import { Button, Form, Input, Modal, Select, Typography } from "antd";
-import { addDataSet, AddOrUpdateDataSet, getDataSet, getDataSetDefineList, updateDataSet } from "./data-set-service";
+import {
+    addDataSet,
+    addDataSetDefine,
+    AddOrUpdateDataSet,
+    AddOrUpdateDataSetDefine,
+    getDataSet,
+    getDataSetDefineList,
+    updateDataSet
+} from "./data-set-service";
 import { useUser } from "../../store/account";
 import { message } from "../../store/feedback";
 import { useEffect, useState } from "react";
@@ -18,9 +26,7 @@ function DataSetEdit(props: EditProps) {
     const [showDataType, setShowDataType] = useState(false);
 
     useEffect(() => {
-        if (props.editId <= 0) {
-            return;
-        }
+        if (props.editId <= 0) return;
         getDataSet(props.editId)
             .then(({ data }) => {
                 loadDataDefine(data.data_type);
@@ -41,15 +47,46 @@ function DataSetEdit(props: EditProps) {
             .catch(() => null);
     };
 
+    const validateDataDefine = (dateType: string) => {
+        if (dateType != "dict") return true;
+        const defines = editForm.getFieldValue("data_define") as string;
+        const names = defines.split(",");
+        const nameSet = new Set(names);
+        if (names.length != nameSet.size) {
+            message.error("不能定义重复的字段属性");
+            return false;
+        }
+        return true;
+    };
+
+    const saveDataDefine = (dataSetId: number, dateType: string) => {
+        if (dataSetId <= 0 || dateType != "dict") return Promise.resolve(undefined);
+        const defines = editForm.getFieldValue("data_define") as string;
+        const defineList: Array<AddOrUpdateDataSetDefine> = defines.split(",").map((name) => ({
+            data_set_id: dataSetId,
+            name: name,
+            data_type: "string"
+        }));
+        return addDataSetDefine(defineList);
+    };
+
     const handleClose = () => {
         props.onDataSetQuery();
         props.setOpenEdit(false);
     };
 
     const handleSubmit = (data: AddOrUpdateDataSet) => {
+        // 检查重复的字段属性定义
+        if (!validateDataDefine(data.data_type)) {
+            return;
+        }
         setSaving(true);
         if (props.editId <= 0) {
             addDataSet({ ...data, username })
+                .then(({ data }) => {
+                    // 保存数据定义
+                    return saveDataDefine(data.id, data.data_type);
+                })
                 .then(() => {
                     message.success("保存成功");
                     handleClose();
@@ -58,6 +95,10 @@ function DataSetEdit(props: EditProps) {
                 .finally(() => setSaving(false));
         } else {
             updateDataSet(props.editId, { ...data, username })
+                .then(() => {
+                    // 保存数据定义
+                    return saveDataDefine(props.editId, data.data_type);
+                })
                 .then(() => {
                     message.success("保存成功");
                     handleClose();
@@ -76,9 +117,9 @@ function DataSetEdit(props: EditProps) {
             maskClosable={false}
             footer={null}>
             <Form
+                name="dataSetEditForm"
                 form={editForm}
                 onFinish={handleSubmit}
-                name="editForm"
                 layout="vertical"
                 autoComplete="off"
                 disabled={saving}

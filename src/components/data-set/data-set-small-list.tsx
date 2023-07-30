@@ -63,7 +63,7 @@ function DataSetSmallList(props: DataSetSmallListProps) {
             maskClosable={false}
             open={props.open}
             onClose={props.onClose}>
-            <Form layout="inline" form={queryForm} onFinish={handleDataSetQuery}>
+            <Form name="queryDataSetSmallForm" layout="inline" form={queryForm} onFinish={handleDataSetQuery}>
                 <Form.Item label="描述" name="description">
                     <Input placeholder="请输入描述" allowClear />
                 </Form.Item>

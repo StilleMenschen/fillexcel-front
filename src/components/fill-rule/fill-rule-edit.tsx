@@ -117,6 +117,7 @@ function FillRuleEdit(props: EditProps) {
             maskClosable={false}
             footer={null}>
             <Form
+                name="fillRuleEditForm"
                 form={editForm}
                 onFinish={handleSubmit}
                 disabled={saving}
@@ -124,7 +125,6 @@ function FillRuleEdit(props: EditProps) {
                     start_line: 1,
                     line_number: 2
                 }}
-                name="editForm"
                 layout="vertical"
                 autoComplete="off">
                 {props.editId > 0 && (

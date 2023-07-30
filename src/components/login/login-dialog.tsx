@@ -34,8 +34,8 @@ function LoginDialog() {
     return (
         <Modal title="登录" closeIcon={false} open={!signInfo.logged} forceRender={true} footer={null}>
             <Form
+                name="loginForm"
                 form={loginForm}
-                name="login-form"
                 onFinish={handleLogin}
                 initialValues={{ username: "jack", password: "4321dcba" }}
                 labelCol={{ span: 4 }}

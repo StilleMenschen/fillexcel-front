@@ -72,7 +72,7 @@ export function getDataSet(id: number): Promise<AxiosResponse<DataSet>> {
     return httpService.get(`/fills/dataSet/${id}`);
 }
 
-export function updateDataSet(id: number, dataSet: AddOrUpdateDataSet): Promise<AxiosResponse<DataSet>> {
+export function updateDataSet(id: number, dataSet: AddOrUpdateDataSet): Promise<AxiosResponse> {
     return httpService.put(`/fills/dataSet/${id}`, dataSet);
 }
 
@@ -90,11 +90,15 @@ export function getDataSetValueList(
     return httpService.get("/fills/dataSetValue", { params: { data_set_id, page, size } });
 }
 
-export function addDataSetValue(dataSet: AddOrUpdateDataSetValue): Promise<AxiosResponse<DataSetValue>> {
+export function addDataSetValue(dataSet: AddOrUpdateDataSetValue): Promise<AxiosResponse> {
     return httpService.post("/fills/dataSetValue", dataSet);
 }
 
-export function updateDataSetValue(id: number, dataSet: AddOrUpdateDataSetValue): Promise<AxiosResponse<DataSetValue>> {
+export function getDataSetValue(id: number): Promise<AxiosResponse<DataSetValue>> {
+    return httpService.get(`/fills/dataSetValue/${id}`);
+}
+
+export function updateDataSetValue(id: number, dataSet: AddOrUpdateDataSetValue): Promise<AxiosResponse> {
     return httpService.put(`/fills/dataSetValue/${id}`, dataSet);
 }
 
@@ -110,4 +114,8 @@ export function getDataSetDefineList(
     size: number
 ): Promise<ResultResponse<Array<DataSetDefine>>> {
     return httpService.get("/fills/dataSetDefine", { params: { data_set_id, page, size } });
+}
+
+export function addDataSetDefine(dataSet: Array<AddOrUpdateDataSetDefine>): Promise<AxiosResponse> {
+    return httpService.post("/fills/dataSetDefine", dataSet);
 }

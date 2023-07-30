@@ -75,7 +75,7 @@ function DataSetList() {
 
     return (
         <>
-            <Form layout="inline" form={queryForm} onFinish={handleDataSetQuery}>
+            <Form name="queryDataSetForm" layout="inline" form={queryForm} onFinish={handleDataSetQuery}>
                 <Form.Item label="描述" name="description">
                     <Input placeholder="请输入描述" allowClear />
                 </Form.Item>

@@ -1,5 +1,5 @@
 import { useRouteError } from "react-router-dom";
-import { Button, Empty } from "antd";
+import { Button, Empty, Typography } from "antd";
 
 interface Error {
     statusText: string | null;
@@ -12,7 +12,7 @@ export default function ErrorPage() {
     return (
         <Empty
             style={{ paddingTop: "2rem" }}
-            description={<span>哎呀！出现意外错误... {error.statusText || error.message}</span>}>
+            description={<Typography.Text>哎呀！出现意外错误。 {error.statusText || error.message}</Typography.Text>}>
             <Button type="link" onClick={() => window.history.back()}>
                 返回上一页
             </Button>
