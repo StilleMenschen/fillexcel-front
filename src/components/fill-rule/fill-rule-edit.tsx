@@ -16,8 +16,8 @@ import { useImmer } from "use-immer";
 interface EditProps {
     editId: number;
     openEdit: boolean;
-    setOpenEdit: CallableFunction;
-    onFillRuleQuery: CallableFunction;
+    onClose: () => void;
+    onFillRuleQuery: () => void;
 }
 
 interface FileItem {
@@ -35,7 +35,7 @@ function FillRuleEdit(props: EditProps) {
 
     const handleClose = () => {
         props.onFillRuleQuery();
-        props.setOpenEdit(false);
+        props.onClose();
     };
 
     useEffect(() => {
@@ -112,7 +112,7 @@ function FillRuleEdit(props: EditProps) {
         <Modal
             open={props.openEdit}
             onCancel={handleClose}
-            title={`${props.editId <= 0 ? "新增" : "编辑"}填充规则`}
+            title={props.editId <= 0 ? "新增填充规则" : "编辑填充规则"}
             forceRender={true}
             maskClosable={false}
             footer={null}>

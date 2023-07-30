@@ -1,22 +1,15 @@
 import { Button, Form, Input, Modal, Select, Typography } from "antd";
-import {
-    addDataSet,
-    addDataSetDefine,
-    AddOrUpdateDataSet,
-    AddOrUpdateDataSetDefine,
-    getDataSet,
-    getDataSetDefineList,
-    updateDataSet
-} from "./data-set-service";
+import { addDataSet, AddOrUpdateDataSet, getDataSet, updateDataSet } from "./data-set-service";
 import { useUser } from "../../store/account";
 import { message } from "../../store/feedback";
 import { useEffect, useState } from "react";
+import { addDataSetDefine, AddOrUpdateDataSetDefine, getDataSetDefineList } from "./data-set-define-service.ts";
 
 interface EditProps {
     editId: number;
     openEdit: boolean;
-    setOpenEdit: CallableFunction;
-    onDataSetQuery: CallableFunction;
+    onClose: () => void;
+    onDataSetQuery: () => void;
 }
 
 function DataSetEdit(props: EditProps) {
@@ -72,7 +65,7 @@ function DataSetEdit(props: EditProps) {
 
     const handleClose = () => {
         props.onDataSetQuery();
-        props.setOpenEdit(false);
+        props.onClose();
     };
 
     const handleSubmit = (data: AddOrUpdateDataSet) => {
@@ -112,7 +105,7 @@ function DataSetEdit(props: EditProps) {
         <Modal
             open={props.openEdit}
             onCancel={handleClose}
-            title={`${props.editId <= 0 ? "新增" : "编辑"}数据集`}
+            title={props.editId <= 0 ? "新增数据集" : "编辑数据集"}
             forceRender={true}
             maskClosable={false}
             footer={null}>

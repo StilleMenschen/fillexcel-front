@@ -166,7 +166,7 @@ function DataSetList() {
                 <DataSetEdit
                     editId={editId.current}
                     openEdit={openEdit}
-                    setOpenEdit={setOpenEdit}
+                    onClose={() => setOpenEdit(false)}
                     onDataSetQuery={handleDataSetQuery}
                 />
             )}

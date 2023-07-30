@@ -15,11 +15,10 @@ function FillRuleList() {
     // 查询
     const { username } = useUser();
     const [queryForm] = Form.useForm();
-    // 新增/编辑
-    const [openEdit, setOpenEdit] = useState(false);
-    // 表格组件分页
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [requirementList, setRequirementList] = useState<Array<Requirement>>([]);
+    // 新增/编辑
+    const [openEdit, setOpenEdit] = useState(false);
     const editId = useRef(-1);
     // 导航到配置页
     const navigate = useNavigate();
@@ -164,7 +163,7 @@ function FillRuleList() {
                 <FillRuleEdit
                     editId={editId.current}
                     openEdit={openEdit}
-                    setOpenEdit={setOpenEdit}
+                    onClose={() => setOpenEdit(false)}
                     onFillRuleQuery={handleFillRuleQuery}
                 />
             )}

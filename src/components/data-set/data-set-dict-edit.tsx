@@ -1,24 +1,20 @@
 import { Link, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
-import {
-    DataSet,
-    DataSetDefine,
-    DataSetValue,
-    deleteDataSetValue,
-    getDataSet,
-    getDataSetDefineList,
-    getDataSetValueList
-} from "./data-set-service.ts";
+import { DataSet, getDataSet } from "./data-set-service.ts";
 import { useEffect, useState } from "react";
 import { Breadcrumb, Button, Card, Col, Divider, Input, List, Popconfirm, Row, Space, Tag, Typography } from "antd";
 import DataSetDictEditForm from "./data-set-dict-edit-form.tsx";
 import { EditFilled, MinusCircleFilled } from "@ant-design/icons";
 import { message } from "../../store/feedback.ts";
+import { DataSetValue, deleteDataSetValue, getDataSetValueList } from "./data-set-value-service.ts";
+import { DataSetDefine, getDataSetDefineList } from "./data-set-define-service.ts";
 
 const showTotal = (total: number) => `总计 ${total}`;
 
 function DataSetDictEdit() {
     const { dataSetId } = useParams();
+    const dataSetIdNum = Number(dataSetId);
+    // 数据集查询
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [dataSetValueList, updateDataSetValueList] = useImmer<Array<DataSetValue>>([]);
     const [dataSet, setDataSet] = useState<DataSet>();
@@ -28,7 +24,7 @@ function DataSetDictEdit() {
     const [editId, setEditId] = useState(-1);
 
     const handleDataSetValueQuery = () => {
-        getDataSetValueList(Number(dataSetId), pageObj.number, pageObj.size)
+        getDataSetValueList(dataSetIdNum, pageObj.number, pageObj.size)
             .then(({ data }) => {
                 updateDataSetValueList(data.data);
                 updatePageObj((draft) => {
@@ -51,12 +47,12 @@ function DataSetDictEdit() {
     }, [pageObj.number, pageObj.size]);
 
     useEffect(() => {
-        getDataSet(Number(dataSetId))
+        getDataSet(dataSetIdNum)
             .then(({ data }) => {
                 setDataSet(data);
             })
             .catch(() => null);
-        queryDataSetDefineList(Number(dataSetId));
+        queryDataSetDefineList(dataSetIdNum);
     }, []);
 
     const handlePageChange = (number: number, size: number) => {
@@ -155,11 +151,10 @@ function DataSetDictEdit() {
             </Row>
             {openEdit && (
                 <DataSetDictEditForm
-                    dataSetId={Number(dataSetId)}
                     editId={editId}
                     dataSetDefineList={dataSetDefineList}
                     openEditForm={openEdit}
-                    setOpenEditForm={setOpenEdit}
+                    onClose={() => setOpenEdit(false)}
                     onDataSetDictQuery={handleDataSetValueQuery}
                 />
             )}

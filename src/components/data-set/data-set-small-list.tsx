@@ -10,7 +10,7 @@ interface DataSetSmallListProps {
     open: boolean;
     onClose: () => void;
     dataType: string;
-    onSelectDataSetId: (dataSetId: number) => void;
+    onSelectDataSetId: (dataSetId: number, description: string) => void;
 }
 
 function DataSetSmallList(props: DataSetSmallListProps) {
@@ -50,8 +50,8 @@ function DataSetSmallList(props: DataSetSmallListProps) {
         }
     };
 
-    const handleSelectDataSetId = (id: number) => {
-        props.onSelectDataSetId(id);
+    const handleSelectDataSetId = (id: number, description: string) => {
+        props.onSelectDataSetId(id, description);
         props.onClose();
     };
 
@@ -77,7 +77,7 @@ function DataSetSmallList(props: DataSetSmallListProps) {
                     title={row.id}
                     size="small"
                     extra={
-                        <Button type="link" onClick={() => handleSelectDataSetId(row.id)}>
+                        <Button type="link" onClick={() => handleSelectDataSetId(row.id, row.description)}>
                             选择
                         </Button>
                     }

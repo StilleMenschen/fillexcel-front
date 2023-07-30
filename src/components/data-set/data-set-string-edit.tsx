@@ -1,18 +1,17 @@
 import { Breadcrumb, Button, Card, Col, Divider, Input, InputRef, List, Popconfirm, Row, Space, Typography } from "antd";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import {
-    addDataSetValue,
-    DataSet,
-    DataSetValue,
-    deleteDataSetValue,
-    getDataSet,
-    getDataSetValueList,
-    updateDataSetValue
-} from "./data-set-service.ts";
+import { DataSet, getDataSet } from "./data-set-service.ts";
 import { useImmer } from "use-immer";
 import { CheckCircleFilled, CloseCircleFilled, EditFilled, MinusCircleFilled } from "@ant-design/icons";
 import { message } from "../../store/feedback.ts";
+import {
+    addDataSetValue,
+    DataSetValue,
+    deleteDataSetValue,
+    getDataSetValueList,
+    updateDataSetValue
+} from "./data-set-value-service.ts";
 
 const showTotal = (total: number) => `总计 ${total}`;
 
@@ -30,7 +29,7 @@ interface AddInputProps {
 function EditInput(props: EditInputProps) {
     const [editable, setEditable] = useState(false);
     const dirty = useRef(props.data.item);
-    const input = useRef<InputRef | null>(null);
+    const input = useRef<InputRef>(null);
 
     const handleAdd = () => {
         // 校验后再保存
@@ -51,7 +50,7 @@ function EditInput(props: EditInputProps) {
     return (
         <Space.Compact block className="little-top-space">
             <Input
-                ref={(e) => (input.current = e)}
+                ref={input}
                 style={{ textAlign: "center" }}
                 value={props.data.item}
                 readOnly={!editable}
@@ -131,12 +130,14 @@ function AddInput(props: AddInputProps) {
 
 function DataSetStringEdit() {
     const { dataSetId } = useParams();
+    const dataSetNum = Number(dataSetId);
+    // 数据集查询
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [dataSetValueList, updateDataSetValueList] = useImmer<Array<DataSetValue>>([]);
     const [dataSet, setDataSet] = useState<DataSet>();
 
     const handleDataSetValueQuery = () => {
-        getDataSetValueList(Number(dataSetId), pageObj.number, pageObj.size)
+        getDataSetValueList(dataSetNum, pageObj.number, pageObj.size)
             .then(({ data }) => {
                 updateDataSetValueList(data.data);
                 updatePageObj((draft) => {
@@ -151,7 +152,7 @@ function DataSetStringEdit() {
     }, [pageObj.number, pageObj.size]);
 
     useEffect(() => {
-        getDataSet(Number(dataSetId))
+        getDataSet(dataSetNum)
             .then(({ data }) => {
                 setDataSet(data);
             })

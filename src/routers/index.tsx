@@ -12,6 +12,7 @@ import ColumnRuleEdit from "../components/column-rule/column-rule-edit.tsx";
 import FileRecordList from "../components/fille-record/file-recod-list.tsx";
 import DataSetStringEdit from "../components/data-set/data-set-string-edit.tsx";
 import DataSetDictEdit from "../components/data-set/data-set-dict-edit.tsx";
+import { fetchGenerateRule } from "../store/generate-rule.ts";
 
 const router = createBrowserRouter([
     {
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
             {
                 path: "/fillRule",
                 loader: () => {
+                    fetchGenerateRule();
                     setNavBar("fillRule");
                     return null;
                 },

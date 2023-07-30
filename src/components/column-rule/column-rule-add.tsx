@@ -1,32 +1,14 @@
 import { Breadcrumb, Button, Col, Form, Input, Row, Select, Steps, Switch } from "antd";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { message } from "../../store/feedback.ts";
 import { GenerateRule } from "../generate-rule/generate-rule-service.ts";
 import { addColumnRule, AddOrUpdateColumnRule } from "./column-rule-service.ts";
-import { addDataParameter } from "./column-rule-parameter-service.ts";
-import GenerateRuleSelect, { GenerateRuleMap } from "../generate-rule/generate-rule-select.tsx";
+import GenerateRuleSelect from "../generate-rule/generate-rule-select.tsx";
 import { GenerateRuleParameter, getGenerateRuleParameterListByRule } from "../generate-rule/generate-rule-parameter-service.ts";
 import GenerateRuleParameterForm from "../generate-rule/generate-rule-parameter-form.tsx";
-
-type ParameterMap = {
-    [key: string]: string | number | boolean;
-};
-
-const parallelSaveParameter = (ruleId: number, parameterList: Array<GenerateRuleParameter>, values: ParameterMap) => {
-    return addDataParameter(
-        parameterList.map((param) => {
-            const val = values[param.name];
-            return {
-                param_rule_id: param.id,
-                column_rule_id: ruleId,
-                name: param.name,
-                value: String(val),
-                data_set_id: param.name == "data_set_id" ? Number(val) : null
-            };
-        })
-    );
-};
+import { parallelSaveParameter, ParameterMap, setTypeAndAssociate } from "./cloumn-rule-common.ts";
+import { useGenerateRuleMap } from "../../store/generate-rule.ts";
 
 function ColumnRuleAdd() {
     const { fillRuleId } = useParams();
@@ -34,7 +16,7 @@ function ColumnRuleAdd() {
     const [parameterForm] = Form.useForm();
     const [saving, setSaving] = useState(false);
     // 规则数据
-    const ruleMap = useRef<GenerateRuleMap>({});
+    const { generateRuleMap } = useGenerateRuleMap();
     const [generateRule, setGenerateRule] = useState<GenerateRule | null>(null);
     const [generateRuleId, setGenerateRuleId] = useState<number | null>(null);
     const [generateRuleParameterList, setGenerateRuleParameterList] = useState<Array<GenerateRuleParameter>>([]);
@@ -42,10 +24,6 @@ function ColumnRuleAdd() {
     const navigate = useNavigate();
     // 步骤
     const [stepCount, setStepCount] = useState(0);
-
-    const handleGenerateRuleLoad = (data: GenerateRuleMap) => {
-        ruleMap.current = data;
-    };
 
     const handleAddColumnRule = (columnRule: AddOrUpdateColumnRule) => {
         if (!generateRuleId) {
@@ -64,7 +42,7 @@ function ColumnRuleAdd() {
             })
             .then(({ data }) => {
                 setStepCount(2);
-                return parallelSaveParameter(data.id, generateRuleParameterList, parameters);
+                return parallelSaveParameter(data, generateRuleParameterList, parameters);
             })
             .then(() => {
                 message.success("保存成功");
@@ -77,12 +55,8 @@ function ColumnRuleAdd() {
             });
     };
 
-    const setFormField = (name: string, value: unknown) => {
-        editForm.setFieldValue(name, value);
-    };
-
     const handleGenerateRuleSelect = (ruleId: number) => {
-        const item = ruleMap.current[ruleId];
+        const item = generateRuleMap[ruleId];
         setGenerateRuleId(ruleId);
         getGenerateRuleParameterListByRule(ruleId, 1, 16)
             .then(({ data }) => {
@@ -90,25 +64,7 @@ function ColumnRuleAdd() {
                 setGenerateRule(item);
             })
             .catch(() => null);
-        switch (item.function_name) {
-            case "join_string":
-            case "value_list_iter":
-            case "associated_fill":
-                setFormField("column_type", "string");
-                setFormField("associated_of", true);
-                break;
-            case "calculate_expressions":
-                setFormField("column_type", "number");
-                setFormField("associated_of", true);
-                break;
-            case "random_number_iter":
-                setFormField("column_type", "number");
-                setFormField("associated_of", false);
-                break;
-            default:
-                setFormField("column_type", "string");
-                setFormField("associated_of", false);
-        }
+        setTypeAndAssociate(editForm, item.function_name);
     };
 
     return (
@@ -120,8 +76,8 @@ function ColumnRuleAdd() {
                     { title: "新增" }
                 ]}
             />
-            <Row className="little-top-space" justify="start">
-                <Col span={12}>
+            <Row className="little-top-space" justify="start" gutter={8}>
+                <Col span={11}>
                     <Form
                         name="columnRuleAddForm"
                         form={editForm}
@@ -141,15 +97,11 @@ function ColumnRuleAdd() {
                             <Input placeholder="请填写单元格列值，如A、F、AC" allowClear />
                         </Form.Item>
                         <Form.Item label="生成规则" extra="选择生成规则" required>
-                            <GenerateRuleSelect
-                                value={generateRuleId}
-                                onLoad={handleGenerateRuleLoad}
-                                onChange={handleGenerateRuleSelect}
-                            />
+                            <GenerateRuleSelect value={generateRuleId} onChange={handleGenerateRuleSelect} />
                         </Form.Item>
                         <Form.Item
                             label="数据类型"
-                            extra="如果生成规则生成的数据是数字则选择数值类型"
+                            extra="如果生成规则生成的数据是数字则选择数值类型（自动设置）"
                             name="column_type"
                             required>
                             <Select
@@ -168,7 +120,7 @@ function ColumnRuleAdd() {
                             <Switch disabled />
                         </Form.Item>
                         <Form.Item style={{ paddingLeft: "4.8rem" }}>
-                            <Button type="primary" htmlType="submit">
+                            <Button block type="primary" htmlType="submit">
                                 保存
                             </Button>
                         </Form.Item>
@@ -185,7 +137,7 @@ function ColumnRuleAdd() {
                         />
                     )}
                 </Col>
-                <Col span={11} offset={1}>
+                <Col span={13}>
                     <GenerateRuleParameterForm
                         rule={generateRule}
                         parameterForm={parameterForm}

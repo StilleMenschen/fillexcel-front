@@ -1,37 +1,14 @@
 import { Select } from "antd";
-import { useEffect, useState } from "react";
-import { GenerateRule, getGenerateRuleList } from "./generate-rule-service.ts";
 import { BaseOptionType } from "rc-select/lib/Select";
+import { useGenerateRuleMap } from "../../store/generate-rule.ts";
 
 export interface GenerateRuleSelectProp {
-    onLoad: (data: GenerateRuleMap) => void;
     value: number | null;
     onChange: (value: number) => void;
 }
 
-export interface GenerateRuleMap {
-    [key: number]: GenerateRule;
-}
-
-const initGenerateRuleMap = (data: Array<GenerateRule>) => {
-    const ruleMap: GenerateRuleMap = {};
-    data.forEach((gr) => {
-        ruleMap[gr.id] = gr;
-    });
-    return ruleMap;
-};
-
 function GenerateRuleSelect(props: GenerateRuleSelectProp) {
-    const [generateRuleList, setGenerateRuleList] = useState<Array<GenerateRule>>([]);
-
-    useEffect(() => {
-        getGenerateRuleList(1, 16)
-            .then(({ data }) => {
-                setGenerateRuleList(data.data);
-                props.onLoad(initGenerateRuleMap(data.data));
-            })
-            .catch(() => null);
-    }, []);
+    const { generateRuleList } = useGenerateRuleMap();
 
     return (
         <Select<number, BaseOptionType>

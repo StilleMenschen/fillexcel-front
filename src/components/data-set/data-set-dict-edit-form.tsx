@@ -1,14 +1,15 @@
 import { Button, Form, Input, Modal } from "antd";
-import { addDataSetValue, DataSetDefine, getDataSetValue, updateDataSetValue } from "./data-set-service.ts";
+import { DataSetDefine } from "./data-set-define-service.ts";
 import { useEffect, useState } from "react";
 import { message } from "../../store/feedback.ts";
+import { useParams } from "react-router-dom";
+import { addDataSetValue, getDataSetValue, updateDataSetValue } from "./data-set-value-service.ts";
 
 interface DataSetDictEditFormProps {
-    dataSetId: number;
     editId: number;
     dataSetDefineList: Array<DataSetDefine>;
     openEditForm: boolean;
-    setOpenEditForm: (value: boolean) => void;
+    onClose: () => void;
     onDataSetDictQuery: () => void;
 }
 
@@ -17,6 +18,8 @@ type DataSetDict = {
 };
 
 function DataSetDictEditForm(props: DataSetDictEditFormProps) {
+    const { dataSetId } = useParams();
+    const dataSetIdNum = Number(dataSetId);
     const [editForm] = Form.useForm();
     const [saving, setSaving] = useState(false);
 
@@ -32,14 +35,14 @@ function DataSetDictEditForm(props: DataSetDictEditFormProps) {
     const closeAndQuery = () => {
         setSaving(false);
         props.onDataSetDictQuery();
-        props.setOpenEditForm(false);
+        props.onClose();
     };
 
     const handleSaveDataDictValue = (data: DataSetDict) => {
         setSaving(true);
         if (props.editId <= 0) {
             addDataSetValue({
-                data_set_id: props.dataSetId,
+                data_set_id: dataSetIdNum,
                 item: JSON.stringify(data),
                 data_type: "dict"
             })
@@ -50,7 +53,7 @@ function DataSetDictEditForm(props: DataSetDictEditFormProps) {
                 .finally(closeAndQuery);
         } else {
             updateDataSetValue(props.editId, {
-                data_set_id: props.dataSetId,
+                data_set_id: dataSetIdNum,
                 item: JSON.stringify(data),
                 data_type: "dict"
             })
@@ -66,7 +69,7 @@ function DataSetDictEditForm(props: DataSetDictEditFormProps) {
         <Modal
             title={props.editId <= 0 ? "新增定义数据" : "编辑定义数据"}
             open={props.openEditForm}
-            onCancel={() => props.setOpenEditForm(false)}
+            onCancel={props.onClose}
             forceRender={true}
             footer={null}
             maskClosable={false}

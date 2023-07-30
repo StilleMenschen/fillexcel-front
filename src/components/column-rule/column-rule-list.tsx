@@ -8,15 +8,20 @@ import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import { message } from "../../store/feedback.ts";
 import { getRequirement, Requirement } from "../fill-rule/fill-rule-service.ts";
 import GenerateButton from "../fill-rule/generate-button.tsx";
+import { useGenerateRuleMap } from "../../store/generate-rule.ts";
 
 const showTotal = (total: number) => `总计 ${total}`;
 
 function ColumnRuleList() {
     const { fillRuleId } = useParams();
     const [queryForm] = Form.useForm();
+    // 列规则数据查询
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [columnRuleList, setColumnRuleList] = useState<Array<ColumnRule>>([]);
+    // 填充规则
     const [fillRuleData, setFillRuleData] = useState<Requirement>();
+    // 生成规则
+    const { generateRuleMap } = useGenerateRuleMap();
     // 导航到编辑/新增页
     const navigate = useNavigate();
 
@@ -33,16 +38,16 @@ function ColumnRuleList() {
     };
 
     useEffect(() => {
-        handleColumnRuleQuery();
-    }, [pageObj.number, pageObj.size]);
-
-    useEffect(() => {
         getRequirement(Number(fillRuleId))
             .then(({ data }) => {
                 setFillRuleData(data);
             })
             .catch(() => null);
     }, []);
+
+    useEffect(() => {
+        handleColumnRuleQuery();
+    }, [pageObj.number, pageObj.size]);
 
     const handlePageChange = (number: number, size: number) => {
         // 如果分页数有变
@@ -65,6 +70,15 @@ function ColumnRuleList() {
                 handleColumnRuleQuery();
             })
             .catch(() => null);
+    };
+
+    const getGenerateRuleDescription = (ruleId: number) => {
+        const rule = generateRuleMap[ruleId];
+        if (rule.description) {
+            return rule.description;
+        } else {
+            return ruleId;
+        }
     };
 
     return (
@@ -115,9 +129,14 @@ function ColumnRuleList() {
                             )}
                         />
                         <Table.Column<ColumnRule>
-                            title="是否有关联数据"
+                            title="关联生成规则"
+                            key="description"
+                            render={(_, row) => <Typography.Text>{getGenerateRuleDescription(row.rule_id)}</Typography.Text>}
+                        />
+                        <Table.Column<ColumnRule>
+                            title="是否关联数据"
                             key="associated_of"
-                            render={(value) => <Typography.Text> {value ? "是" : "否"} </Typography.Text>}
+                            render={(_, row) => <Typography.Text>{row.associated_of ? "是" : "否"}</Typography.Text>}
                         />
                         <Table.Column<ColumnRule> title="更新于" dataIndex="updated_at" key="updated_at" />
                         <Table.Column<ColumnRule>
