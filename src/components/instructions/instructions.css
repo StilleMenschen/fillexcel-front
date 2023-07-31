@@ -1,0 +1,7 @@
+.instructions .list {
+    padding-left: 1rem;
+}
+
+.instructions .list .list-item {
+    line-height: 1.48rem;
+}

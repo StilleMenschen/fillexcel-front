@@ -115,7 +115,7 @@ function FillRuleList() {
                     render={(_, row) => <GenerateButton icon={true} key={row.id} requirementId={row.id} />}
                 />
                 <Table.Column<Requirement>
-                    title="编辑"
+                    title="配置/编辑"
                     key="operation"
                     fixed="right"
                     width={140}

@@ -140,7 +140,7 @@ function ColumnRuleList() {
                         />
                         <Table.Column<ColumnRule> title="更新于" dataIndex="updated_at" key="updated_at" />
                         <Table.Column<ColumnRule>
-                            title="操作"
+                            title="编辑"
                             key="operation"
                             fixed="right"
                             width={140}

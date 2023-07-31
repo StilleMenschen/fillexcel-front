@@ -116,7 +116,7 @@ function DataSetList() {
                 />
                 <Table.Column<DataSet> title="更新于" dataIndex="updated_at" width={172} key="updated_at" />
                 <Table.Column<DataSet>
-                    title="编辑"
+                    title="配置/编辑"
                     key="operation"
                     fixed="right"
                     width={140}
