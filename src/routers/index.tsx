@@ -35,8 +35,8 @@ const router = createBrowserRouter([
             },
             {
                 path: "/fillRule",
-                loader: () => {
-                    fetchGenerateRule();
+                loader: async () => {
+                    await fetchGenerateRule();
                     setNavBar("fillRule");
                     return null;
                 },

@@ -47,8 +47,8 @@ const initGenerateRuleMap = (generateRules: Array<GenerateRule>) => {
     return ruleMap;
 };
 
-export function fetchGenerateRule() {
-    getGenerateRuleList(1, 16)
+export async function fetchGenerateRule() {
+    await getGenerateRuleList(1, 16)
         .then(({ data }) => {
             generateRule = {
                 generateRuleList: data.data,
