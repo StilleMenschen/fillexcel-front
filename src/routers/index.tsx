@@ -13,6 +13,7 @@ import FileRecordList from "../components/fille-record/file-recod-list.tsx";
 import DataSetStringEdit from "../components/data-set/data-set-string-edit.tsx";
 import DataSetDictEdit from "../components/data-set/data-set-dict-edit.tsx";
 import { fetchGenerateRule } from "../store/generate-rule.ts";
+import Examples from "../components/instructions/examples.tsx";
 
 const router = createBrowserRouter([
     {
@@ -32,6 +33,14 @@ const router = createBrowserRouter([
                     return null;
                 },
                 element: <Instructions />
+            },
+            {
+                path: "/examples",
+                loader: () => {
+                    setNavBar("Home");
+                    return null;
+                },
+                element: <Examples />
             },
             {
                 path: "/fillRule",

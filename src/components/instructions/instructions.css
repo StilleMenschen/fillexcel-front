@@ -5,3 +5,27 @@
 .instructions .list .list-item {
     line-height: 1.48rem;
 }
+
+.instructions .table {
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.instructions .table tr th {
+    width: 10rem;
+    background-color: #404000;
+}
+
+.instructions .table tr th, .instructions .table tr td {
+    border: 0.01rem solid white;
+}
+
+.instructions button {
+    padding: 0.2rem 0.48rem;
+    text-align: center;
+    margin: 0.4rem 0.2rem;
+}
+
+.instructions button:hover {
+    cursor: pointer;
+}

@@ -18,6 +18,7 @@ export default function Instructions() {
                     </li>
                     <li className="list-item">可配置关联一个自定义的数据集，一组对象或一组字词</li>
                 </ul>
+                查看更多的<Link to="/examples">例子</Link>
             </Card>
             <Card title="数据集" extra={<Link to="/dataSet">定义数据</Link>} style={{ width: "32rem" }} hoverable>
                 <strong>自定义填入单元格的数据</strong>
