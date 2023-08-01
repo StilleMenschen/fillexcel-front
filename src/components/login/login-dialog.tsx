@@ -33,13 +33,7 @@ function LoginDialog() {
 
     return (
         <Modal title="登录" closeIcon={false} open={!signInfo.logged} forceRender={true} footer={null}>
-            <Form
-                name="loginForm"
-                form={loginForm}
-                onFinish={handleLogin}
-                initialValues={{ username: "jack", password: "4321dcba" }}
-                labelCol={{ span: 4 }}
-                autoComplete="off">
+            <Form name="loginForm" form={loginForm} onFinish={handleLogin} labelCol={{ span: 4 }} autoComplete="off">
                 <Form.Item label="账号" name="username" rules={[{ required: true, message: "请输入账号" }]}>
                     <Input allowClear />
                 </Form.Item>

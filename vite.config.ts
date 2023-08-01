@@ -34,7 +34,10 @@ export default defineConfig({
         // sourcemap: true,
         rollupOptions: {
             output: {
-                manualChunks(id) {
+                manualChunks: {
+                    antd: ["antd"]
+                }
+                /*manualChunks(id) {
                     // 合并外部依赖到同一个文件
                     if (/node_modules/.test(id)) {
                         return "vendor";
@@ -43,7 +46,7 @@ export default defineConfig({
                     if (moduleMatch.test(id)) {
                         return "app";
                     }
-                }
+                }*/
             }
         }
     }
