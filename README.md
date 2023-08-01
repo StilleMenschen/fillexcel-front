@@ -39,7 +39,7 @@
 另外，自定义字段属性对象数组还需要配置绑定，如参考上面的定义，
 将 mass 绑定到单元格列 A，将 radius 绑定到单元格列 B
 
-> 这只是前端项目，对应的后端为 [fillexcel](https://gitee.com/stillemenschen/fillexcel)
+> 这只是前端项目，对应的后端仓库为 [fillexcel](https://gitee.com/stillemenschen/fillexcel)
 
 ## 依赖
 
