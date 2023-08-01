@@ -29,6 +29,10 @@ export default function Instructions() {
                         <p>{`{"mass": 851.21, "radius": 78, "temperature": "-227°C"}`}</p>
                         <p>{`{"mass": 581, "radius": 42.254, "temperature": "318°C"}`}</p>
                     </li>
+                    <li className="list-item">
+                        另外，自定义字段属性对象数组还需要配置绑定，如参考上面的定义，将 mass 绑定到单元格列 A，将 radius
+                        绑定到单元格列 B
+                    </li>
                 </ul>
             </Card>
             <Card title="生成记录" extra={<Link to="/fileRecord">下载文件</Link>} style={{ width: "32rem" }} hoverable>
