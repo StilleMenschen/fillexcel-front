@@ -9,6 +9,7 @@
 .instructions .table {
     border-collapse: collapse;
     text-align: center;
+    margin: 0.48rem 0;
 }
 
 .instructions .table tr th {
@@ -18,14 +19,4 @@
 
 .instructions .table tr th, .instructions .table tr td {
     border: 0.01rem solid white;
-}
-
-.instructions button {
-    padding: 0.2rem 0.48rem;
-    text-align: center;
-    margin: 0.4rem 0.2rem;
-}
-
-.instructions button:hover {
-    cursor: pointer;
 }

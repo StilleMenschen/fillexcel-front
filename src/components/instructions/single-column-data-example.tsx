@@ -1,26 +1,7 @@
 import { Link } from "react-router-dom";
 import { useRef } from "react";
-
-function getRandomTwoDecimal(min: number, max: number) {
-    // 生成0到1之间的随机小数
-    let random = Math.random();
-    // 将随机小数映射到指定范围
-    let result = random * (max - min) + min;
-    // 保留两位小数
-    return result.toFixed(2);
-}
-
-function getCurrentDateTime(idx: number) {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = ("0" + (now.getMonth() + 1)).slice(-2);
-    const day = ("0" + now.getDate()).slice(-2);
-    const hour = ("0" + now.getHours()).slice(-2);
-    const minute = ("0" + now.getMinutes()).slice(-2);
-    const second = ("0" + now.getSeconds()).slice(-2);
-
-    return `${year}${month}${day}-${hour}${minute}${second}-0${idx}`;
-}
+import { Button } from "antd";
+import { getCurrentDateTime, getRandomTwoDecimal } from "./instructions-util.ts";
 
 function fillData(table: HTMLTableElement | null, idx: number) {
     if (!table) return;
@@ -54,11 +35,9 @@ function SingleColumnDataExample() {
 
     return (
         <>
-            <p>以下是一个简单的单例数据填入</p>
+            <p>以下是一个简单的单例数据填入，点击按钮开始</p>
             <p>设置固定的字符串“你好”填入列A，设置范围随机数填入列B，设置日期时间文本填入列D</p>
-            <button className="button" type="button" onClick={start}>
-                开始演示
-            </button>
+            <Button onClick={start}>开始演示</Button>
             <table className="table" ref={table}>
                 <thead>
                     <tr>
