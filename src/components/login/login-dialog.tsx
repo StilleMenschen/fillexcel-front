@@ -40,6 +40,7 @@ function LoginDialog() {
             } else {
                 // 不存在则注册
                 createUser(user.username, user.password).then(() => {
+                    message.success("注册成功");
                     getToken(user);
                 });
             }
@@ -57,7 +58,7 @@ function LoginDialog() {
                 </Form.Item>
                 <Form.Item>
                     <Button style={{ marginTop: "1rem" }} block type="primary" htmlType="submit">
-                        登录
+                        登录/注册
                     </Button>
                 </Form.Item>
             </Form>
