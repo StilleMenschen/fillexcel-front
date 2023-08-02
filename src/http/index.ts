@@ -76,6 +76,7 @@ httpService.interceptors.response.use(
                     case 401:
                         setLogout();
                         if (response.config.url?.indexOf("/auth/token") === -1) {
+                            setAuthorization(null);
                             message.warning("登录失效，请重新登录");
                         }
                         break;
