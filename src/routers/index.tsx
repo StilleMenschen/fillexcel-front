@@ -35,7 +35,7 @@ const router = createBrowserRouter([
                 element: <Instructions />
             },
             {
-                path: "/examples",
+                path: "/examples/:key",
                 loader: () => {
                     setNavBar("Home");
                     return null;

@@ -27,7 +27,13 @@ const emitChange = () => {
     }
 };
 
-export const getAuthorization = () => signInfo.prefix + (signInfo.token || "");
+export const getAuthorization = () => {
+    if (signInfo.token) {
+        return signInfo.prefix + signInfo.token;
+    } else {
+        return null;
+    }
+};
 
 export const setLogin = (token: string) => {
     signInfo = {

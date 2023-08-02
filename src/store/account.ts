@@ -33,6 +33,7 @@ const emitChange = () => {
 export const fetchUserInfo = (name: string | null) => {
     const username = name || user.username;
     if (username && username != "Anonymous") {
+        user.username = username;
         getUserInfo(username)
             .then(({ data }) => {
                 setUser(data);

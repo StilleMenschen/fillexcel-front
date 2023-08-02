@@ -18,7 +18,7 @@ export default function Instructions() {
                     </li>
                     <li className="list-item">可配置关联一个自定义的数据集，一组对象或一组字词</li>
                 </ul>
-                查看更多的<Link to="/examples">例子</Link>
+                查看更多的<Link to="/examples/single">例子</Link>
             </Card>
             <Card title="数据集" extra={<Link to="/dataSet">定义数据</Link>} style={{ width: "32rem" }} hoverable>
                 <strong>自定义填入单元格的数据</strong>
@@ -35,6 +35,7 @@ export default function Instructions() {
                         绑定到单元格列 B
                     </li>
                 </ul>
+                查看更多的<Link to="/examples/collection">例子</Link>
             </Card>
             <Card title="生成记录" extra={<Link to="/fileRecord">下载文件</Link>} style={{ width: "32rem" }} hoverable>
                 <strong>下载已经生成的文件</strong>

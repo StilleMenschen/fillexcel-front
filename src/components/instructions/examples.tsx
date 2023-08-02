@@ -1,32 +1,30 @@
 import { Collapse, CollapseProps } from "antd";
+import { useParams } from "react-router-dom";
 import SingleColumnDataExample from "./single-column-data-example.tsx";
-
-const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
+import CollectionColumnDataExample from "./collection-column-data-example.tsx";
+import RelatedColumnDataExample from "./related-column-data-example.tsx";
 
 const items: CollapseProps["items"] = [
     {
-        key: "1",
+        key: "single",
         label: "简单填入的值",
         children: <SingleColumnDataExample />
     },
     {
-        key: "2",
+        key: "collection",
         label: "自定义数据集填入的值",
-        children: <p>{text}</p>
+        children: <CollectionColumnDataExample />
     },
     {
         key: "3",
         label: "有关联数据填入的值",
-        children: <p>{text}</p>
+        children: <RelatedColumnDataExample />
     }
 ];
 
 function Examples() {
-    return <Collapse className="instructions" accordion items={items} defaultActiveKey={["1"]} />;
+    const { key } = useParams();
+    return <Collapse className="instructions" accordion items={items} defaultActiveKey={[key || "1"]} />;
 }
 
 export default Examples;

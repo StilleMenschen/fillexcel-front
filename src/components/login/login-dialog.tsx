@@ -1,5 +1,5 @@
 import { Modal, Form, Input, Button } from "antd";
-import { fetchToken } from "./login-service.ts";
+import { createUser, existsUsername, fetchToken } from "./login-service.ts";
 import { setLogin, useSignInfo } from "../../store/sign-info.ts";
 import { fetchUserInfo } from "../../store/account.ts";
 import { message } from "../../store/feedback.ts";
@@ -15,12 +15,12 @@ function LoginDialog() {
     const signInfo = useSignInfo();
     const navigate = useNavigate();
 
-    const handleLogin = (user: LoginUser) => {
-        // 处理登录逻辑，例如发送登录请求等
+    const getToken = (user: LoginUser) => {
         fetchToken(user.username, user.password)
             .then(({ data }) => {
                 setLogin(data.access);
                 message.success("登录成功");
+                loginForm.resetFields();
                 // 获取用户信息
                 fetchUserInfo(user.username);
                 // 到首页
@@ -29,6 +29,21 @@ function LoginDialog() {
             .catch(() => {
                 message.error("账号或密码不正确");
             });
+    };
+
+    const handleLogin = (user: LoginUser) => {
+        // 处理登录逻辑，例如发送登录请求等
+        existsUsername(user.username).then((isExists) => {
+            if (isExists) {
+                // 存在则登录
+                getToken(user);
+            } else {
+                // 不存在则注册
+                createUser(user.username, user.password).then(() => {
+                    getToken(user);
+                });
+            }
+        });
     };
 
     return (
