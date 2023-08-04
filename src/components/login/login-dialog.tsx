@@ -32,7 +32,7 @@ function LoginDialog() {
     };
 
     const handleLogin = (user: LoginUser) => {
-        // 处理登录逻辑，例如发送登录请求等
+        // 先检查用户是否存在
         existsUsername(user.username).then((isExists) => {
             if (isExists) {
                 // 存在则登录
@@ -41,6 +41,7 @@ function LoginDialog() {
                 // 不存在则注册
                 createUser(user.username, user.password).then(() => {
                     message.success("注册成功");
+                    // 然后再登录
                     getToken(user);
                 });
             }

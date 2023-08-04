@@ -15,6 +15,9 @@ export interface GenerateRuleMap {
     [key: number]: GenerateRule;
 }
 
+/**
+ * 单元格数据的生成规则
+ */
 let generateRule = {
     generateRuleMap: {} as GenerateRuleMap,
     generateRuleList: [] as Array<GenerateRule>
@@ -22,6 +25,10 @@ let generateRule = {
 
 let listeners: Array<CallableFunction> = [];
 
+/**
+ * 收集依赖
+ * @param listener 从组件收集过来的依赖（无参数的回调函数）用于通知组件重新渲染
+ */
 const subscribe = (listener: CallableFunction) => {
     listeners = [...listeners, listener];
     return () => {
@@ -33,12 +40,19 @@ const snapshot = () => {
     return generateRule;
 };
 
+/**
+ * 通知组件重新渲染
+ */
 const emitChange = () => {
     for (const listener of listeners) {
         listener();
     }
 };
 
+/**
+ * 将列表对象转为一个 ID 映射的 Map
+ * @param generateRules 生成规则
+ */
 const initGenerateRuleMap = (generateRules: Array<GenerateRule>) => {
     const ruleMap: GenerateRuleMap = {};
     generateRules.forEach((gr) => {

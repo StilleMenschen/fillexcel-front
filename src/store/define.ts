@@ -12,7 +12,7 @@ export interface User {
     email: string;
     date_joined: string;
 }
-
+// 数据类型枚举映射
 export const DATA_TYPE = new Map<string, string>([
     ["string", "字符串"],
     ["number", "数值"],

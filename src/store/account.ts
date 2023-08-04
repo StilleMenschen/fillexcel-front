@@ -4,6 +4,9 @@ import { getUserInfo } from "../components/login/login-service.ts";
 import { setLogout } from "./sign-info.ts";
 import { message } from "./feedback.ts";
 
+/**
+ * 用户信息
+ */
 let user: User = {
     id: -1,
     username: localStorage.getItem("username") || "Anonymous",
@@ -13,6 +16,10 @@ let user: User = {
 
 let listeners: Array<CallableFunction> = [];
 
+/**
+ * 收集依赖
+ * @param listener 从组件收集过来的依赖（无参数的回调函数）用于通知组件重新渲染
+ */
 const subscribe = (listener: CallableFunction) => {
     listeners = [...listeners, listener];
     return () => {
@@ -24,6 +31,9 @@ const snapshot = () => {
     return user;
 };
 
+/**
+ * 通知组件重新渲染
+ */
 const emitChange = () => {
     for (const listener of listeners) {
         listener();
@@ -32,6 +42,7 @@ const emitChange = () => {
 
 export const fetchUserInfo = (name: string | null) => {
     const username = name || user.username;
+    // 如果是有效的用户名则获取用户信息
     if (username && username != "Anonymous") {
         user.username = username;
         getUserInfo(username)
@@ -47,6 +58,7 @@ export const fetchUserInfo = (name: string | null) => {
 
 export const setUser = (data: User) => {
     user = { ...data };
+    // 本地存储用户名
     localStorage.setItem("username", user.username);
     emitChange();
 };

@@ -2,6 +2,9 @@ import { SignInfo } from "./define.ts";
 import { useSyncExternalStore } from "react";
 import { setAuthorization } from "../http";
 
+/**
+ * 登录状态相关的信息
+ */
 let signInfo: SignInfo = {
     prefix: "Bearer ",
     token: localStorage.getItem("authorization"),
@@ -10,6 +13,10 @@ let signInfo: SignInfo = {
 
 let listeners: Array<CallableFunction> = [];
 
+/**
+ * 收集依赖
+ * @param listener 从组件收集过来的依赖（无参数的回调函数）用于通知组件重新渲染
+ */
 const subscribe = (listener: CallableFunction) => {
     listeners = [...listeners, listener];
     return () => {
@@ -21,6 +28,9 @@ const snapshot = () => {
     return signInfo;
 };
 
+/**
+ * 通知组件重新渲染
+ */
 const emitChange = () => {
     for (const listener of listeners) {
         listener();
@@ -29,6 +39,7 @@ const emitChange = () => {
 
 export const getAuthorization = () => {
     if (signInfo.token) {
+        // 拼接上 JWT 的前缀
         return signInfo.prefix + signInfo.token;
     } else {
         return null;
@@ -42,10 +53,14 @@ export const setLogin = (token: string) => {
         token: token
     };
     setAuthorization(signInfo.prefix + token);
+    // 缓存到客户端
     localStorage.setItem("authorization", token);
     emitChange();
 };
 
+/**
+ * 退出登录
+ */
 export const setLogout = () => {
     if (!signInfo.logged) return;
     signInfo = {

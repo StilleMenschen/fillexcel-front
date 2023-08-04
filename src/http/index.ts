@@ -36,8 +36,11 @@ export const httpService = axios.create({
     timeout: 30000
 });
 
-export const setAuthorization = (authorization: string | null) => {
-    httpService.defaults.headers.common["Authorization"] = authorization;
+/**
+ * 设置 Token
+ */
+export const setAuthorization = (token: string | null) => {
+    httpService.defaults.headers.common["Authorization"] = token;
 };
 
 setAuthorization(getAuthorization());

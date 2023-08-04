@@ -20,6 +20,7 @@ export function getUserInfo(username: string): Promise<AxiosResponse<User>> {
 
 export function existsUsername(username: string): Promise<boolean> {
     return httpService.head("/users", { params: { username } }).then((response) => {
+        // Axios 可能会把响应头转为小写
         const isExists = response.headers["user-exists"] || response.headers["USER-EXISTS"];
         return Promise.resolve(isExists == "TRUE");
     });

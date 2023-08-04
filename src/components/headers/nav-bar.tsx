@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Menu } from "antd";
 import { InfoCircleFilled, ControlFilled, FileFilled, DatabaseFilled } from "@ant-design/icons";
-import { setNavBar, useNavBar } from "../../store/navigation.ts";
+import { paths, setNavBar, useNavBar } from "../../store/navigation.ts";
 import { MenuClickEventHandler } from "rc-menu/lib/interface";
 
 const menuList = [
@@ -27,17 +27,13 @@ const menuList = [
     }
 ];
 
-const paths = new Map([
-    ["Home", "/"],
-    ["fillRule", "/fillRule"],
-    ["dataSet", "/dataSet"],
-    ["fileRecord", "/fileRecord"]
-]);
-
 function NavBar() {
     const navigate = useNavigate();
     const nav = useNavBar();
 
+    /**
+     * 更新导航并路由
+     */
     const handleClick: MenuClickEventHandler = (e) => {
         setNavBar(e.key);
         navigate(paths.get(e.key) || "/");

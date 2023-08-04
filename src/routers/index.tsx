@@ -45,6 +45,8 @@ const router = createBrowserRouter([
             {
                 path: "/fillRule",
                 loader: async () => {
+                    // 同步等待生成规则加载完成
+                    // 加载完成后再渲染路由对应的组件
                     await fetchGenerateRule();
                     setNavBar("fillRule");
                     return null;

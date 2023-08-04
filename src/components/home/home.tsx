@@ -9,9 +9,11 @@ import { message as messageUnit } from "../../store/feedback.ts";
  * 主页
  */
 function Home() {
+    // 关联上下文，获取到主题等样式的配置
     const [messageApi, contextHolder] = message.useMessage();
 
     useEffect(() => {
+        // 绑定到代理对象中
         messageUnit.success = (msg) => {
             void messageApi.success(msg);
         };

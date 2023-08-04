@@ -1,13 +1,23 @@
+/**
+ * 随机范围数值
+ * @param min 最小值（包含）
+ * @param max 最大值（不包含）
+ */
 export function getRandomTwoDecimal(min: number, max: number) {
     // 生成0到1之间的随机小数
-    let random = Math.random();
+    const random = Math.random();
     // 将随机小数映射到指定范围
-    let result = random * (max - min) + min;
+    const result = random * (max - min) + min;
     // 保留两位小数
     return result.toFixed(2);
 }
 
+/**
+ * 当前日期时间组成的字符串
+ * @param idx 追加的序号
+ */
 export function getCurrentDateTime(idx: number) {
+    if (!idx) idx = 1;
     const now = new Date();
     const year = now.getFullYear();
     const month = ("0" + (now.getMonth() + 1)).slice(-2);
