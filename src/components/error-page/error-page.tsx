@@ -7,6 +7,7 @@ interface Error {
 }
 
 export default function ErrorPage() {
+    // 路由时渲染组件出现的异常
     const error = useRouteError() as Error;
 
     return (

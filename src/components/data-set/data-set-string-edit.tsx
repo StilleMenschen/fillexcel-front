@@ -31,7 +31,7 @@ function EditInput(props: EditInputProps) {
     const dirty = useRef(props.data.item);
     const input = useRef<InputRef>(null);
 
-    const handleAdd = () => {
+    const handleSave = () => {
         // 校验后再保存
         if (props.data.item && props.data.item.length > 0) {
             props.onUpdate(props.data.id, props.data);
@@ -57,14 +57,16 @@ function EditInput(props: EditInputProps) {
                 onChange={(e) => props.onChange(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.code == "Enter" || e.code == "NumpadEnter") {
-                        handleAdd();
+                        // 按下回车键也可保存
+                        handleSave();
                     } else if (e.code == "Escape") {
+                        // 按下Esc键可撤销
                         handleCancel();
                     }
                 }}
             />
             {editable ? (
-                <Button icon={<CheckCircleFilled />} onClick={handleAdd} />
+                <Button icon={<CheckCircleFilled />} onClick={handleSave} />
             ) : (
                 <Button
                     icon={<EditFilled />}
@@ -97,6 +99,7 @@ function AddInput(props: AddInputProps) {
     const [value, setValue] = useState("");
     const handleAdd = () => {
         if (!value || value == "") return;
+        // 非空的数据则新增
         props.onAdd(value);
         setValue("");
     };
@@ -110,6 +113,7 @@ function AddInput(props: AddInputProps) {
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.code == "Enter" || e.code == "NumpadEnter") {
+                        // 按下回车新增
                         handleAdd();
                     } else if (e.code == "Escape") {
                         setValue("");
@@ -131,7 +135,7 @@ function AddInput(props: AddInputProps) {
 function DataSetStringEdit() {
     const { dataSetId } = useParams();
     const dataSetNum = Number(dataSetId);
-    // 数据集查询
+    // 字符串数组-数据集查询
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [dataSetValueList, updateDataSetValueList] = useImmer<Array<DataSetValue>>([]);
     const [dataSet, setDataSet] = useState<DataSet>();
@@ -231,8 +235,8 @@ function DataSetStringEdit() {
                                 data={row}
                                 onChange={(val) => {
                                     updateDataSetValueList((draft) => {
-                                        const item = draft[idx];
-                                        item.item = val;
+                                        const element = draft[idx];
+                                        element.item = val;
                                     });
                                 }}
                                 onUpdate={handleUpdateItem}

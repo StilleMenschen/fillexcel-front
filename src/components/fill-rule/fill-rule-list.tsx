@@ -41,6 +41,7 @@ function FillRuleList() {
     });
 
     useEffect(() => {
+        // 如果分页有变化会重新查询
         handleFillRuleQuery();
     }, [pageObj.number, pageObj.size]);
 
@@ -83,6 +84,7 @@ function FillRuleList() {
                     <Button
                         type="primary"
                         onClick={() => {
+                            // 新增没有 ID
                             editId.current = -1;
                             setOpenEdit(true);
                         }}>
@@ -132,6 +134,7 @@ function FillRuleList() {
                                 <Button
                                     shape="circle"
                                     onClick={() => {
+                                        // 编辑的ID
                                         editId.current = row.id;
                                         setOpenEdit(true);
                                     }}

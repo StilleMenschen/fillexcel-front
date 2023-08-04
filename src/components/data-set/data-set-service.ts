@@ -18,8 +18,14 @@ export interface AddOrUpdateDataSet {
     data_type: string;
 }
 
-// 数据集
-
+/**
+ * 数据集
+ * @param username 用户名
+ * @param description 描述
+ * @param data_type 不同的数据集类型（字典、字符串）
+ * @param page
+ * @param size
+ */
 export function getDataSetList(
     username: string,
     description: string,

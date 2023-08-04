@@ -14,6 +14,12 @@ export interface GenerateRuleParameter {
     updated_at: string;
 }
 
+/**
+ * 生成规则参数
+ * @param rule_id 生成规则ID
+ * @param page
+ * @param size
+ */
 export function getGenerateRuleParameterListByRule(
     rule_id: number,
     page: number,
@@ -22,6 +28,9 @@ export function getGenerateRuleParameterListByRule(
     return httpService.get("/fills/generateRuleParameter", { params: { rule_id, page, size } });
 }
 
+/**
+ * 单个生成规则参数查询
+ */
 export function getGenerateRuleParameterById(id: number): Promise<ResultResponse<Array<GenerateRuleParameter>>> {
     return httpService.get(`/fills/generateRuleParameter/${id}`);
 }

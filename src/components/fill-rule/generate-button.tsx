@@ -34,10 +34,12 @@ function GenerateButton(props: GenerateButtonProps) {
             })
             .catch(() => null)
             .finally(() => {
+                // 提交请求完成后才允许点击
                 setDisabled(false);
             });
     };
 
+    // 根据是否有图标配置来生成不同类型的按钮
     return (
         <>
             {contextHolder}

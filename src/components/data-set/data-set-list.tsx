@@ -36,6 +36,7 @@ function DataSetList() {
     };
 
     useEffect(() => {
+        // 如果分页有变化会重新查询
         handleDataSetQuery();
     }, [pageObj.number, pageObj.size]);
 
@@ -63,6 +64,7 @@ function DataSetList() {
     };
 
     const navigateWhenDataType = (dataType: string, dataSetId: number) => {
+        // 不同的数据类型选择不同的组件处理
         switch (dataType) {
             case "string":
                 navigate(`/dataSet/string/${dataSetId}`);

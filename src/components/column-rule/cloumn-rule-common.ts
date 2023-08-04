@@ -9,8 +9,15 @@ export type ParameterMap = {
     [key: string]: string | number | boolean;
 };
 
+/**
+ * 保存列规则的参数
+ * @param rule 列规则
+ * @param parameterList 生成参数列表
+ * @param values 对应实际配置的参数值
+ */
 export function parallelSaveParameter(rule: ColumnRule, parameterList: Array<GenerateRuleParameter>, values: ParameterMap) {
     if (values["bind_attr_name"]) {
+        // 如果有绑定属性的情况（数据集）
         addDataSetBind({
             data_set_id: Number(values["data_set_id"]),
             column_rule_id: rule.id,
@@ -30,34 +37,35 @@ export function parallelSaveParameter(rule: ColumnRule, parameterList: Array<Gen
                 column_rule_id: rule.id,
                 name: param.name,
                 value: String(val),
+                // 关联数据集的情况需要保存关联的 ID
                 data_set_id: param.name == "data_set_id" ? Number(val) : null
             };
         })
     );
 }
 
+/**
+ * 不同的生成规则有不同的数据类型以及是否有数据关联
+ * @param editForm
+ * @param functionName 生成方法名称
+ */
 export function setTypeAndAssociate(editForm: FormInstance, functionName: string) {
-    const setFormField = (name: string, value: unknown) => {
-        editForm.setFieldValue(name, value);
-    };
-
+    let columnType = "string";
+    let associatedOf = false;
     switch (functionName) {
         case "join_string":
         case "value_list_iter":
         case "associated_fill":
-            setFormField("column_type", "string");
-            setFormField("associated_of", true);
+            associatedOf = true;
             break;
         case "calculate_expressions":
-            setFormField("column_type", "number");
-            setFormField("associated_of", true);
+            columnType = "number";
+            associatedOf = true;
             break;
         case "random_number_iter":
-            setFormField("column_type", "number");
-            setFormField("associated_of", false);
+            columnType = "number";
             break;
-        default:
-            setFormField("column_type", "string");
-            setFormField("associated_of", false);
     }
+    editForm.setFieldValue("column_type", columnType);
+    editForm.setFieldValue("associated_of", associatedOf);
 }

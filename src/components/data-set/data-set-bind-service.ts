@@ -18,6 +18,14 @@ export interface AddOrUpdateDataSetBind {
     data_name: string;
 }
 
+/**
+ * 单元格和字典数据对应字段属性的绑定
+ * @param data_set_id
+ * @param column_rule_id 列规则ID
+ * @param column_name 列名
+ * @param page
+ * @param size
+ */
 export function getDataSetBindList(
     data_set_id: number,
     column_rule_id: number | null,

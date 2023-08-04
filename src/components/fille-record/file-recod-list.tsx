@@ -40,6 +40,7 @@ function DownloadButton(props: DownloadButtonProps) {
                 message.error("文件下载异常，请稍后再试");
             })
             .finally(() => {
+                // 2 秒后才允许再次点击
                 setTimeout(() => {
                     setDisabled(false);
                 }, 2000);
@@ -78,6 +79,7 @@ function FileRecordList() {
     };
 
     useEffect(() => {
+        // 如果分页有变化会重新查询
         handleFileRecordQuery();
     }, [pageObj.number, pageObj.size]);
 

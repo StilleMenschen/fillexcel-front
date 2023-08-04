@@ -14,7 +14,7 @@ const showTotal = (total: number) => `总计 ${total}`;
 function DataSetDictEdit() {
     const { dataSetId } = useParams();
     const dataSetIdNum = Number(dataSetId);
-    // 数据集查询
+    // 字典数组-数据集查询
     const [pageObj, updatePageObj] = useImmer({ number: 1, size: 8, total: 0 });
     const [dataSetValueList, updateDataSetValueList] = useImmer<Array<DataSetValue>>([]);
     const [dataSet, setDataSet] = useState<DataSet>();

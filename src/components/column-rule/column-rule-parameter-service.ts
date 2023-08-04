@@ -20,6 +20,12 @@ export interface AddOrUpdateDataParameter {
     data_set_id: number | null;
 }
 
+/**
+ * 列规则参数（与生成规则的参数是对应的）
+ * @param column_rule_id
+ * @param page
+ * @param size
+ */
 export function getDataParameterListByRule(
     column_rule_id: number | string,
     page: number,

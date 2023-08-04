@@ -23,8 +23,11 @@ export interface AddOrUpdateRequirement {
 }
 
 export interface RequirementQueryParams {
+    // 用户名
     username: string;
+    // 备注
     remark?: string | null;
+    // 原文件名
     original_filename?: string | null;
 }
 
@@ -38,6 +41,12 @@ export interface GenerateFileResult {
     took: number;
 }
 
+/**
+ * 填充要求列表
+ * @param queryParams
+ * @param page
+ * @param size
+ */
 export function getRequirementList(
     queryParams: RequirementQueryParams,
     page: number,
@@ -46,6 +55,10 @@ export function getRequirementList(
     return httpService.get("/fills/requirement", { params: { ...queryParams, page, size } });
 }
 
+/**
+ * 添加填充要求
+ * @param req
+ */
 export function addRequirement(req: AddOrUpdateRequirement): Promise<AxiosResponse<Requirement>> {
     return httpService.post("/fills/requirement", req);
 }
@@ -62,6 +75,11 @@ export function deleteRequirement(id: number) {
     return httpService.delete(`/fills/requirement/${id}`);
 }
 
+/**
+ * 上传填充要求的参考文件，生成的文件基于此文件来填入数据
+ * @param username 用户名
+ * @param file
+ */
 export function uploadRequirementFile(username: string, file: File): Promise<AxiosResponse<FileResult>> {
     const formData = new FormData();
     formData.append("username", username);
@@ -73,6 +91,10 @@ export function uploadRequirementFile(username: string, file: File): Promise<Axi
     });
 }
 
+/**
+ * 按规则生成文件
+ * @param id
+ */
 export function generateFile(id: number): Promise<AxiosResponse<GenerateFileResult>> {
     return httpService.post(`/fills/${id}`);
 }

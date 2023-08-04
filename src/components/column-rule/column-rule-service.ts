@@ -20,6 +20,13 @@ export interface AddOrUpdateColumnRule {
     associated_of: boolean;
 }
 
+/**
+ * 列规则列表
+ * @param requirement_id 填充规则ID
+ * @param page
+ * @param size
+ * @param column_name 列名称
+ */
 export function getColumnRuleListByRequirement(
     requirement_id: number,
     page: number,

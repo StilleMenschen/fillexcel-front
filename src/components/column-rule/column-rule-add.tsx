@@ -30,18 +30,23 @@ function ColumnRuleAdd() {
             message.error("请先选择生成规则");
             return;
         }
+        // 重置处理步骤
         setStepCount(0);
+        // 处理数据过程中不允许编辑
         setSaving(true);
         let parameters = {};
         parameterForm
             .validateFields()
+            // 1-校验参数
             .then((values: ParameterMap) => {
                 setStepCount(1);
                 parameters = values;
+                // 2-保存列规则
                 return addColumnRule({ ...columnRule, requirement_id: Number(fillRuleId), rule_id: generateRuleId });
             })
             .then(({ data }) => {
                 setStepCount(2);
+                // 3-保存参数，关联列规则
                 return parallelSaveParameter(data, generateRuleParameterList, parameters);
             })
             .then(() => {
@@ -61,6 +66,7 @@ function ColumnRuleAdd() {
         getGenerateRuleParameterListByRule(ruleId, 1, 16)
             .then(({ data }) => {
                 setGenerateRuleParameterList(data.data);
+                // 查询完成后再设置生成规则以触发参数选择的组件重新渲染
                 setGenerateRule(item);
             })
             .catch(() => null);

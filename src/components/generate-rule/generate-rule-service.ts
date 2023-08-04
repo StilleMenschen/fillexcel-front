@@ -10,10 +10,16 @@ export interface GenerateRule {
     updated_at?: string;
 }
 
+/**
+ * 生成规则列表
+ */
 export function getGenerateRuleList(page: number, size: number): Promise<ResultResponse<Array<GenerateRule>>> {
     return httpService.get("/fills/generateRule", { params: { page, size } });
 }
 
+/**
+ * 单个生成规则数据
+ */
 export function getGenerateRule(id: number): Promise<GenerateRule> {
     return httpService.get(`/fills/generateRule/${id}`);
 }

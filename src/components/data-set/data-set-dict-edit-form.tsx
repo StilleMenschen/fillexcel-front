@@ -25,6 +25,7 @@ function DataSetDictEditForm(props: DataSetDictEditFormProps) {
 
     useEffect(() => {
         if (props.editId <= 0) return;
+        // 如果是编辑加载原数据
         getDataSetValue(props.editId)
             .then(({ data }) => {
                 editForm.setFieldsValue(JSON.parse(data.item));
@@ -43,7 +44,7 @@ function DataSetDictEditForm(props: DataSetDictEditFormProps) {
         if (props.editId <= 0) {
             addDataSetValue({
                 data_set_id: dataSetIdNum,
-                item: JSON.stringify(data),
+                item: JSON.stringify(data), // 转为 JSON 字符串
                 data_type: "dict"
             })
                 .then(() => {
@@ -54,7 +55,7 @@ function DataSetDictEditForm(props: DataSetDictEditFormProps) {
         } else {
             updateDataSetValue(props.editId, {
                 data_set_id: dataSetIdNum,
-                item: JSON.stringify(data),
+                item: JSON.stringify(data), // 转为 JSON 字符串
                 data_type: "dict"
             })
                 .then(() => {

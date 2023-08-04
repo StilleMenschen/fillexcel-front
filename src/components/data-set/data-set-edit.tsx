@@ -20,6 +20,7 @@ function DataSetEdit(props: EditProps) {
 
     useEffect(() => {
         if (props.editId <= 0) return;
+        // 如果是编辑需要加载原数据
         getDataSet(props.editId)
             .then(({ data }) => {
                 loadDataDefine(data.data_type);
@@ -31,6 +32,7 @@ function DataSetEdit(props: EditProps) {
     }, [props.editId]);
 
     const loadDataDefine = (dateType: string) => {
+        // 不是字典类型不需要加载字段属性定义
         if (props.editId <= 0 || dateType != "dict") return;
         getDataSetDefineList(props.editId, 1, 64)
             .then(({ data }) => {
@@ -41,6 +43,7 @@ function DataSetEdit(props: EditProps) {
     };
 
     const validateDataDefine = (dateType: string) => {
+        // 不是字典类型不需要校验
         if (dateType != "dict") return true;
         const defines = editForm.getFieldValue("data_define") as string;
         const names = defines.split(",");
@@ -53,6 +56,7 @@ function DataSetEdit(props: EditProps) {
     };
 
     const saveDataDefine = (dataSetId: number, dateType: string) => {
+        // 不是字典类型不需要保存定义
         if (dataSetId <= 0 || dateType != "dict") return Promise.resolve(undefined);
         const defines = editForm.getFieldValue("data_define") as string;
         const defineList: Array<AddOrUpdateDataSetDefine> = defines.split(",").map((name) => ({
@@ -73,6 +77,7 @@ function DataSetEdit(props: EditProps) {
         if (!validateDataDefine(data.data_type)) {
             return;
         }
+        // 处理数据过程中不允许编辑
         setSaving(true);
         if (props.editId <= 0) {
             addDataSet({ ...data, username })
@@ -142,21 +147,23 @@ function DataSetEdit(props: EditProps) {
                         onChange={(value) => setShowDataType(value == "dict")}
                     />
                 </Form.Item>
-                {showDataType && (
-                    <Form.Item
-                        label="数据定义"
-                        name="data_define"
-                        rules={[
-                            { pattern: /^[a-zA-Z]+(,[a-zA-Z]+)*$/g, message: "字段属性以英文单词表示，多个以英文逗号隔开" }
-                        ]}>
-                        <Input.TextArea
-                            autoSize={{ minRows: 2, maxRows: 8 }}
-                            showCount
-                            maxLength={512}
-                            placeholder="请输入数据定义（字段属性以英文单词表示，多个以英文逗号隔开）"
-                        />
-                    </Form.Item>
-                )}
+                {
+                    /* 字典类型需要设置字段属性 */ showDataType && (
+                        <Form.Item
+                            label="数据定义"
+                            name="data_define"
+                            rules={[
+                                { pattern: /^[a-zA-Z]+(,[a-zA-Z]+)*$/g, message: "字段属性以英文单词表示，多个以英文逗号隔开" }
+                            ]}>
+                            <Input.TextArea
+                                autoSize={{ minRows: 2, maxRows: 8 }}
+                                showCount
+                                maxLength={512}
+                                placeholder="请输入数据定义（字段属性以英文单词表示，多个以英文逗号隔开）"
+                            />
+                        </Form.Item>
+                    )
+                }
                 <Form.Item>
                     <Button block size="large" type="primary" htmlType="submit">
                         保存

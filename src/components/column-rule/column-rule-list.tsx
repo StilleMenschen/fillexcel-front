@@ -46,6 +46,7 @@ function ColumnRuleList() {
     }, []);
 
     useEffect(() => {
+        // 如果分页有变化会重新查询
         handleColumnRuleQuery();
     }, [pageObj.number, pageObj.size]);
 

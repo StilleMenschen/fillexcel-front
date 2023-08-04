@@ -8,6 +8,7 @@ export interface GenerateRuleSelectProp {
 }
 
 function GenerateRuleSelect(props: GenerateRuleSelectProp) {
+    // 自定义外部管理的生成规则
     const { generateRuleList } = useGenerateRuleMap();
 
     return (

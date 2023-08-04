@@ -40,6 +40,7 @@ function FillRuleEdit(props: EditProps) {
 
     useEffect(() => {
         if (props.editId <= 0) return;
+        // 如果是编辑，则加载待编辑的数据
         getRequirement(props.editId)
             .then(({ data }) => {
                 const { id, file_id, original_filename, remark, start_line, line_number } = data;
@@ -69,6 +70,7 @@ function FillRuleEdit(props: EditProps) {
             start_line: data.start_line,
             line_number: data.line_number
         };
+        // 处理数据过程中不允许编辑
         setSaving(true);
         if (props.editId <= 0) {
             addRequirement(formData)

@@ -33,6 +33,7 @@ function DataSetSmallList(props: DataSetSmallListProps) {
     };
 
     useEffect(() => {
+        // 如果分页有变化会重新查询
         handleDataSetQuery();
     }, [pageObj.number, pageObj.size]);
 

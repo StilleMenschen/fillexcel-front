@@ -1,8 +1,6 @@
 import { AxiosResponse } from "axios";
 import { httpService, ResultResponse } from "../../http";
 
-// 数据集列表
-
 export interface DataSetValue {
     id: number;
     data_set_id: number;
@@ -18,8 +16,12 @@ export interface AddOrUpdateDataSetValue {
     data_type: string;
 }
 
-// 数据集列表
-
+/**
+ * 字符串数组-数据集列表
+ * @param data_set_id
+ * @param page
+ * @param size
+ */
 export function getDataSetValueList(
     data_set_id: number,
     page: number,

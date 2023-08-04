@@ -1,8 +1,6 @@
 import { AxiosResponse } from "axios";
 import { httpService, ResultResponse } from "../../http";
 
-// 字典数据集
-
 export interface DataSetDefine {
     id: number;
     data_set_id: number;
@@ -18,8 +16,12 @@ export interface AddOrUpdateDataSetDefine {
     data_type: string;
 }
 
-// 字典数据集定义
-
+/**
+ * 字典数组-数据集列表
+ * @param data_set_id
+ * @param page
+ * @param size
+ */
 export function getDataSetDefineList(
     data_set_id: number,
     page: number,

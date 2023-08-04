@@ -30,24 +30,29 @@ function ColumnRuleEdit() {
     const [stepCount, setStepCount] = useState(0);
 
     useEffect(() => {
+        // 编辑的情况下需要查询原数据
         const crId = Number(columnRuleId);
         let genRuleId = -1;
         getColumnRule(crId)
+            // 查询列规则
             .then(({ data }) => {
                 setColumnRule(data);
                 editForm.setFieldValue("column_name", data.column_name);
                 editForm.setFieldValue("column_type", data.column_type);
                 editForm.setFieldValue("associated_of", data.associated_of);
                 genRuleId = data.rule_id;
+                // 查询列规则的参数
                 return getDataParameterListByRule(crId, 1, 16);
             })
             .then(({ data }) => {
                 setDataParameterList(data.data);
+                // 查询生成规则的参数
                 return getGenerateRuleParameterListByRule(genRuleId, 1, 16);
             })
             .then(({ data }) => {
                 setGenerateRuleParameterList(data.data);
                 setGenerateRuleId(genRuleId);
+                // 查询完成后再设置生成规则以触发参数选择的组件重新渲染
                 setGenerateRule(generateRuleMap[genRuleId]);
             })
             .catch(() => null);
@@ -63,14 +68,17 @@ function ColumnRuleEdit() {
         let parameters = {};
         parameterForm
             .validateFields()
+            // 1-校验参数
             .then((values: ParameterMap) => {
                 setStepCount(1);
                 parameters = values;
                 const crId = Number(columnRuleId);
+                // 2-保存列规则
                 return updateColumnRule(crId, { ...columnRule, requirement_id: Number(fillRuleId), rule_id: generateRuleId });
             })
             .then(({ data }) => {
                 setStepCount(2);
+                // 3-保存参数，关联列规则
                 return parallelSaveParameter(data, generateRuleParameterList, parameters);
             })
             .then(() => {
@@ -90,6 +98,7 @@ function ColumnRuleEdit() {
         getGenerateRuleParameterListByRule(ruleId, 1, 16)
             .then(({ data }) => {
                 setGenerateRuleParameterList(data.data);
+                // 查询完成后再设置生成规则以触发参数选择的组件重新渲染
                 setGenerateRule(item);
             })
             .catch(() => null);

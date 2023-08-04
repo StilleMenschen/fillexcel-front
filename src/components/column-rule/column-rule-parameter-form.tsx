@@ -18,7 +18,10 @@ interface ColumnRuleParameterFormProps {
     dataParameterList?: Array<DataParameter>;
     generateRuleParameterList: Array<GenerateRuleParameter>;
 }
-// 额外的校验规则
+
+/**
+ * 除了必填之外，增加额外的校验规则
+ */
 const extraRuleMap = new Map<string, Array<Rule>>([
     ["join_string.columns", [{ pattern: /^[A-Z]+(,[A-Z]+)*$/g, message: "必须是大写字母表示的列，以英文逗号分隔" }]],
     ["calculate_expressions.expressions", [{ pattern: /^[0-9A-Z-+*/.{}() ]+$/g, message: "请输入有效的计算表达式" }]],
@@ -27,7 +30,9 @@ const extraRuleMap = new Map<string, Array<Rule>>([
     ["random_number_iter.start", [{ type: "number", min: 1, max: 65535, message: "请输入大于1-65535之间的数字" }]],
     ["random_number_iter.stop", [{ type: "number", min: 1, max: 65535, message: "请输入大于1-65535之间的数字" }]]
 ]);
-
+/**
+ * 关联的数据处理方式不同
+ */
 const specialFunctionNameSet = new Set(["associated_fill", "value_list_iter"]);
 
 function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
@@ -66,8 +71,10 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
         }
     };
 
+    /**
+     * 没有给默认参数或者不是原来设置的生成规则不填入默认参数
+     */
     const notFirstSetRule = () => {
-        // 没有给默认参数或者不是原来设置的生成规则不填入默认参数
         return props.columnRule?.rule_id == props.generateRule?.id;
     };
 
@@ -82,6 +89,7 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
     const setParameters = (generateRuleParameters: Array<GenerateRuleParameter>, dataParameters?: Array<DataParameter>) => {
         const form = props.parameterForm;
         if (dataParameters) {
+            // 编辑的情况下处理填入原数据
             if (notFirstSetRule()) {
                 const previousDataMap = new Map();
                 dataParameters.forEach((param) => {
@@ -102,6 +110,7 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
         generateRuleParameters.forEach((grp) => {
             const val = grp.default_value;
             if (val && val != "") {
+                // 根据数据类型转换
                 switch (grp.data_type) {
                     case "boolean":
                         form.setFieldValue(grp.name, val == "true");
@@ -117,6 +126,7 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
     };
 
     useEffect(() => {
+        // 如果生成规则重新选择会重新设置参数
         setParameters(props.generateRuleParameterList, props.dataParameterList);
     }, [props.generateRule]);
 
@@ -130,6 +140,11 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
         queryDataSetDefineList(dataSet.id);
     };
 
+    /**
+     * 渲染关联数据集的规则
+     * @param ruleFunctionName
+     * @param parameter
+     */
     const renderSpecialItem = (ruleFunctionName: string, parameter: GenerateRuleParameter) => {
         const itemAttr = {
             key: parameter.id,
@@ -138,6 +153,7 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
             name: parameter.name
         };
         switch (ruleFunctionName) {
+            // 字符串数组
             case "value_list_iter":
                 return (
                     <Form.Item
@@ -160,6 +176,7 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
                         </Typography.Text>
                     </Form.Item>
                 );
+            // 字典数组
             case "associated_fill":
                 return (
                     <Fragment key="associated_fill">
@@ -210,11 +227,12 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
             extra: parameter.hints,
             name: parameter.name
         };
-        // 根据规则名称补充校验
         const ruleKey = `${ruleFunctionName}.${parameter.name}`;
         const extraRule = extraRuleMap.get(ruleKey) || [];
+        // 根据规则名称补充校验
         const rules = [{ required: parameter.required, message: "请填写该值" }, ...extraRule];
         switch (parameter.data_type) {
+            // 按数据类型渲染组件
             case "string":
                 return (
                     <Form.Item {...itemAttr} rules={rules}>
@@ -241,8 +259,10 @@ function ColumnRuleParameterForm(props: ColumnRuleParameterFormProps) {
     const formItemList = props.generateRuleParameterList.map((parameter) => {
         const ruleFunctionName = String(props.generateRule?.function_name);
         if (specialFunctionNameSet.has(ruleFunctionName)) {
+            // 关联数据集的规则
             return renderSpecialItem(ruleFunctionName, parameter);
         } else {
+            // 无关联数据的规则
             return renderNormalItem(ruleFunctionName, parameter);
         }
     });
